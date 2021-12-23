@@ -58,6 +58,12 @@ namespace Tiled2ZXNext
                             full.Append(tiledData.WriteLayer(layer, compress));
                         }
                     }
+                    full.Append(fileName);
+                    full.Append("_eof\r\n");
+                    full.Append("\t\tdb $");
+                    full.Append(255.ToString("X2"));
+                    full.Append("\t\t; end of file\r\n");
+
 
                     fileName = Path.ChangeExtension(fileName, extension);
                     string fullPath = Path.Combine(outputPath, fileName);

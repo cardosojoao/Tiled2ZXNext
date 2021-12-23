@@ -68,6 +68,8 @@ namespace Tiled2ZXNext
 
         private static List<StringBuilder> WriteTiledLayerCompress(Layer layer)
         {
+            int lengthData = 0;
+            StringBuilder headerType = new StringBuilder(200);
             StringBuilder header = new StringBuilder(100);
             StringBuilder data = new StringBuilder(1024);
             List<StringBuilder> output = new List<StringBuilder>() { header, data };
@@ -79,16 +81,28 @@ namespace Tiled2ZXNext
 
             //GroupType += 16;                                    // compress format
 
-            header.Append("\t\tdb $");
-            header.Append(GroupType.ToString("X2"));
-            header.Append("\t\t; data type\r\n");
+            headerType.Append("\t\tdb $");
+            headerType.Append(GroupType.ToString("X2"));
+            headerType.Append("\t\t; data type\r\n");
 
             for (int row = 0; row < layer.Height; row++)        // loop all rows of tiled map
             {
-                header.Append("\t\tdw %");
+                
 
                 for (int col = 0; col < layer.Width; col++)     // loop all columns of row
                 {
+                    if (col == 0)
+                    {
+                        header.Append("\t\tdb %");
+                        lengthData++;
+                    }
+
+                    if (col == 8)
+                    {
+                        header.Append(",%");
+                        lengthData++;
+                    }
+
                     int tileID = layer.Data[index];             // get tileId
                     index++;
                     if (tileID > 0)                             // if  tileId > 0 is a valid tile
@@ -96,15 +110,18 @@ namespace Tiled2ZXNext
                         // Sprites are 0 based
                         tileID--;
                         header.Append('1');                     // set tile active in header
+                        
                         if (colOut == 0)
                         {   // first element must initiate
                             data.Append("\t\tdb $");
                             data.Append(tileID.ToString("X2"));
+                            lengthData++;
                         }
                         else
                         {   // column separator and value
                             data.Append(",$");
                             data.Append(tileID.ToString("X2"));
+                            lengthData++;
                         }
                         colOut++;
                         // max tiles per line 8
@@ -122,20 +139,28 @@ namespace Tiled2ZXNext
                 header.Append("\r\n");
             }
             data.Append("\r\n");                                // last line of data, add new line
+            
+            headerType.Append("\t\tdb $");
+            headerType.Append(lengthData.ToString("X2"));
+            headerType.Append("\t\t; Block size\r\n");
+            // insert header at begin
+            header.Insert(0, headerType);
             return output;
         }
 
         private static List<StringBuilder> WriteTiledLayerRaw(Layer layer)
         {
+            int lengthData = 0;
             StringBuilder data = new StringBuilder(1024);
+            StringBuilder headerType = new StringBuilder(200);
             StringBuilder header = new StringBuilder(100);
             List<StringBuilder> output = new List<StringBuilder>() { header, data };
 
             int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), false);
 
-            header.Append("\t\tdb $");
-            header.Append(GroupType.ToString("X2"));
-            header.Append("\t\t; data type\r\n");
+            headerType.Append("\t\tdb $");
+            headerType.Append(GroupType.ToString("X2"));
+            headerType.Append("\t\t; data type\r\n");
 
             // raw format
             int index = 0;
@@ -160,10 +185,16 @@ namespace Tiled2ZXNext
                     }
 
                     data.Append(tileId.ToString("X2"));
+                    lengthData ++;
                     index++;
                 }
                 data.Append("\r\n");
             }
+            headerType.Append("\t\tdb $");
+            headerType.Append(lengthData.ToString("X2"));
+            headerType.Append("\t\t; Block size\r\n");
+            // insert header at begin
+            header.Insert(0, headerType);
             return output;
         }
 
@@ -205,19 +236,23 @@ namespace Tiled2ZXNext
         /// <returns></returns>
         public static List<StringBuilder> WriteObjectsLayerRaw(Layer layer)
         {
+            int lengthData = 0;
             StringBuilder data = new StringBuilder(500);
+            StringBuilder headerType = new StringBuilder(500);
             StringBuilder header = new StringBuilder(500);
             List<StringBuilder> output = new List<StringBuilder>() { header, data };
 
-            int GroupType = GetPropertyInt(layer.Properties, "Type");
-            header.Append("\t\tdb $");
-            header.Append(GroupType.ToString("X2"));
-            header.Append("\t\t; data type\r\n");
+            // int GroupType = GetPropertyInt(layer.Properties, "Type");
+            int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), false);
+
+            headerType.Append("\t\tdb $");
+            headerType.Append(GroupType.ToString("X2"));
+            headerType.Append("\t\t; data type\r\n");
 
             header.Append("\t\tdb $");
             header.Append(layer.Objects.Count.ToString("X2"));
             header.Append("\t\t; Objects count\r\n");
-
+            lengthData++;
 
             data.Append("\t\t; X, Y, Width, Height, ObjectType, Layer, EventsID\r\n");
             foreach (Object obj in layer.Objects)
@@ -244,14 +279,21 @@ namespace Tiled2ZXNext
                 data.Append(",$");
                 data.Append(Double2Hex(EventsID));
                 data.Append("\r\n");
-
+                lengthData += 7;
             }
+            headerType.Append("\t\tdb $");
+            headerType.Append(lengthData.ToString("X2"));
+            headerType.Append("\t\t; Block size\r\n");
+            // insert header at begin
+            header.Insert(0, headerType);
             return output;
         }
 
         public static List<StringBuilder> WriteObjectsLayerCompress(Layer layer)
         {
+            int lengthData = 0; 
             StringBuilder data = new StringBuilder(1024);
+            StringBuilder headerType = new StringBuilder(200);
             StringBuilder header = new StringBuilder(200);
             List<StringBuilder> output = new List<StringBuilder>() { header, data };
 
@@ -259,12 +301,14 @@ namespace Tiled2ZXNext
             int layerId = GetPropertyInt(layer.Properties, "Layer");
             int ObjectType = GetPropertyInt(layer.Properties, "ObjectType");
             int EventsID = GetPropertyInt(layer.Properties, "EventsConfig");
-            int GroupType = GetPropertyInt(layer.Properties, "Type");
+            //int GroupType = GetPropertyInt(layer.Properties, "Type");
 
 
-            header.Append("\t\tdb $");
-            header.Append(GroupType.ToString("X2"));
-            header.Append("\t\t; data type\r\n");
+            int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), true);
+
+            headerType.Append("\t\tdb $");
+            headerType.Append(GroupType.ToString("X2"));
+            headerType.Append("\t\t; data type\r\n");
 
             layerMask *= 16 + layerId;
             header.Append("\t\tdb $");
@@ -279,6 +323,8 @@ namespace Tiled2ZXNext
             header.Append("\t\tdb $");
             header.Append(layer.Objects.Count.ToString("X2"));
             header.Append("\t\t; Objects count\r\n");
+            
+            lengthData += 4;
 
             if (layer.Name == "Collision")
             {
@@ -298,13 +344,20 @@ namespace Tiled2ZXNext
                 data.Append(Double2Hex(obj.Width));
                 data.Append(",$");
                 data.Append(Double2Hex(obj.Height));
+                lengthData += 4;
                 if (obj.Gid != null)
                 {
                     data.Append(",$");
                     data.Append(Double2Hex((int)obj.Gid));
+                    lengthData++;
                 }
                 data.Append("\r\n");
             }
+            headerType.Append("\t\tdb $");
+            headerType.Append(lengthData.ToString("X2"));
+            headerType.Append("\t\t; Block size\r\n");
+            // insert header at begin
+            header.Insert(0, headerType);
             return output;
         }
 
@@ -316,7 +369,9 @@ namespace Tiled2ZXNext
         /// <returns></returns>
         public static List<StringBuilder> WriteObjectsLayerCompress2(Layer layer)
         {
+            int lengthData = 0;
             StringBuilder data = new StringBuilder(1024);
+            StringBuilder headerType = new StringBuilder(200);
             StringBuilder header = new StringBuilder(200);
             List<StringBuilder> output = new List<StringBuilder>() { header, data };
 
@@ -324,12 +379,13 @@ namespace Tiled2ZXNext
             int layerId = GetPropertyInt(layer.Properties, "Layer");
             int ObjectType = GetPropertyInt(layer.Properties, "ObjectType");
             int EventsID = GetPropertyInt(layer.Properties, "EventsConfig");
-            int GroupType = GetPropertyInt(layer.Properties, "Type");
+            //int GroupType = GetPropertyInt(layer.Properties, "Type");
 
+            int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), true);
 
-            header.Append("\t\tdb $");
-            header.Append(GroupType.ToString("X2"));
-            header.Append("\t\t; data type\r\n");
+            headerType.Append("\t\tdb $");
+            headerType.Append(GroupType.ToString("X2"));
+            headerType.Append("\t\t; data type\r\n");
 
             layerMask *= 16 + layerId;
             header.Append("\t\tdb $");
@@ -344,14 +400,14 @@ namespace Tiled2ZXNext
             header.Append("\t\tdb $");
             header.Append((layer.Objects.Count / 2).ToString("X2"));
             header.Append("\t\t; Objects count\r\n");
-
+            lengthData += 4;
             if (layer.Name == "Collision")
             {
                 data.Append("\t\t; X, Y, Width, Height\r\n");
             }
             else
             {
-                data.Append("\t\t; X, Y, Width, Height, Gid\r\n");
+                data.Append("\t\t; X, Y, Width, Height, offsetX, offsetY, size, Gid\r\n");
             }
 
             int objType = 0; // object
@@ -373,6 +429,7 @@ namespace Tiled2ZXNext
                     data.Append(Double2Hex(obj.Height));
                     cacheObject = obj;
                     objType = 1;        // sprite
+                    lengthData += 4;
                 }
                 else
                 {
@@ -386,9 +443,16 @@ namespace Tiled2ZXNext
                     data.Append(Double2Hex((int)obj.Gid));
                     data.Append("\r\n");
                     objType = 0;        // object
+                    lengthData += 4;
                 }
 
             }
+            headerType.Append("\t\tdb $");
+            headerType.Append(lengthData.ToString("X2"));
+            headerType.Append("\t\t; Block size\r\n");
+            // insert header at begin
+            header.Insert(0, headerType);
+
             return output;
         }
 
