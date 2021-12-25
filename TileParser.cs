@@ -82,6 +82,7 @@ namespace Tiled2ZXNext
             StringBuilder header = new (100);
             StringBuilder data = new (1024);
             List<StringBuilder> output = new () { header, data };
+            List<int> spriteSheets = new();
 
             int colOut = 0;     // row output not the same row of tiled map
             int index = 0;      // index of tiled map 
@@ -93,11 +94,11 @@ namespace Tiled2ZXNext
             headerType.Append("\t\tdb $");
             headerType.Append(GroupType.ToString("X2"));
             headerType.Append("\t\t; data type\r\n");
+            
+
 
             for (int row = 0; row < layer.Height; row++)        // loop all rows of tiled map
             {
-
-
                 for (int col = 0; col < layer.Width; col++)     // loop all columns of row
                 {
                     if (col == 0)
@@ -117,7 +118,10 @@ namespace Tiled2ZXNext
                     if (tileID > 0)                             // if  tileId > 0 is a valid tile
                     {   // tile active
                         // Sprites are 0 based
-                        tileID= GetParsedGid(tileID);
+                        var gidData = GetParsedGid(tileID);
+                        SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
+                        
+                        tileID = gidData.gid;
                         tileID--;
                         header.Append('1');                     // set tile active in header
 
@@ -150,9 +154,25 @@ namespace Tiled2ZXNext
             }
             data.Append("\r\n");                                // last line of data, add new line
 
+            // increase sprite data size  by 1 to include the sprite sheet code
+            lengthData++;
+
             headerType.Append("\t\tdb $");
             headerType.Append(lengthData.ToString("X2"));
             headerType.Append("\t\t; Block size\r\n");
+
+            // get first sprite sheet code
+            int spriteSheetID = spriteSheets[0];
+
+            headerType.Append("\t\tdb $");
+            headerType.Append(spriteSheetID.ToString("X2"));
+            headerType.Append("\t\t; Sprite Sheet ID\r\n");
+
+            if(spriteSheets.Count > 1)
+            {
+                Console.Error.WriteLine("Multiple sprite sheets in block " + layer.Name);
+            }
+
             // insert header at begin
             header.Insert(0, headerType);
             return output;
@@ -165,6 +185,7 @@ namespace Tiled2ZXNext
             StringBuilder headerType = new (200);
             StringBuilder header = new (100);
             List<StringBuilder> output = new () { header, data };
+            List<int> spriteSheets = new();
 
             int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), false);
 
@@ -191,7 +212,10 @@ namespace Tiled2ZXNext
                     }
                     else
                     {
-                        tileId = GetParsedGid(tileId);     // tile index is 0 based
+                        var gidData = GetParsedGid(tileId);     // tile index is 0 based
+                        SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
+                        
+                        tileId = gidData.gid;
                         tileId--;
                     }
 
@@ -201,9 +225,24 @@ namespace Tiled2ZXNext
                 }
                 data.Append("\r\n");
             }
+            lengthData++;
+
             headerType.Append("\t\tdb $");
             headerType.Append(lengthData.ToString("X2"));
             headerType.Append("\t\t; Block size\r\n");
+
+            // get first sprite sheet code
+            int spriteSheetID = spriteSheets[0];
+
+            headerType.Append("\t\tdb $");
+            headerType.Append(spriteSheetID.ToString("X2"));
+            headerType.Append("\t\t; Sprite Sheet ID\r\n");
+
+            if (spriteSheets.Count > 1)
+            {
+                Console.Error.WriteLine("Multiple sprite sheets in block " + layer.Name);
+            }
+
             // insert header at begin
             header.Insert(0, headerType);
             return output;
@@ -307,6 +346,7 @@ namespace Tiled2ZXNext
             StringBuilder headerType = new (200);
             StringBuilder header = new (200);
             List<StringBuilder> output = new () { header, data };
+            List<int> spriteSheets = new();
 
             int layerMask = GetPropertyInt(layer.Properties, "LayerMask");
             int layerId = GetPropertyInt(layer.Properties, "Layer");
@@ -358,15 +398,39 @@ namespace Tiled2ZXNext
                 lengthData += 4;
                 if (obj.Gid != null)
                 {
+                    var gidData = GetParsedGid((int)obj.Gid);
+                    SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
+
                     data.Append(",$");
-                    data.Append(Double2Hex((int)GetParsedGid((int)obj.Gid)));
+                    data.Append(Double2Hex(gidData.gid));
                     lengthData++;
                 }
                 data.Append("\r\n");
             }
+
+            if(spriteSheets.Count > 0)
+            {
+                lengthData++;
+            }
+
             headerType.Append("\t\tdb $");
             headerType.Append(lengthData.ToString("X2"));
             headerType.Append("\t\t; Block size\r\n");
+
+            if (spriteSheets.Count > 0)
+            {
+                // get first sprite sheet code
+                int spriteSheetID = spriteSheets[0];
+
+                headerType.Append("\t\tdb $");
+                headerType.Append(spriteSheetID.ToString("X2"));
+                headerType.Append("\t\t; Sprite Sheet ID\r\n");
+
+                if (spriteSheets.Count > 1)
+                {
+                    Console.Error.WriteLine("Multiple sprite sheets in block " + layer.Name);
+                }
+            }
             // insert header at begin
             header.Insert(0, headerType);
             return output;
@@ -385,6 +449,7 @@ namespace Tiled2ZXNext
             StringBuilder headerType = new (200);
             StringBuilder header = new (200);
             List<StringBuilder> output = new () { header, data };
+            List<int> spriteSheets = new();
 
             int layerMask = GetPropertyInt(layer.Properties, "LayerMask");
             int layerId = GetPropertyInt(layer.Properties, "Layer");
@@ -444,6 +509,9 @@ namespace Tiled2ZXNext
                 }
                 else
                 {
+                    var gidData = GetParsedGid((int)obj.Gid);
+                    SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
+
                     data.Append(",$");
                     data.Append(Double2Hex(ParentChildoffset(cacheObject.X, obj.X)));
                     data.Append(",$");
@@ -451,16 +519,33 @@ namespace Tiled2ZXNext
                     data.Append(",$");
                     data.Append(Double2Hex(SpriteSize(obj.Width, obj.Height)));
                     data.Append(",$");
-                    data.Append(Double2Hex(GetParsedGid((int)obj.Gid)));
+                    data.Append(Double2Hex(gidData.gid));
                     data.Append("\r\n");
                     objType = 0;        // object
                     lengthData += 4;
                 }
 
             }
+
+            lengthData++;
+
             headerType.Append("\t\tdb $");
             headerType.Append(lengthData.ToString("X2"));
             headerType.Append("\t\t; Block size\r\n");
+
+            // get first sprite sheet code
+            int spriteSheetID = spriteSheets[0];
+
+            headerType.Append("\t\tdb $");
+            headerType.Append(spriteSheetID.ToString("X2"));
+            headerType.Append("\t\t; Sprite Sheet ID\r\n");
+
+            if (spriteSheets.Count > 1)
+            {
+                Console.Error.WriteLine("Multiple sprite sheets in block " + layer.Name);
+            }
+
+
             // insert header at begin
             header.Insert(0, headerType);
 
@@ -590,17 +675,37 @@ namespace Tiled2ZXNext
             return size;
         }
 
-        private int GetParsedGid(int gid)
+        /// <summary>
+        /// resolve GID by set gid to index of specific sprite sheet
+        /// </summary>
+        /// <param name="gid">Tiled sprite GID</param>
+        /// <returns>tupple with gid and sprite sheet converted</returns>
+        private (int gid, int spriteSheet) GetParsedGid(int gid)
         {
+            int spriteSheet = 0;
             foreach (Tileset tileSet in this.Tilesets)
             {
                 if (gid >= tileSet.Firstgid && gid <= tileSet.Lastgid)
                 {
                     gid -= tileSet.Parsedgid;
+                    spriteSheet = tileSet.SpriteSheetID;
                     break;
                 }
             }
-            return gid;
+            return (gid, spriteSheet);
+        }
+
+        /// <summary>
+        /// keep track of all different Sprite sheets where used in the current block
+        /// </summary>
+        /// <param name="spriteSheets">collection of used sprite sheets</param>
+        /// <param name="spriteSheetID">current sprite sheet ID</param>
+        private void SpriteSheetsBlock( List<int> spriteSheets, int spriteSheetID)
+        {
+            if(!spriteSheets.Exists( i => i == spriteSheetID))
+            {
+                spriteSheets.Add(spriteSheetID);
+            }
         }
 
     }

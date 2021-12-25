@@ -28,6 +28,9 @@
 
         private byte columnsField;
 
+        private TilesetTileProperty[] propertiesField;
+
+
         /// <remarks/>
         public TilesetImage image
         {
@@ -149,6 +152,20 @@
             set
             {
                 this.columnsField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayItemAttribute("property", IsNullable = false)]
+        public TilesetTileProperty[] properties
+        {
+            get
+            {
+                return propertiesField;
+            }
+            set
+            {
+                propertiesField = value;
             }
         }
     }

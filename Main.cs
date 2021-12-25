@@ -29,7 +29,7 @@ namespace Tiled2ZXNext
 
             ResolveTileSets(tiledData.Tilesets);
 
-            StringBuilder full = new (2048);
+            StringBuilder full = new(2048);
             string fileName = TiledParser.GetProperty(tiledData.Properties, "FileName");
             string extension = "asm";
 
@@ -65,8 +65,8 @@ namespace Tiled2ZXNext
 
         private void ResolveTileSets(List<Tileset> tileSets)
         {
-            Dictionary<string, List<Tileset>> resolved = new ();
-            Dictionary<string, tileset> tilesSetData = new ();
+            Dictionary<string, List<Tileset>> resolved = new();
+            Dictionary<string, tileset> tilesSetData = new();
 
             foreach (Tileset tileSet in tileSets)
             {
@@ -77,24 +77,31 @@ namespace Tiled2ZXNext
                 if (!resolved.ContainsKey(tileSetData.image.source))
                 {
                     resolved.Add(tileSetData.image.source, new List<Tileset>());
-                    tilesSetData.Add(tileSetData.image.source,tileSetData);
+                    tilesSetData.Add(tileSetData.image.source, tileSetData);
                 }
                 resolved[tileSetData.image.source].Add(tileSet);
             }
 
-            foreach( KeyValuePair<string, List<Tileset>> sets in resolved)
+            foreach (KeyValuePair<string, List<Tileset>> sets in resolved)
             {
-                foreach(Tileset set in sets.Value)
+                foreach (Tileset set in sets.Value)
                 {
-                    //tileset tileSetData = tilesSetData[sets.Key];
+                    tileset tileSetData = tilesSetData[sets.Key];
                     set.Parsedgid = set.Firstgid - 1;
+                    // set sprite sheet id
+                    set.SpriteSheetID = int.Parse( GetTileSetProperty(tileSetData.properties, "SpriteSheetID"));
                 }
             }
         }
 
+        /// <summary>
+        /// load tile set and deserialize into collection of objects
+        /// </summary>
+        /// <param name="pathFile"></param>
+        /// <returns></returns>
         private static tileset ReadTileSet(string pathFile)
         {
-            XmlSerializer serializer = new (typeof(tileset));
+            XmlSerializer serializer = new(typeof(tileset));
             tileset tileSet;
             using (Stream reader = new FileStream(pathFile, FileMode.Open))
             {
@@ -102,6 +109,26 @@ namespace Tiled2ZXNext
                 tileSet = (tileset)serializer.Deserialize(reader);
             }
             return tileSet;
+        }
+
+        /// <summary>
+        /// get the sprite sheet id from tileset
+        /// </summary>
+        /// <param name="properties">collection of properties</param>
+        /// <param name="name">property name</param>
+        /// <returns>property value or empty if not found</returns>
+        private static string GetTileSetProperty(TilesetTileProperty[] properties, string name)
+        {
+            string value = string.Empty;
+            foreach (TilesetTileProperty prop in properties)
+            {
+                if(prop.name.ToLower() == name.ToLower())
+                {
+                    value = prop.value;
+                    break;
+                }
+            }
+            return value;
         }
     }
 }

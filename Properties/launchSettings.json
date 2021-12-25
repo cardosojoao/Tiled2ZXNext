@@ -2,7 +2,7 @@
   "profiles": {
     "Tiled2ZXNext": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\devl\\zx\\Tiled\\zx16x16.json -u"
+      "commandLineArgs": "D:\\devl\\zx\\Tiled\\zx16x16.json -c"
     }
   }
 }

@@ -113,6 +113,10 @@ namespace Tiled2ZXNext
         /// what should be the value substracted to the gid value
         /// </summary>
         public int Parsedgid { get; set;  }
+        /// <summary>
+        /// Sprite sheet id ( each sprite sheet is 8K and can have 32 sprites of 16x16 or 128 of 8x8)
+        /// </summary>
+        public int SpriteSheetID { get; set; }
 
     }
 

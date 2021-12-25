@@ -37,7 +37,7 @@ namespace Tiled2ZXNext
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    Console.Error.WriteLine(ex.ToString());
                 }
             }
         }
