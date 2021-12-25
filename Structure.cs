@@ -106,6 +106,14 @@ namespace Tiled2ZXNext
 
         [JsonPropertyName("source")]
         public string Source { get; set; }
+
+        public int Lastgid { get; set; }
+        /// <summary>
+        /// result of resolving the tileset names, different tileset could have the same image, just different tile size
+        /// what should be the value substracted to the gid value
+        /// </summary>
+        public int Parsedgid { get; set;  }
+
     }
 
     public class TiledRoot

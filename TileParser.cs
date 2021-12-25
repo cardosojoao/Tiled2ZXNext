@@ -2,12 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace Tiled2ZXNext
 {
     public class TiledParser : TiledRoot
     {
+        public List<tileset> TileSetData;
+
+
+
+        public TiledParser()
+        {
+            TileSetData = new List<tileset>();
+        }
 
         public bool ExistLayer(string layerName)
         {
@@ -22,7 +31,7 @@ namespace Tiled2ZXNext
 
         public StringBuilder WriteLayer(Layer layer, bool compress = false)
         {
-            StringBuilder result = null;
+            StringBuilder result;
 
             switch (layer.Type)
             {
@@ -37,7 +46,7 @@ namespace Tiled2ZXNext
                         result = new StringBuilder(50);
                         result.Append("Invalid layer type [");
                         result.Append(layer.Type);
-                        result.Append("]");
+                        result.Append(']');
                     }
                     break;
             }
@@ -46,9 +55,9 @@ namespace Tiled2ZXNext
 
 
 
-        public static StringBuilder WriteTiledLayer(Layer layer, bool compress = false)
+        public StringBuilder WriteTiledLayer(Layer layer, bool compress = false)
         {
-            StringBuilder output = new StringBuilder(5000);
+            StringBuilder output = new(5000);
             List<StringBuilder> data;
 
             if (compress)
@@ -66,13 +75,13 @@ namespace Tiled2ZXNext
             return output;
         }
 
-        private static List<StringBuilder> WriteTiledLayerCompress(Layer layer)
+        private List<StringBuilder> WriteTiledLayerCompress(Layer layer)
         {
             int lengthData = 0;
-            StringBuilder headerType = new StringBuilder(200);
-            StringBuilder header = new StringBuilder(100);
-            StringBuilder data = new StringBuilder(1024);
-            List<StringBuilder> output = new List<StringBuilder>() { header, data };
+            StringBuilder headerType = new (200);
+            StringBuilder header = new (100);
+            StringBuilder data = new (1024);
+            List<StringBuilder> output = new () { header, data };
 
             int colOut = 0;     // row output not the same row of tiled map
             int index = 0;      // index of tiled map 
@@ -87,7 +96,7 @@ namespace Tiled2ZXNext
 
             for (int row = 0; row < layer.Height; row++)        // loop all rows of tiled map
             {
-                
+
 
                 for (int col = 0; col < layer.Width; col++)     // loop all columns of row
                 {
@@ -108,9 +117,10 @@ namespace Tiled2ZXNext
                     if (tileID > 0)                             // if  tileId > 0 is a valid tile
                     {   // tile active
                         // Sprites are 0 based
+                        tileID= GetParsedGid(tileID);
                         tileID--;
                         header.Append('1');                     // set tile active in header
-                        
+
                         if (colOut == 0)
                         {   // first element must initiate
                             data.Append("\t\tdb $");
@@ -139,7 +149,7 @@ namespace Tiled2ZXNext
                 header.Append("\r\n");
             }
             data.Append("\r\n");                                // last line of data, add new line
-            
+
             headerType.Append("\t\tdb $");
             headerType.Append(lengthData.ToString("X2"));
             headerType.Append("\t\t; Block size\r\n");
@@ -148,13 +158,13 @@ namespace Tiled2ZXNext
             return output;
         }
 
-        private static List<StringBuilder> WriteTiledLayerRaw(Layer layer)
+        private List<StringBuilder> WriteTiledLayerRaw(Layer layer)
         {
             int lengthData = 0;
-            StringBuilder data = new StringBuilder(1024);
-            StringBuilder headerType = new StringBuilder(200);
-            StringBuilder header = new StringBuilder(100);
-            List<StringBuilder> output = new List<StringBuilder>() { header, data };
+            StringBuilder data = new (1024);
+            StringBuilder headerType = new (200);
+            StringBuilder header = new (100);
+            List<StringBuilder> output = new () { header, data };
 
             int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), false);
 
@@ -171,9 +181,9 @@ namespace Tiled2ZXNext
                 {
                     if (col > 0)
                     {   // not first col add separator
-                        data.Append(",");
+                        data.Append(',');
                     }
-                    data.Append("$");
+                    data.Append('$');
                     int tileId = layer.Data[index];
                     if (tileId == 0)
                     {
@@ -181,11 +191,12 @@ namespace Tiled2ZXNext
                     }
                     else
                     {
-                        tileId--;     // tile index is 0 based
+                        tileId = GetParsedGid(tileId);     // tile index is 0 based
+                        tileId--;
                     }
 
                     data.Append(tileId.ToString("X2"));
-                    lengthData ++;
+                    lengthData++;
                     index++;
                 }
                 data.Append("\r\n");
@@ -198,9 +209,9 @@ namespace Tiled2ZXNext
             return output;
         }
 
-        public static StringBuilder WriteObjectsLayer(Layer layer, bool compress)
+        public StringBuilder WriteObjectsLayer(Layer layer, bool compress)
         {
-            StringBuilder output = new StringBuilder(1024);
+            StringBuilder output = new (1024);
             List<StringBuilder> data;
 
             int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), compress);
@@ -237,10 +248,10 @@ namespace Tiled2ZXNext
         public static List<StringBuilder> WriteObjectsLayerRaw(Layer layer)
         {
             int lengthData = 0;
-            StringBuilder data = new StringBuilder(500);
-            StringBuilder headerType = new StringBuilder(500);
-            StringBuilder header = new StringBuilder(500);
-            List<StringBuilder> output = new List<StringBuilder>() { header, data };
+            StringBuilder data = new (500);
+            StringBuilder headerType = new (500);
+            StringBuilder header = new(500);
+            List<StringBuilder> output = new() { header, data };
 
             // int GroupType = GetPropertyInt(layer.Properties, "Type");
             int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), false);
@@ -289,13 +300,13 @@ namespace Tiled2ZXNext
             return output;
         }
 
-        public static List<StringBuilder> WriteObjectsLayerCompress(Layer layer)
+        public List<StringBuilder> WriteObjectsLayerCompress(Layer layer)
         {
-            int lengthData = 0; 
-            StringBuilder data = new StringBuilder(1024);
-            StringBuilder headerType = new StringBuilder(200);
-            StringBuilder header = new StringBuilder(200);
-            List<StringBuilder> output = new List<StringBuilder>() { header, data };
+            int lengthData = 0;
+            StringBuilder data = new (1024);
+            StringBuilder headerType = new (200);
+            StringBuilder header = new (200);
+            List<StringBuilder> output = new () { header, data };
 
             int layerMask = GetPropertyInt(layer.Properties, "LayerMask");
             int layerId = GetPropertyInt(layer.Properties, "Layer");
@@ -323,7 +334,7 @@ namespace Tiled2ZXNext
             header.Append("\t\tdb $");
             header.Append(layer.Objects.Count.ToString("X2"));
             header.Append("\t\t; Objects count\r\n");
-            
+
             lengthData += 4;
 
             if (layer.Name == "Collision")
@@ -348,7 +359,7 @@ namespace Tiled2ZXNext
                 if (obj.Gid != null)
                 {
                     data.Append(",$");
-                    data.Append(Double2Hex((int)obj.Gid));
+                    data.Append(Double2Hex((int)GetParsedGid((int)obj.Gid)));
                     lengthData++;
                 }
                 data.Append("\r\n");
@@ -367,13 +378,13 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="layer"></param>
         /// <returns></returns>
-        public static List<StringBuilder> WriteObjectsLayerCompress2(Layer layer)
+        public List<StringBuilder> WriteObjectsLayerCompress2(Layer layer)
         {
             int lengthData = 0;
-            StringBuilder data = new StringBuilder(1024);
-            StringBuilder headerType = new StringBuilder(200);
-            StringBuilder header = new StringBuilder(200);
-            List<StringBuilder> output = new List<StringBuilder>() { header, data };
+            StringBuilder data = new (1024);
+            StringBuilder headerType = new (200);
+            StringBuilder header = new (200);
+            List<StringBuilder> output = new () { header, data };
 
             int layerMask = GetPropertyInt(layer.Properties, "LayerMask");
             int layerId = GetPropertyInt(layer.Properties, "Layer");
@@ -434,13 +445,13 @@ namespace Tiled2ZXNext
                 else
                 {
                     data.Append(",$");
-                    data.Append(Double2Hex(TiledParser.ParentChildoffset(cacheObject.X, obj.X)));
+                    data.Append(Double2Hex(ParentChildoffset(cacheObject.X, obj.X)));
                     data.Append(",$");
-                    data.Append(Double2Hex(TiledParser.ParentChildoffset(cacheObject.Y, obj.Y)));
+                    data.Append(Double2Hex(ParentChildoffset(cacheObject.Y, obj.Y)));
                     data.Append(",$");
-                    data.Append(Double2Hex(TiledParser.SpriteSize(obj.Width, obj.Height)));
+                    data.Append(Double2Hex(SpriteSize(obj.Width, obj.Height)));
                     data.Append(",$");
-                    data.Append(Double2Hex((int)obj.Gid));
+                    data.Append(Double2Hex(GetParsedGid((int)obj.Gid)));
                     data.Append("\r\n");
                     objType = 0;        // object
                     lengthData += 4;
@@ -458,7 +469,7 @@ namespace Tiled2ZXNext
 
         public static StringBuilder WriteHeader(Layer layer, bool compress)
         {
-            StringBuilder output = new StringBuilder(200);
+            StringBuilder output = new (200);
 
             output.Append(";\r\n");
             output.Append(";\r\n");
@@ -505,7 +516,7 @@ namespace Tiled2ZXNext
 
         private static string Double2Hex(double value)
         {
-            string result = null;
+            string result;
             if (value >= 0)
             {
                 result = ((int)Math.Round(value, 0)).ToString("X2");
@@ -531,7 +542,7 @@ namespace Tiled2ZXNext
             {
                 uint type = (ushort)groupType;
                 uint mask = 0b_0000_0000_0001_1111;
-                type = type & mask;
+                type &= mask;
                 groupType = (int)type;
             }
 
@@ -540,7 +551,7 @@ namespace Tiled2ZXNext
 
         private static double ParentChildoffset(double parent, double child)
         {
-            double offset = 0;
+            double offset;
 
             if (parent > child)
             {
@@ -558,25 +569,38 @@ namespace Tiled2ZXNext
             double size = 0;
             if (width == 1 && height == 1)
             {
-                size = 0;
+                size = 1;
             }
             else if (width == 2 && height == 2)
             {
-                size = 1;
+                size = 2;
             }
             else if (width == 4 && height == 4)
             {
-                size = 2;
+                size = 4;
             }
             else if (width == 8 && height == 8)
             {
-                size = 3;
+                size = 8;
             }
             else if (width == 16 && height == 16)
             {
-                size = 4;
+                size = 16;
             }
             return size;
+        }
+
+        private int GetParsedGid(int gid)
+        {
+            foreach (Tileset tileSet in this.Tilesets)
+            {
+                if (gid >= tileSet.Firstgid && gid <= tileSet.Lastgid)
+                {
+                    gid -= tileSet.Parsedgid;
+                    break;
+                }
+            }
+            return gid;
         }
 
     }
