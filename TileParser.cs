@@ -78,10 +78,10 @@ namespace Tiled2ZXNext
         private List<StringBuilder> WriteTiledLayerCompress(Layer layer)
         {
             int lengthData = 0;
-            StringBuilder headerType = new (200);
-            StringBuilder header = new (100);
-            StringBuilder data = new (1024);
-            List<StringBuilder> output = new () { header, data };
+            StringBuilder headerType = new(200);
+            StringBuilder header = new(100);
+            StringBuilder data = new(1024);
+            List<StringBuilder> output = new() { header, data };
             List<int> spriteSheets = new();
 
             int colOut = 0;     // row output not the same row of tiled map
@@ -94,7 +94,7 @@ namespace Tiled2ZXNext
             headerType.Append("\t\tdb $");
             headerType.Append(GroupType.ToString("X2"));
             headerType.Append("\t\t; data type\r\n");
-            
+
 
 
             for (int row = 0; row < layer.Height; row++)        // loop all rows of tiled map
@@ -120,7 +120,7 @@ namespace Tiled2ZXNext
                         // Sprites are 0 based
                         var gidData = GetParsedGid(tileID);
                         SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
-                        
+
                         tileID = gidData.gid;
                         tileID--;
                         header.Append('1');                     // set tile active in header
@@ -168,7 +168,7 @@ namespace Tiled2ZXNext
             headerType.Append(spriteSheetID.ToString("X2"));
             headerType.Append("\t\t; Sprite Sheet ID\r\n");
 
-            if(spriteSheets.Count > 1)
+            if (spriteSheets.Count > 1)
             {
                 Console.Error.WriteLine("Multiple sprite sheets in block " + layer.Name);
             }
@@ -181,10 +181,10 @@ namespace Tiled2ZXNext
         private List<StringBuilder> WriteTiledLayerRaw(Layer layer)
         {
             int lengthData = 0;
-            StringBuilder data = new (1024);
-            StringBuilder headerType = new (200);
-            StringBuilder header = new (100);
-            List<StringBuilder> output = new () { header, data };
+            StringBuilder data = new(1024);
+            StringBuilder headerType = new(200);
+            StringBuilder header = new(100);
+            List<StringBuilder> output = new() { header, data };
             List<int> spriteSheets = new();
 
             int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), false);
@@ -214,7 +214,7 @@ namespace Tiled2ZXNext
                     {
                         var gidData = GetParsedGid(tileId);     // tile index is 0 based
                         SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
-                        
+
                         tileId = gidData.gid;
                         tileId--;
                     }
@@ -250,7 +250,7 @@ namespace Tiled2ZXNext
 
         public StringBuilder WriteObjectsLayer(Layer layer, bool compress)
         {
-            StringBuilder output = new (1024);
+            StringBuilder output = new(1024);
             List<StringBuilder> data;
 
             int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), compress);
@@ -287,8 +287,8 @@ namespace Tiled2ZXNext
         public static List<StringBuilder> WriteObjectsLayerRaw(Layer layer)
         {
             int lengthData = 0;
-            StringBuilder data = new (500);
-            StringBuilder headerType = new (500);
+            StringBuilder data = new(500);
+            StringBuilder headerType = new(500);
             StringBuilder header = new(500);
             List<StringBuilder> output = new() { header, data };
 
@@ -342,10 +342,10 @@ namespace Tiled2ZXNext
         public List<StringBuilder> WriteObjectsLayerCompress(Layer layer)
         {
             int lengthData = 0;
-            StringBuilder data = new (1024);
-            StringBuilder headerType = new (200);
-            StringBuilder header = new (200);
-            List<StringBuilder> output = new () { header, data };
+            StringBuilder data = new(1024);
+            StringBuilder headerType = new(200);
+            StringBuilder header = new(200);
+            List<StringBuilder> output = new() { header, data };
             List<int> spriteSheets = new();
 
             int layerMask = GetPropertyInt(layer.Properties, "LayerMask");
@@ -408,7 +408,7 @@ namespace Tiled2ZXNext
                 data.Append("\r\n");
             }
 
-            if(spriteSheets.Count > 0)
+            if (spriteSheets.Count > 0)
             {
                 lengthData++;
             }
@@ -445,10 +445,10 @@ namespace Tiled2ZXNext
         public List<StringBuilder> WriteObjectsLayerCompress2(Layer layer)
         {
             int lengthData = 0;
-            StringBuilder data = new (1024);
-            StringBuilder headerType = new (200);
-            StringBuilder header = new (200);
-            List<StringBuilder> output = new () { header, data };
+            StringBuilder data = new(1024);
+            StringBuilder headerType = new(200);
+            StringBuilder header = new(200);
+            List<StringBuilder> output = new() { header, data };
             List<int> spriteSheets = new();
 
             int layerMask = GetPropertyInt(layer.Properties, "LayerMask");
@@ -495,6 +495,7 @@ namespace Tiled2ZXNext
                 Object obj = layer.Objects[index];
                 if (objType == 0)
                 {
+                    // resolve Object
                     data.Append("\t\tdb $");
                     data.Append(Double2Hex(obj.X));
                     data.Append(",$");
@@ -509,7 +510,19 @@ namespace Tiled2ZXNext
                 }
                 else
                 {
-                    var gidData = GetParsedGid((int)obj.Gid);
+                    // resolve Sprite
+                    int size = (int)SpriteSize(obj.Width, obj.Height);
+                    (int gid, int spriteSheet) gidData;
+                    if (size == 8)
+                    {
+                        gidData = GetParsedGid((int)obj.Gid);
+                        gidData.gid--;
+                        gidData.gid = CalcGid8x8(gidData.gid);
+                    }
+                    else
+                    {
+                        gidData = GetParsedGid((int)obj.Gid);
+                    }
                     SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
 
                     data.Append(",$");
@@ -554,7 +567,7 @@ namespace Tiled2ZXNext
 
         public static StringBuilder WriteHeader(Layer layer, bool compress)
         {
-            StringBuilder output = new (200);
+            StringBuilder output = new(200);
 
             output.Append(";\r\n");
             output.Append(";\r\n");
@@ -700,12 +713,28 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="spriteSheets">collection of used sprite sheets</param>
         /// <param name="spriteSheetID">current sprite sheet ID</param>
-        private void SpriteSheetsBlock( List<int> spriteSheets, int spriteSheetID)
+        private void SpriteSheetsBlock(List<int> spriteSheets, int spriteSheetID)
         {
-            if(!spriteSheets.Exists( i => i == spriteSheetID))
+            if (!spriteSheets.Exists(i => i == spriteSheetID))
             {
                 spriteSheets.Add(spriteSheetID);
             }
+        }
+
+        public int CalcGid8x8(int gidSize8)
+        {
+            int gid = gidSize8 % 16;
+            int row = gidSize8 >> 5;
+            gid >>= 1;
+            gid = row * 8 + gid;
+
+            int cella = gidSize8 & 0b00000001;      // col
+            cella <<= 6;
+            int cellb = gidSize8 & 0b00010000;      // row
+            cellb <<= 3;
+            cella |= cellb;
+            gid |= cella;
+            return gid;
         }
 
     }

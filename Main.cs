@@ -25,6 +25,8 @@ namespace Tiled2ZXNext
             //string outputPath = Path.GetDirectoryName(inputFile);
             string data = File.ReadAllText(inputFile);
 
+            
+            
             TiledParser tiledData = JsonSerializer.Deserialize<TiledParser>(data);
 
             ResolveTileSets(tiledData.Tilesets);
