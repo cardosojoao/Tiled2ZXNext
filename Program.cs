@@ -8,6 +8,10 @@ namespace Tiled2ZXNext
     {
         static void Main(string[] args)
         {
+
+            TiledParser.CalcGid8(8);
+
+
             Console.WriteLine("Tiled 2 ZX Next converter " + Assembly.GetEntryAssembly().GetName().Version);
             if (args.Length == 0)
             {

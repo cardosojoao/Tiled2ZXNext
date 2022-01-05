@@ -107,34 +107,44 @@ namespace Tiled2ZXNext
                         lengthData++;
                     }
 
-                    if (col == 8)
+                    if (col % 8 == 0 && col > 0)
                     {
                         header.Append(",%");
                         lengthData++;
                     }
 
-                    int tileID = layer.Data[index];             // get tileId
+                    uint tileId = (uint)layer.Data[index];             // get tileId
                     index++;
-                    if (tileID > 0)                             // if  tileId > 0 is a valid tile
+                    if (tileId > 0)                             // if  tileId > 0 is a valid tile
                     {   // tile active
                         // Sprites are 0 based
-                        var gidData = GetParsedGid(tileID);
+
+                        uint mirrorH = tileId & 0b10000000_00000000_00000000_00000000;
+                        mirrorH >>= 24;                     // bit 31 -> bit 7
+
+                        tileId &= 0b11111111;
+
+                        var gidData = GetParsedGid((int)tileId);
                         SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
 
-                        tileID = gidData.gid;
-                        tileID--;
+                        tileId = (uint)gidData.gid-1;
+                        tileId = (uint)CalcGid8((int)tileId);
+                        
+                        tileId &= 0b01111111;
+                        tileId |= mirrorH;              // add mirror flag
+                        
                         header.Append('1');                     // set tile active in header
 
                         if (colOut == 0)
                         {   // first element must initiate
                             data.Append("\t\tdb $");
-                            data.Append(tileID.ToString("X2"));
+                            data.Append(tileId.ToString("X2"));
                             lengthData++;
                         }
                         else
                         {   // column separator and value
                             data.Append(",$");
-                            data.Append(tileID.ToString("X2"));
+                            data.Append(tileId.ToString("X2"));
                             lengthData++;
                         }
                         colOut++;
@@ -157,8 +167,8 @@ namespace Tiled2ZXNext
             // increase sprite data size  by 1 to include the sprite sheet code
             lengthData++;
 
-            headerType.Append("\t\tdb $");
-            headerType.Append(lengthData.ToString("X2"));
+            headerType.Append("\t\tdw $");
+            headerType.Append(lengthData.ToString("X4"));
             headerType.Append("\t\t; Block size\r\n");
 
             // get first sprite sheet code
@@ -205,18 +215,25 @@ namespace Tiled2ZXNext
                         data.Append(',');
                     }
                     data.Append('$');
-                    int tileId = layer.Data[index];
+                    uint tileId = (uint)layer.Data[index];
                     if (tileId == 0)
                     {
                         tileId = 255;  // means empty tile
                     }
                     else
                     {
-                        var gidData = GetParsedGid(tileId);     // tile index is 0 based
+                        uint mirrorH = tileId & 0b10000000_00000000_00000000_00000000;
+                        mirrorH >>= 24;                     // bit 31 -> bit 7
+
+                        tileId &= 0b11111111;
+                        var gidData = GetParsedGid((int)tileId);     // tile index is 0 based
                         SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
 
-                        tileId = gidData.gid;
-                        tileId--;
+                        tileId = (uint)gidData.gid - 1;
+                        tileId = (uint)CalcGid8((int)tileId);
+
+                        tileId &= 0b01111111;
+                        tileId |= mirrorH;              // add mirror flag
                     }
 
                     data.Append(tileId.ToString("X2"));
@@ -227,8 +244,8 @@ namespace Tiled2ZXNext
             }
             lengthData++;
 
-            headerType.Append("\t\tdb $");
-            headerType.Append(lengthData.ToString("X2"));
+            headerType.Append("\t\tdw $");
+            headerType.Append(lengthData.ToString("X4"));
             headerType.Append("\t\t; Block size\r\n");
 
             // get first sprite sheet code
@@ -331,8 +348,8 @@ namespace Tiled2ZXNext
                 data.Append("\r\n");
                 lengthData += 7;
             }
-            headerType.Append("\t\tdb $");
-            headerType.Append(lengthData.ToString("X2"));
+            headerType.Append("\t\tdw $");
+            headerType.Append(lengthData.ToString("X4"));
             headerType.Append("\t\t; Block size\r\n");
             // insert header at begin
             header.Insert(0, headerType);
@@ -422,8 +439,8 @@ namespace Tiled2ZXNext
                 // get first sprite sheet code
                 int spriteSheetID = spriteSheets[0];
 
-                headerType.Append("\t\tdb $");
-                headerType.Append(spriteSheetID.ToString("X2"));
+                headerType.Append("\t\tdw $");
+                headerType.Append(spriteSheetID.ToString("X4"));
                 headerType.Append("\t\t; Sprite Sheet ID\r\n");
 
                 if (spriteSheets.Count > 1)
@@ -513,13 +530,13 @@ namespace Tiled2ZXNext
                     // resolve Sprite
                     int size = (int)SpriteSize(obj.Width, obj.Height);
                     (int gid, int spriteSheet) gidData;
-                    if (size == 8)
-                    {
-                        gidData = GetParsedGid((int)obj.Gid);
-                        gidData.gid--;
-                        gidData.gid = CalcGid8x8(gidData.gid);
-                    }
-                    else
+                    //if (size == 8)
+                    //{
+                    //    gidData = GetParsedGid((int)obj.Gid);
+                    //    gidData.gid--;
+                    //    gidData.gid = CalcGid8x8(gidData.gid);
+                    //}
+                    //else
                     {
                         gidData = GetParsedGid((int)obj.Gid);
                     }
@@ -542,8 +559,8 @@ namespace Tiled2ZXNext
 
             lengthData++;
 
-            headerType.Append("\t\tdb $");
-            headerType.Append(lengthData.ToString("X2"));
+            headerType.Append("\t\tdw $");
+            headerType.Append(lengthData.ToString("X4"));
             headerType.Append("\t\t; Block size\r\n");
 
             // get first sprite sheet code
@@ -737,5 +754,16 @@ namespace Tiled2ZXNext
             return gid;
         }
 
+        public static int CalcGid8(int gidSize8)
+        {
+            int p1 = (gidSize8 / 16);
+            int p2 = gidSize8 % 8;
+            int p3 = p2 / 2;
+            int p4 = (gidSize8>>3) & 0b1;
+
+            int gid = (p1 * 16) + p2 + (p3 * 2) + (p4 * 2);
+            
+            return gid;
+        }
     }
 }

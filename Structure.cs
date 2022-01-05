@@ -60,7 +60,7 @@ namespace Tiled2ZXNext
     public class Layer
     {
         [JsonPropertyName("data")]
-        public List<int> Data { get; set; }
+        public List<uint> Data { get; set; }
 
         [JsonPropertyName("height")]
         public int Height { get; set; }
