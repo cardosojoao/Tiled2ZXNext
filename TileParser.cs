@@ -9,26 +9,12 @@ namespace Tiled2ZXNext
 {
     public class TiledParser : TiledRoot
     {
-        public List<tileset> TileSetData;
-
-
-
-        public TiledParser()
-        {
-            TileSetData = new List<tileset>();
-        }
-
-        public bool ExistLayer(string layerName)
-        {
-            return Layers.Exists(l => l.Name.ToLower() == layerName.ToLower());
-        }
-
-        public Layer GetLayer(string layerName)
-        {
-            return Layers.Find(l => l.Name.ToLower() == layerName.ToLower());
-        }
-
-
+        /// <summary>
+        /// based on layer type call the correct constructor
+        /// </summary>
+        /// <param name="layer">current layer</param>
+        /// <param name="compress">compress or not value</param>
+        /// <returns>string build with layer contents</returns>
         public StringBuilder WriteLayer(Layer layer, bool compress = false)
         {
             StringBuilder result;
@@ -54,7 +40,12 @@ namespace Tiled2ZXNext
         }
 
 
-
+        /// <summary>
+        /// get header and data from tile writters and append everyrhing
+        /// </summary>
+        /// <param name="layer">current layer</param>
+        /// <param name="compress">compress or not value</param>
+        /// <returns>main string build with header and data appended</returns>
         public StringBuilder WriteTiledLayer(Layer layer, bool compress = false)
         {
             StringBuilder output = new(5000);
@@ -75,6 +66,13 @@ namespace Tiled2ZXNext
             return output;
         }
 
+        /// <summary>
+        /// Write tilemap layer compressed
+        /// uses a bitmap to identify the tiles that are filled and only store the tile id of those tiles
+        /// it does include the X mirror bit in the tile id (bit 7) that allow up 127 differen tiles
+        /// </summary>
+        /// <param name="layer">tilemap layer</param>
+        /// <returns>string builder collection that includes header and data</returns>
         private List<StringBuilder> WriteTiledLayerCompress(Layer layer)
         {
             int lengthData = 0;
@@ -94,8 +92,6 @@ namespace Tiled2ZXNext
             headerType.Append("\t\tdb $");
             headerType.Append(GroupType.ToString("X2"));
             headerType.Append("\t\t; data type\r\n");
-
-
 
             for (int row = 0; row < layer.Height; row++)        // loop all rows of tiled map
             {
@@ -128,7 +124,7 @@ namespace Tiled2ZXNext
                         SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
 
                         tileId = (uint)gidData.gid-1;
-                        tileId = (uint)CalcGid8((int)tileId);
+                        //tileId = (uint)CalcGid8((int)tileId); no longer used we map the tiled with tilemap tile ids
                         
                         tileId &= 0b01111111;
                         tileId |= mirrorH;              // add mirror flag
@@ -188,6 +184,12 @@ namespace Tiled2ZXNext
             return output;
         }
 
+        /// <summary>
+        /// Write tilemap layer raw without any type of compression
+        /// it does include the X mirror bit in the tile id (bit 7) that allow up 127 differen tiles
+        /// </summary>
+        /// <param name="layer">tilemap layer</param>
+        /// <returns>string builder collection that includes header and data</returns>
         private List<StringBuilder> WriteTiledLayerRaw(Layer layer)
         {
             int lengthData = 0;
@@ -230,7 +232,7 @@ namespace Tiled2ZXNext
                         SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
 
                         tileId = (uint)gidData.gid - 1;
-                        tileId = (uint)CalcGid8((int)tileId);
+                        //tileId = (uint)CalcGid8((int)tileId);  no longer used we match the tiled id with tilemap tile ids
 
                         tileId &= 0b01111111;
                         tileId |= mirrorH;              // add mirror flag
@@ -265,6 +267,12 @@ namespace Tiled2ZXNext
             return output;
         }
 
+        /// <summary>
+        /// write objects layer
+        /// </summary>
+        /// <param name="layer">layer</param>
+        /// <param name="compress">compress or raw</param>
+        /// <returns></returns>
         public StringBuilder WriteObjectsLayer(Layer layer, bool compress)
         {
             StringBuilder output = new(1024);
@@ -297,10 +305,10 @@ namespace Tiled2ZXNext
         }
 
         /// <summary>
-        /// objects collection
+        /// write objects layer raw, each line contains all the properties of object
         /// </summary>
-        /// <param name="layer"></param>
-        /// <returns></returns>
+        /// <param name="layer">layer</param>
+        /// <returns>string builder collection with header and data</returns>
         public static List<StringBuilder> WriteObjectsLayerRaw(Layer layer)
         {
             int lengthData = 0;
@@ -356,6 +364,11 @@ namespace Tiled2ZXNext
             return output;
         }
 
+        /// <summary>
+        /// write objects layer compressed, there is an header with the shared properties and then each line contain the object property
+        /// </summary>
+        /// <param name="layer">layer</param>
+        /// <returns>string builder collection with header and data</returns>
         public List<StringBuilder> WriteObjectsLayerCompress(Layer layer)
         {
             int lengthData = 0;
@@ -454,11 +467,10 @@ namespace Tiled2ZXNext
         }
 
         /// <summary>
-        /// Object collection with image
-        /// first object and then image
+        /// write object collection that are used in pairs, one collision object and one sprite
         /// </summary>
-        /// <param name="layer"></param>
-        /// <returns></returns>
+        /// <param name="layer">layer</param>
+        /// <returns>string builder with header and data</returns>
         public List<StringBuilder> WriteObjectsLayerCompress2(Layer layer)
         {
             int lengthData = 0;
@@ -582,39 +594,25 @@ namespace Tiled2ZXNext
             return output;
         }
 
-        public static StringBuilder WriteHeader(Layer layer, bool compress)
-        {
-            StringBuilder output = new(200);
 
-            output.Append(";\r\n");
-            output.Append(";\r\n");
-            output.Append("; Layer [");
-            output.Append(layer.Name);
-            output.Append("] X-");
-            output.Append(layer.Width);
-            output.Append(", Y-");
-            output.Append(layer.Height);
-            if (compress)
-            {
-                output.Append(" (Compressed)");
-            }
-            else
-            {
-                output.Append(" (Raw)");
-            }
-
-            output.Append("\r\n");
-            output.Append(";\r\n");
-
-            return output;
-        }
-
+        /// <summary>
+        /// get property value as string
+        /// </summary>
+        /// <param name="properties">collection of properties</param>
+        /// <param name="name">property name</param>
+        /// <returns>propery value</returns>
         public static string GetProperty(List<Property> properties, string name)
         {
             string? value = properties.Find(p => p.Name.ToLower() == name.ToLower()).Value;
             return value;
         }
 
+        /// <summary>
+        /// get property value as int
+        /// </summary>
+        /// <param name="properties">properties</param>
+        /// <param name="name">property name</param>
+        /// <returns>value as int in case error 255</returns>
         public static int GetPropertyInt(List<Property> properties, string name)
         {
             string value;
@@ -629,6 +627,11 @@ namespace Tiled2ZXNext
             return int.Parse(value);
         }
 
+        /// <summary>
+        /// convert double to hexadecimal value
+        /// </summary>
+        /// <param name="value">value</param>
+        /// <returns>hexadecimal value</returns>
         private static string Double2Hex(double value)
         {
             string result;
@@ -644,6 +647,12 @@ namespace Tiled2ZXNext
 
         }
 
+        /// <summary>
+        /// convert group type by cross checking compress parameter
+        /// </summary>
+        /// <param name="groupType">original group type</param>
+        /// <param name="compress">compress flag</param>
+        /// <returns>new group type</returns>
         private static int GroupTypeConvert(int groupType, bool compress)
         {
             if (groupType < 16)
@@ -664,6 +673,12 @@ namespace Tiled2ZXNext
             return groupType;
         }
 
+        /// <summary>
+        /// convert the tileid to always have index 0 for the tileset used
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="child"></param>
+        /// <returns></returns>
         private static double ParentChildoffset(double parent, double child)
         {
             double offset;
@@ -679,6 +694,13 @@ namespace Tiled2ZXNext
             return offset;
         }
 
+        /// <summary>
+        /// based on width and height return the size code
+        /// currently only accepts same width and height and return that value (1,2,4,8,16)
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns>value from width or height</returns>
         private static double SpriteSize(double width, double height)
         {
             double size = 0;
@@ -738,6 +760,12 @@ namespace Tiled2ZXNext
             }
         }
 
+        /// <summary>
+        /// NOT USED
+        /// other parser to 8x8 tiles
+        /// </summary>
+        /// <param name="gidSize8"></param>
+        /// <returns></returns>
         public int CalcGid8x8(int gidSize8)
         {
             int gid = gidSize8 % 16;
@@ -754,6 +782,13 @@ namespace Tiled2ZXNext
             return gid;
         }
 
+
+        /// <summary>
+        /// NOT USED
+        /// parse the Tiled tile id and convert to remy format where each sprite 16x16 contain 4 8x8 sprites sequentially
+        /// </summary>
+        /// <param name="gidSize8"></param>
+        /// <returns></returns>
         public static int CalcGid8(int gidSize8)
         {
             int p1 = (gidSize8 / 16);

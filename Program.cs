@@ -9,7 +9,7 @@ namespace Tiled2ZXNext
         static void Main(string[] args)
         {
 
-            TiledParser.CalcGid8(8);
+            ImageHelper.t(@"D:\devl\zx\assets\tilemap8x8_8.png", @"D:\devl\zx\assets\tilemap8x8_8t.png");
 
 
             Console.WriteLine("Tiled 2 ZX Next converter " + Assembly.GetEntryAssembly().GetName().Version);
