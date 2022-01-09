@@ -13,6 +13,8 @@ namespace Tiled2ZXNext
         private readonly bool compress;
         private readonly string outputPath;
 
+
+        public string OutputFile { get; set; }
         public Controller(string inputFile, bool compress)
         {
             this.inputFile = inputFile;
@@ -22,10 +24,7 @@ namespace Tiled2ZXNext
 
         public void Run()
         {
-            //string outputPath = Path.GetDirectoryName(inputFile);
             string data = File.ReadAllText(inputFile);
-
-            
             
             TiledParser tiledData = JsonSerializer.Deserialize<TiledParser>(data);
 
@@ -57,11 +56,11 @@ namespace Tiled2ZXNext
             full.Append(255.ToString("X2"));
             full.Append("\t\t; end of file\r\n");
 
-
             fileName = Path.ChangeExtension(fileName, extension);
-            string fullPath = Path.Combine(outputPath, fileName);
-            Console.WriteLine("output file " + fullPath);
-            File.WriteAllText(fullPath, full.ToString());
+            OutputFile = Path.Combine(outputPath, fileName);
+
+            Console.WriteLine("output file " + OutputFile);
+            File.WriteAllText(OutputFile, full.ToString());
         }
 
 
