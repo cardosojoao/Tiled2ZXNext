@@ -443,8 +443,8 @@ namespace Tiled2ZXNext
                 lengthData++;
             }
 
-            headerType.Append("\t\tdb $");
-            headerType.Append(lengthData.ToString("X2"));
+            headerType.Append("\t\tdw $");
+            headerType.Append(lengthData.ToString("X4"));           // size must be 2B long (map is over 256 Bytes)
             headerType.Append("\t\t; Block size\r\n");
 
             if (spriteSheets.Count > 0)

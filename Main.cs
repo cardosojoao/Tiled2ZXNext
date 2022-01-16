@@ -7,60 +7,53 @@ using System.Xml.Serialization;
 
 namespace Tiled2ZXNext
 {
-    public class Controller
+    public partial class Controller
     {
-        private readonly string inputFile;
-        private readonly bool compress;
-        private readonly string outputPath;
+        private string inputFile;
+        private string fileName;
+        private bool compress;
+        private string outputFile;
+        private string inputPath;
+
+        public string OutputRoomFile { get; set; }
+        public string OutputMapFile { get; set; }
 
 
-        public string OutputFile { get; set; }
-        public Controller(string inputFile, bool compress)
+
+        public void Run(Options o)
         {
-            this.inputFile = inputFile;
-            this.compress = compress;
-            outputPath = Path.GetDirectoryName(inputFile);
-        }
+            inputFile = o.Input;
+            compress = o.Compress;
 
-        public void Run()
-        {
-            string data = File.ReadAllText(inputFile);
+            inputPath = Path.GetDirectoryName(inputFile);
             
+            string data = File.ReadAllText(inputFile);
+
+
             TiledParser tiledData = JsonSerializer.Deserialize<TiledParser>(data);
 
             ResolveTileSets(tiledData.Tilesets);
 
-            StringBuilder full = new(2048);
-            string fileName = TiledParser.GetProperty(tiledData.Properties, "FileName");
+            fileName = TiledParser.GetProperty(tiledData.Properties, "FileName");
             string extension = "asm";
+            outputFile = fileName + "." + extension;
+
+            // get map settings
+            StringBuilder mapData = ProcessMap(tiledData);
+            Console.WriteLine("output map file " + outputFile);
+            // write map to final location
+            OutputMap(o, mapData);
 
 
-            full.Append(fileName);
-            full.Append(":\r\n");
+            BuildList(o.MapPath, "*.asm", o.MapPath + "\\list.txt");
 
-            foreach (Layer layer in tiledData.Layers)
-            {
-                if (layer.Visible)
-                {
-                    full.Append(fileName);
-                    full.Append('_');
-                    full.Append(layer.Name);
-                    full.Append(":\r\n");
+            // get layers data
+            StringBuilder layerData = ProcessLayer(tiledData);
+            Console.WriteLine("output layer file " + outputFile);
+            // write layers to final location
+            OutputLayer(o, layerData);
 
-                    full.Append(tiledData.WriteLayer(layer, compress));
-                }
-            }
-            full.Append(fileName);
-            full.Append("_eof\r\n");
-            full.Append("\t\tdb $");
-            full.Append(255.ToString("X2"));
-            full.Append("\t\t; end of file\r\n");
-
-            fileName = Path.ChangeExtension(fileName, extension);
-            OutputFile = Path.Combine(outputPath, fileName);
-
-            Console.WriteLine("output file " + OutputFile);
-            File.WriteAllText(OutputFile, full.ToString());
+            PostProcessing(o);
         }
 
 
@@ -71,7 +64,7 @@ namespace Tiled2ZXNext
 
             foreach (Tileset tileSet in tileSets)
             {
-                string file = Path.Combine(outputPath, tileSet.Source);
+                string file = Path.Combine(inputPath, tileSet.Source);
                 tileset tileSetData = ReadTileSet(file);
 
                 tileSet.Lastgid = tileSetData.tilecount + tileSet.Firstgid - 1;
@@ -90,7 +83,7 @@ namespace Tiled2ZXNext
                     tileset tileSetData = tilesSetData[sets.Key];
                     set.Parsedgid = set.Firstgid - 1;
                     // set sprite sheet id
-                    set.SpriteSheetID = int.Parse( GetTileSetProperty(tileSetData.properties, "SpriteSheetID"));
+                    set.SpriteSheetID = int.Parse(GetTileSetProperty(tileSetData.properties, "SpriteSheetID"));
                 }
             }
         }
@@ -123,7 +116,7 @@ namespace Tiled2ZXNext
             string value = string.Empty;
             foreach (TilesetTileProperty prop in properties)
             {
-                if(prop.name.ToLower() == name.ToLower())
+                if (prop.name.ToLower() == name.ToLower())
                 {
                     value = prop.value;
                     break;
