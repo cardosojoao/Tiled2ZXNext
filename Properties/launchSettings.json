@@ -2,7 +2,7 @@
   "profiles": {
     "Tiled2ZXNext": {
       "commandName": "Project",
-      "commandLineArgs": "-iD:\\devl\\zx\\Tiled\\tilemap_8x8.json -mD:\\devl\\zx\\src\\ZXGame\\game\\map -rD:\\devl\\zx\\src\\ZXGame\\game\\rooms"
+      "commandLineArgs": "-iD:\\devl\\zx\\Tiled\\tilemap_8x8.json -mD:\\devl\\zx\\proj\\ZXGame\\3.resources -rD:\\devl\\zx\\proj\\ZXGame\\3.resources\\rooms\r\n\\rooms"
     }
   }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using System.IO;
+using CommandLine;
 
 namespace Tiled2ZXNext
 {
@@ -218,14 +219,21 @@ namespace Tiled2ZXNext
                     }
                     data.Append('$');
                     uint tileId = (uint)layer.Data[index];
+                    uint extend = 0;
                     if (tileId == 0)
                     {
                         tileId = 255;  // means empty tile
                     }
                     else
                     {
-                        uint mirrorH = tileId & 0b10000000_00000000_00000000_00000000;
-                        mirrorH >>= 24;                     // bit 31 -> bit 7
+                        const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+                        const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;
+
+                        extend = tileId & (FLIPPED_HORIZONTALLY_FLAG + FLIPPED_VERTICALLY_FLAG);
+                        // 0b11000000_00000000_00000000_00000000;
+                        // 0b00000000_00000000_00001100_00000000;
+
+                        extend >>= 28;                     // bit 31 -> bit 11
 
                         tileId &= 0b11111111;
                         var gidData = GetParsedGid((int)tileId);     // tile index is 0 based
@@ -234,12 +242,13 @@ namespace Tiled2ZXNext
                         tileId = (uint)gidData.gid - 1;
                         //tileId = (uint)CalcGid8((int)tileId);  no longer used we match the tiled id with tilemap tile ids
 
-                        tileId &= 0b01111111;
-                        tileId |= mirrorH;              // add mirror flag
+                        //tileId &= 0b01111111;
+                        //tileId |= mirror;              // add mirror flag
                     }
 
+                    data.Append(extend.ToString("X2"));
                     data.Append(tileId.ToString("X2"));
-                    lengthData++;
+                    lengthData+=2;
                     index++;
                 }
                 data.Append("\r\n");
@@ -391,7 +400,8 @@ namespace Tiled2ZXNext
             headerType.Append(GroupType.ToString("X2"));
             headerType.Append("\t\t; data type\r\n");
 
-            layerMask *= 16 + layerId;
+            layerMask *= 16;
+            layerMask +=layerId;
             header.Append("\t\tdb $");
             header.Append(ObjectType.ToString("X2"));
             header.Append("\t\t; Type\r\n");
@@ -407,7 +417,7 @@ namespace Tiled2ZXNext
 
             lengthData += 4;
 
-            if (layer.Name == "Collision")
+            if (layer.Name.ToLower() == "collision")
             {
                 data.Append("\t\t; X, Y, Width, Height\r\n");
             }

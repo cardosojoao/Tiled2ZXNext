@@ -23,6 +23,8 @@ namespace Tiled2ZXNext
                     full.Append(fileName);
                     full.Append('_');
                     full.Append(layer.Name);
+                    full.Append('_');
+                    full.Append(layer.Id);
                     full.Append(":\r\n");
 
                     full.Append(tiledData.WriteLayer(layer, compress));
