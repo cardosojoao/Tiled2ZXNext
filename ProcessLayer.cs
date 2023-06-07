@@ -27,7 +27,7 @@ namespace Tiled2ZXNext
                     full.Append(layer.Id);
                     full.Append(":\r\n");
 
-                    full.Append(tiledData.WriteLayer(layer, compress));
+                    full.Append(tiledData.WriteLayer(layer));
                 }
             }
             // add terminator to scene

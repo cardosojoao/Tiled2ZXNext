@@ -16,17 +16,17 @@ namespace Tiled2ZXNext
         /// <param name="layer">current layer</param>
         /// <param name="compress">compress or not value</param>
         /// <returns>string build with layer contents</returns>
-        public StringBuilder WriteLayer(Layer layer, bool compress = false)
+        public StringBuilder WriteLayer(Layer layer)
         {
             StringBuilder result;
 
             switch (layer.Type)
             {
                 case "tilelayer":
-                    result = WriteTiledLayer(layer, compress);
+                    result = WriteTiledLayer(layer);
                     break;
                 case "objectgroup":
-                    result = WriteObjectsLayer(layer, compress);
+                    result = WriteObjectsLayer(layer);
                     break;
                 default:
                     {
@@ -47,23 +47,23 @@ namespace Tiled2ZXNext
         /// <param name="layer">current layer</param>
         /// <param name="compress">compress or not value</param>
         /// <returns>main string build with header and data appended</returns>
-        public StringBuilder WriteTiledLayer(Layer layer, bool compress = false)
+        public StringBuilder WriteTiledLayer(Layer layer)
         {
             StringBuilder output = new(5000);
             List<StringBuilder> data;
 
-            if (compress)
-            {
-                data = WriteTiledLayerCompress(layer);
-                output.Append(data[0]);
-                output.Append(data[1]);
-            }
-            else
-            {
-                data = WriteTiledLayerRaw(layer);
-                output.Append(data[0]);
-                output.Append(data[1]);
-            }
+            //if (compress)
+            //{
+            //    data = WriteTiledLayerCompress(layer);
+            //    output.Append(data[0]);
+            //    output.Append(data[1]);
+            //}
+            //else
+
+            data = WriteTiledLayerRaw(layer);
+            output.Append(data[0]);
+            output.Append(data[1]);
+
             return output;
         }
 
@@ -74,116 +74,117 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="layer">tilemap layer</param>
         /// <returns>string builder collection that includes header and data</returns>
-        private List<StringBuilder> WriteTiledLayerCompress(Layer layer)
-        {
-            int lengthData = 0;
-            StringBuilder headerType = new(200);
-            StringBuilder header = new(100);
-            StringBuilder data = new(1024);
-            List<StringBuilder> output = new() { header, data };
-            List<int> spriteSheets = new();
+        //private List<StringBuilder> WriteTiledLayerCompress(Layer layer)
+        //{
+        //    int lengthData = 0;
+        //    StringBuilder headerType = new(200);
+        //    StringBuilder header = new(100);
+        //    StringBuilder data = new(1024);
+        //    List<StringBuilder> output = new() { header, data };
+        //    List<int> spriteSheets = new();
 
-            int colOut = 0;     // row output not the same row of tiled map
-            int index = 0;      // index of tiled map 
+        //    int colOut = 0;     // row output not the same row of tiled map
+        //    int index = 0;      // index of tiled map 
 
-            int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), true);
+        //    int GroupType = GetPropertyInt(layer.Properties, "Type");
+        //    //int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), true);
 
-            //GroupType += 16;                                    // compress format
+        //    //GroupType += 16;                                    // compress format
 
-            headerType.Append("\t\tdb $");
-            headerType.Append(GroupType.ToString("X2"));
-            headerType.Append("\t\t; data type\r\n");
+        //    headerType.Append("\t\tdb $");
+        //    headerType.Append(GroupType.ToString("X2"));
+        //    headerType.Append("\t\t; data type\r\n");
 
-            for (int row = 0; row < layer.Height; row++)        // loop all rows of tiled map
-            {
-                for (int col = 0; col < layer.Width; col++)     // loop all columns of row
-                {
-                    if (col == 0)
-                    {
-                        header.Append("\t\tdb %");
-                        lengthData++;
-                    }
+        //    for (int row = 0; row < layer.Height; row++)        // loop all rows of tiled map
+        //    {
+        //        for (int col = 0; col < layer.Width; col++)     // loop all columns of row
+        //        {
+        //            if (col == 0)
+        //            {
+        //                header.Append("\t\tdb %");
+        //                lengthData++;
+        //            }
 
-                    if (col % 8 == 0 && col > 0)
-                    {
-                        header.Append(",%");
-                        lengthData++;
-                    }
+        //            if (col % 8 == 0 && col > 0)
+        //            {
+        //                header.Append(",%");
+        //                lengthData++;
+        //            }
 
-                    uint tileId = (uint)layer.Data[index];             // get tileId
-                    index++;
-                    if (tileId > 0)                             // if  tileId > 0 is a valid tile
-                    {   // tile active
-                        // Sprites are 0 based
+        //            uint tileId = (uint)layer.Data[index];             // get tileId
+        //            index++;
+        //            if (tileId > 0)                             // if  tileId > 0 is a valid tile
+        //            {   // tile active
+        //                // Sprites are 0 based
 
-                        uint mirrorH = tileId & 0b10000000_00000000_00000000_00000000;
-                        mirrorH >>= 24;                     // bit 31 -> bit 7
+        //                uint mirrorH = tileId & 0b10000000_00000000_00000000_00000000;
+        //                mirrorH >>= 24;                     // bit 31 -> bit 7
 
-                        tileId &= 0b11111111;
+        //                tileId &= 0b11111111;
 
-                        var gidData = GetParsedGid((int)tileId);
-                        SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
+        //                var gidData = GetParsedGid((int)tileId);
+        //                SpriteSheetsBlock(spriteSheets, gidData.spriteSheet);
 
-                        tileId = (uint)gidData.gid-1;
-                        //tileId = (uint)CalcGid8((int)tileId); no longer used we map the tiled with tilemap tile ids
-                        
-                        tileId &= 0b01111111;
-                        tileId |= mirrorH;              // add mirror flag
-                        
-                        header.Append('1');                     // set tile active in header
+        //                tileId = (uint)gidData.gid - 1;
+        //                //tileId = (uint)CalcGid8((int)tileId); no longer used we map the tiled with tilemap tile ids
 
-                        if (colOut == 0)
-                        {   // first element must initiate
-                            data.Append("\t\tdb $");
-                            data.Append(tileId.ToString("X2"));
-                            lengthData++;
-                        }
-                        else
-                        {   // column separator and value
-                            data.Append(",$");
-                            data.Append(tileId.ToString("X2"));
-                            lengthData++;
-                        }
-                        colOut++;
-                        // max tiles per line 8
-                        if (colOut > 7)
-                        {
-                            colOut = 0;
-                            data.Append("\r\n");
-                        }
-                    }
-                    else
-                    {   // set tile inactive in header
-                        header.Append('0');
-                    }
-                }
-                header.Append("\r\n");
-            }
-            data.Append("\r\n");                                // last line of data, add new line
+        //                tileId &= 0b01111111;
+        //                tileId |= mirrorH;              // add mirror flag
 
-            // increase sprite data size  by 1 to include the sprite sheet code
-            lengthData++;
+        //                header.Append('1');                     // set tile active in header
 
-            headerType.Append("\t\tdw $");
-            headerType.Append(lengthData.ToString("X4"));
-            headerType.Append("\t\t; Block size\r\n");
+        //                if (colOut == 0)
+        //                {   // first element must initiate
+        //                    data.Append("\t\tdb $");
+        //                    data.Append(tileId.ToString("X2"));
+        //                    lengthData++;
+        //                }
+        //                else
+        //                {   // column separator and value
+        //                    data.Append(",$");
+        //                    data.Append(tileId.ToString("X2"));
+        //                    lengthData++;
+        //                }
+        //                colOut++;
+        //                // max tiles per line 8
+        //                if (colOut > 7)
+        //                {
+        //                    colOut = 0;
+        //                    data.Append("\r\n");
+        //                }
+        //            }
+        //            else
+        //            {   // set tile inactive in header
+        //                header.Append('0');
+        //            }
+        //        }
+        //        header.Append("\r\n");
+        //    }
+        //    data.Append("\r\n");                                // last line of data, add new line
 
-            // get first sprite sheet code
-            int spriteSheetID = spriteSheets[0];
+        //    // increase sprite data size  by 1 to include the sprite sheet code
+        //    lengthData++;
 
-            headerType.Append("\t\tdb $");
-            headerType.Append(spriteSheetID.ToString("X2"));
-            headerType.Append("\t\t; Sprite Sheet ID\r\n");
+        //    headerType.Append("\t\tdw $");
+        //    headerType.Append(lengthData.ToString("X4"));
+        //    headerType.Append("\t\t; Block size\r\n");
 
-            if (spriteSheets.Count > 1)
-            {
-                Console.Error.WriteLine("Multiple sprite sheets in block " + layer.Name);
-            }
+        //    // get first sprite sheet code
+        //    int spriteSheetID = spriteSheets[0];
 
-            // insert header at begin
-            header.Insert(0, headerType);
-            return output;
-        }
+        //    headerType.Append("\t\tdb $");
+        //    headerType.Append(spriteSheetID.ToString("X2"));
+        //    headerType.Append("\t\t; Sprite Sheet ID\r\n");
+
+        //    if (spriteSheets.Count > 1)
+        //    {
+        //        Console.Error.WriteLine("Multiple sprite sheets in block " + layer.Name);
+        //    }
+
+        //    // insert header at begin
+        //    header.Insert(0, headerType);
+        //    return output;
+        //}
 
         /// <summary>
         /// Write tilemap layer raw without any type of compression
@@ -199,8 +200,8 @@ namespace Tiled2ZXNext
             StringBuilder header = new(100);
             List<StringBuilder> output = new() { header, data };
             List<int> spriteSheets = new();
-
-            int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), false);
+            int GroupType = GetPropertyInt(layer.Properties, "Type");
+            //int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), false);
 
             headerType.Append("\t\tdb $");
             headerType.Append(GroupType.ToString("X2"));
@@ -210,14 +211,15 @@ namespace Tiled2ZXNext
             int index = 0;
             for (int row = 0; row < layer.Height; row++)
             {
-                data.Append("\t\tdb ");
+                data.Append("\t\t");
+                data.Append("dw $");
                 for (int col = 0; col < layer.Width; col++)
                 {
                     if (col > 0)
                     {   // not first col add separator
-                        data.Append(',');
+                        data.Append(", $");
                     }
-                    data.Append('$');
+
                     uint tileId = (uint)layer.Data[index];
                     uint extend = 0;
                     if (tileId == 0)
@@ -248,7 +250,7 @@ namespace Tiled2ZXNext
 
                     data.Append(extend.ToString("X2"));
                     data.Append(tileId.ToString("X2"));
-                    lengthData+=2;
+                    lengthData += 2;
                     index++;
                 }
                 data.Append("\r\n");
@@ -282,31 +284,33 @@ namespace Tiled2ZXNext
         /// <param name="layer">layer</param>
         /// <param name="compress">compress or raw</param>
         /// <returns></returns>
-        public StringBuilder WriteObjectsLayer(Layer layer, bool compress)
+        public StringBuilder WriteObjectsLayer(Layer layer)
         {
             StringBuilder output = new(1024);
             List<StringBuilder> data;
 
-            int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), compress);
+            int GroupType = GetPropertyInt(layer.Properties, "Type");
 
-            switch (GroupType)
-            {
-                case 16:
-                    {
-                        data = WriteObjectsLayerCompress(layer);
-                        break;
-                    }
-                case 17:
-                    {
-                        data = WriteObjectsLayerCompress2(layer);
-                        break;
-                    }
-                default:
-                    {
-                        data = WriteObjectsLayerRaw(layer);
-                    }
-                    break;
-            }
+            data = WriteObjectsLayerCompress(layer);
+
+            //switch (GroupType)
+            //{
+            //    case 1:
+            //        {
+            //            data = WriteObjectsLayerCompress(layer);
+            //            break;
+            //        }
+            //    case 17:
+            //        {
+            //            data = WriteObjectsLayerCompress2(layer);
+            //            break;
+            //        }
+            //    default:
+            //        {
+            //            data = WriteObjectsLayerRaw(layer);
+            //        }
+            //        break;
+            //}
             output.Append(data[0]);
             output.Append(data[1]);
 
@@ -318,60 +322,60 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="layer">layer</param>
         /// <returns>string builder collection with header and data</returns>
-        public static List<StringBuilder> WriteObjectsLayerRaw(Layer layer)
-        {
-            int lengthData = 0;
-            StringBuilder data = new(500);
-            StringBuilder headerType = new(500);
-            StringBuilder header = new(500);
-            List<StringBuilder> output = new() { header, data };
+        //public static List<StringBuilder> WriteObjectsLayerRaw(Layer layer)
+        //{
+        //    int lengthData = 0;
+        //    StringBuilder data = new(500);
+        //    StringBuilder headerType = new(500);
+        //    StringBuilder header = new(500);
+        //    List<StringBuilder> output = new() { header, data };
 
-            // int GroupType = GetPropertyInt(layer.Properties, "Type");
-            int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), false);
+        //    int GroupType = GetPropertyInt(layer.Properties, "Type");
+        //    //int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), false);
 
-            headerType.Append("\t\tdb $");
-            headerType.Append(GroupType.ToString("X2"));
-            headerType.Append("\t\t; data type\r\n");
+        //    headerType.Append("\t\tdb $");
+        //    headerType.Append(GroupType.ToString("X2"));
+        //    headerType.Append("\t\t; data type\r\n");
 
-            header.Append("\t\tdb $");
-            header.Append(layer.Objects.Count.ToString("X2"));
-            header.Append("\t\t; Objects count\r\n");
-            lengthData++;
+        //    header.Append("\t\tdb $");
+        //    header.Append(layer.Objects.Count.ToString("X2"));
+        //    header.Append("\t\t; Objects count\r\n");
+        //    lengthData++;
 
-            data.Append("\t\t; X, Y, Width, Height, ObjectType, Layer, EventsID\r\n");
-            foreach (Object obj in layer.Objects)
-            {
-                int layerMask = GetPropertyInt(obj.Properties, "LayerMask");
-                int layerId = GetPropertyInt(obj.Properties, "Layer");
-                int ObjectType = GetPropertyInt(obj.Properties, "ObjectType");
-                int EventsID = GetPropertyInt(obj.Properties, "EventsConfig");
-                layerMask *= 16 + layerId;
+        //    data.Append("\t\t; X, Y, Width, Height, ObjectType, Layer, EventsID\r\n");
+        //    foreach (Object obj in layer.Objects)
+        //    {
+        //        int layerMask = GetPropertyInt(obj.Properties, "LayerMask");
+        //        int layerId = GetPropertyInt(obj.Properties, "Layer");
+        //        int ObjectType = GetPropertyInt(obj.Properties, "ObjectType");
+        //        int EventsID = GetPropertyInt(obj.Properties, "EventsConfig");
+        //        layerMask *= 16 + layerId;
 
 
-                data.Append("\t\tdb $");
-                data.Append(Double2Hex(obj.X));
-                data.Append(",$");
-                data.Append(Double2Hex(obj.Y));
-                data.Append(",$");
-                data.Append(Double2Hex(obj.Width));
-                data.Append(",$");
-                data.Append(Double2Hex(obj.Height));
-                data.Append(",$");
-                data.Append(Double2Hex(ObjectType));
-                data.Append(",$");
-                data.Append(Double2Hex(layerMask));
-                data.Append(",$");
-                data.Append(Double2Hex(EventsID));
-                data.Append("\r\n");
-                lengthData += 7;
-            }
-            headerType.Append("\t\tdw $");
-            headerType.Append(lengthData.ToString("X4"));
-            headerType.Append("\t\t; Block size\r\n");
-            // insert header at begin
-            header.Insert(0, headerType);
-            return output;
-        }
+        //        data.Append("\t\tdb $");
+        //        data.Append(Double2Hex(obj.X));
+        //        data.Append(",$");
+        //        data.Append(Double2Hex(obj.Y));
+        //        data.Append(",$");
+        //        data.Append(Double2Hex(obj.Width));
+        //        data.Append(",$");
+        //        data.Append(Double2Hex(obj.Height));
+        //        data.Append(",$");
+        //        data.Append(Double2Hex(ObjectType));
+        //        data.Append(",$");
+        //        data.Append(Double2Hex(layerMask));
+        //        data.Append(",$");
+        //        data.Append(Double2Hex(EventsID));
+        //        data.Append("\r\n");
+        //        lengthData += 7;
+        //    }
+        //    headerType.Append("\t\tdw $");
+        //    headerType.Append(lengthData.ToString("X4"));
+        //    headerType.Append("\t\t; Block size\r\n");
+        //    // insert header at begin
+        //    header.Insert(0, headerType);
+        //    return output;
+        //}
 
         /// <summary>
         /// write objects layer compressed, there is an header with the shared properties and then each line contain the object property
@@ -391,17 +395,18 @@ namespace Tiled2ZXNext
             int layerId = GetPropertyInt(layer.Properties, "Layer");
             int ObjectType = GetPropertyInt(layer.Properties, "ObjectType");
             int EventsID = GetPropertyInt(layer.Properties, "EventsConfig");
-            //int GroupType = GetPropertyInt(layer.Properties, "Type");
-
-
-            int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), true);
+            int GroupType = GetPropertyInt(layer.Properties, "Type");
+            //int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), true);
 
             headerType.Append("\t\tdb $");
             headerType.Append(GroupType.ToString("X2"));
             headerType.Append("\t\t; data type\r\n");
 
             layerMask *= 16;
-            layerMask +=layerId;
+            layerMask += layerId;
+            header.Append("\t\tdb $");
+            header.Append(layer.Objects.Count.ToString("X2"));
+            header.Append("\t\t; Objects count\r\n");
             header.Append("\t\tdb $");
             header.Append(ObjectType.ToString("X2"));
             header.Append("\t\t; Type\r\n");
@@ -411,9 +416,8 @@ namespace Tiled2ZXNext
             header.Append("\t\tdb $");
             header.Append(EventsID.ToString("X2"));
             header.Append("\t\t; Events config\r\n");
-            header.Append("\t\tdb $");
-            header.Append(layer.Objects.Count.ToString("X2"));
-            header.Append("\t\t; Objects count\r\n");
+
+
 
             lengthData += 4;
 
@@ -494,9 +498,8 @@ namespace Tiled2ZXNext
             int layerId = GetPropertyInt(layer.Properties, "Layer");
             int ObjectType = GetPropertyInt(layer.Properties, "ObjectType");
             int EventsID = GetPropertyInt(layer.Properties, "EventsConfig");
-            //int GroupType = GetPropertyInt(layer.Properties, "Type");
-
-            int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), true);
+            int GroupType = GetPropertyInt(layer.Properties, "Type");
+            //int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), true);
 
             headerType.Append("\t\tdb $");
             headerType.Append(GroupType.ToString("X2"));
@@ -663,25 +666,6 @@ namespace Tiled2ZXNext
         /// <param name="groupType">original group type</param>
         /// <param name="compress">compress flag</param>
         /// <returns>new group type</returns>
-        private static int GroupTypeConvert(int groupType, bool compress)
-        {
-            if (groupType < 16)
-            {
-                if (compress)
-                {
-                    groupType += 16;
-                }
-            }
-            else if (groupType >= 32)
-            {
-                uint type = (ushort)groupType;
-                uint mask = 0b_0000_0000_0001_1111;
-                type &= mask;
-                groupType = (int)type;
-            }
-
-            return groupType;
-        }
 
         /// <summary>
         /// convert the tileid to always have index 0 for the tileset used
@@ -804,10 +788,10 @@ namespace Tiled2ZXNext
             int p1 = (gidSize8 / 16);
             int p2 = gidSize8 % 8;
             int p3 = p2 / 2;
-            int p4 = (gidSize8>>3) & 0b1;
+            int p4 = (gidSize8 >> 3) & 0b1;
 
             int gid = (p1 * 16) + p2 + (p3 * 2) + (p4 * 2);
-            
+
             return gid;
         }
     }
