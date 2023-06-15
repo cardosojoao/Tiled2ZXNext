@@ -212,7 +212,7 @@ namespace Tiled2ZXNext
             for (int row = 0; row < layer.Height; row++)
             {
                 data.Append("\t\t");
-                data.Append("dw $");
+                data.Append("db $");
                 for (int col = 0; col < layer.Width; col++)
                 {
                     if (col > 0)
@@ -248,8 +248,11 @@ namespace Tiled2ZXNext
                         //tileId |= mirror;              // add mirror flag
                     }
 
+                    
                     data.Append(extend.ToString("X2"));
+                    data.Append(", $");
                     data.Append(tileId.ToString("X2"));
+
                     lengthData += 2;
                     index++;
                 }
