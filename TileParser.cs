@@ -224,7 +224,7 @@ namespace Tiled2ZXNext
                     uint extend = 0;
                     if (tileId == 0)
                     {
-                        tileId = 255;  // means empty tile
+                        tileId = 63;  // means empty tile and must exist in tile patterns
                     }
                     else
                     {
@@ -248,10 +248,11 @@ namespace Tiled2ZXNext
                         //tileId |= mirror;              // add mirror flag
                     }
 
-                    
-                    data.Append(extend.ToString("X2"));
-                    data.Append(", $");
+
                     data.Append(tileId.ToString("X2"));
+                    data.Append(", $");
+                    data.Append(extend.ToString("X2"));
+                    
 
                     lengthData += 2;
                     index++;
