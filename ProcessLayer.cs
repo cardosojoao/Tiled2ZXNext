@@ -16,7 +16,24 @@ namespace Tiled2ZXNext
             full.Append(fileName);
             full.Append(":\r\n");
 
-            foreach (Layer layer in tiledData.Layers)
+            // we going to process the layers by type
+            List<Layer> tileLayers = tiledData.Layers.FindAll(l => l.Type == "tilelayer");
+            if (tileLayers.Count > 0)
+            {
+                TileMap tilemap = new(tileLayers[0].Height, tileLayers[0].Width);
+                foreach (Layer layer in tileLayers)
+                {
+                    if (layer.Visible)
+                    {
+                        tiledData.ParseLayer(layer, tilemap);
+                    }
+                }
+                StringBuilder tile = tiledData.WriteTiledLayer(tilemap);
+                full.Append(tile);
+            }
+
+            List<Layer> objectGroup = tiledData.Layers.FindAll(l => l.Type == "objectgroup");
+            foreach (Layer layer in objectGroup)
             {
                 if (layer.Visible)
                 {
@@ -27,7 +44,7 @@ namespace Tiled2ZXNext
                     full.Append(layer.Id);
                     full.Append(":\r\n");
 
-                    full.Append(tiledData.WriteLayer(layer));
+                    full.Append(tiledData.WriteObjectsLayer(layer));
                 }
             }
             // add terminator to scene

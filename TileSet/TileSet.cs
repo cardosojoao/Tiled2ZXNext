@@ -9,7 +9,6 @@
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
     public partial class tileset
     {
-
         private TilesetImage imageField;
 
         private TilesetTile tileField;
@@ -43,6 +42,8 @@
                 this.imageField = value;
             }
         }
+
+        
 
         /// <remarks/>
         public TilesetTile tile

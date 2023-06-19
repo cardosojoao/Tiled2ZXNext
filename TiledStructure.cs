@@ -116,7 +116,10 @@ namespace Tiled2ZXNext
         /// <summary>
         /// Sprite sheet id ( each sprite sheet is 8K and can have 32 sprites of 16x16 or 128 of 8x8)
         /// </summary>
-        public int SpriteSheetID { get; set; }
+        public int TileSheetID { get; set; }
+        public int PaletteIndex { get; set; }
+
+        public int Order { get; set; }
 
     }
 
