@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
 using System.Text.Json;
 using System.Xml.Serialization;
 
@@ -11,28 +11,31 @@ namespace Tiled2ZXNext
     {
         private string inputFile;
         private string fileName;
-        private bool compress;
         private string outputFile;
         private string inputPath;
 
         public string OutputRoomFile { get; set; }
         public string OutputMapFile { get; set; }
 
+        public static readonly Dictionary<string, Table> Tables  =  new();
+
+        private Options _options;
 
 
         public void Run(Options o)
         {
+            _options = o;
             inputFile = o.Input;
-            compress = o.Compress;
 
             inputPath = Path.GetDirectoryName(inputFile);
-            
+
             string data = File.ReadAllText(inputFile);
 
 
             TiledParser tiledData = JsonSerializer.Deserialize<TiledParser>(data);
 
             ResolveTileSets(tiledData.Tilesets);
+            ResolveTables(tiledData.Properties);
 
             fileName = TiledParser.GetProperty(tiledData.Properties, "FileName");
             string extension = "asm";
@@ -56,13 +59,51 @@ namespace Tiled2ZXNext
             PostProcessing(o);
         }
 
+        /// <summary>
+        /// check if tables are available and load definition
+        /// </summary>
+        /// <param name="props"></param>
+        private void ResolveTables(List<Property> props)
+        {
+            if (ExistMapProperty(props, "Tables"))
+            {
+                string[] tables = GetMapProperty(props, "Tables").Split('\n');
+                foreach (string table in tables)
+                {
+                    string[] tableParts = table.Split(':');
+                    Table tableSettings = new Table() { Name = tableParts[0], FilePath = tableParts[1] };
+                    Tables.Add(tableSettings.Name, tableSettings );
+                    Console.WriteLine($"Table={tableSettings.Name} Path={tableSettings.FilePath}");
+                    // read the file content    
+                    List<string> tableData = new (File.ReadAllLines(tableSettings.FilePath.Replace("~", _options.AppRoot)));
+                    // find table begin
+                    int tableIndex = tableData.FindIndex(r=> r.Contains( "Table:"+tableSettings.Name, StringComparison.InvariantCultureIgnoreCase));
+                    // if table exists
+                    if(tableIndex>0)
+                    {   // loop through content until find and empty line
+                        for(int line=tableIndex+1; line<tableData.Count; line++)
+                        {
+                            string item = tableData[line];
+                            if (item == string.Empty)
+                            {
+                                break;
+                            }
+                            // get just the name
+                            string[] itemData = item.Split(new char[] { ' ', '\t' });
+                            tableSettings.Items.Add(itemData[0]);
+                        }
+                    }
+                }
+            }
+        }
+
 
         private void ResolveTileSets(List<Tileset> tileSets)
         {
             Dictionary<string, List<Tileset>> resolved = new();
             Dictionary<string, tileset> tilesSetData = new();
 
-            int order= 0;       // order of load 
+            int order = 0;       // order of load 
             foreach (Tileset tileSet in tileSets)
             {
                 tileSet.Order = order;      // judt to keep in mind the physical order of tilesheet that is align with gid's
@@ -97,11 +138,11 @@ namespace Tiled2ZXNext
                         {
                             set.TileSheetID = int.Parse(GetTileSetProperty(tileSetData.tile.properties, "TileSheetId"));
                         }
-                        if(ExistProperty(tileSetData.tile.properties, "PaletteIndex"))
+                        if (ExistProperty(tileSetData.tile.properties, "PaletteIndex"))
                         {
                             set.PaletteIndex = int.Parse(GetTileSetProperty(tileSetData.tile.properties, "PaletteIndex"));
                         }
-                        
+
                     }
                 }
             }
@@ -144,6 +185,21 @@ namespace Tiled2ZXNext
             return value;
         }
 
+
+        private static string GetMapProperty(List<Property> properties, string name)
+        {
+            string value = string.Empty;
+            foreach (Property prop in properties)
+            {
+                if (prop.Name.ToLower() == name.ToLower())
+                {
+                    value = prop.Value;
+                    break;
+                }
+            }
+            return value;
+        }
+
         /// <summary>
         /// check if property exists
         /// </summary>
@@ -163,5 +219,28 @@ namespace Tiled2ZXNext
             }
             return found;
         }
+
+        private static bool ExistMapProperty(List<Property> properties, string name)
+        {
+            bool found = false;
+            foreach (Property prop in properties)
+            {
+                if (prop.Name.ToLower() == name.ToLower())
+                {
+                    found = true;
+                    break;
+                }
+            }
+            return found;
+        }
+
+    }
+
+
+    public class Table
+    {
+        public string Name { get; set; }
+        public string FilePath { get; set; }
+        public List<string> Items { get; set; } = new();
     }
 }

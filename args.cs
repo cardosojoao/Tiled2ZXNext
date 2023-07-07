@@ -12,6 +12,9 @@ namespace Tiled2ZXNext
         [Option('i', "input", Required = true, HelpText = "Input file")]
         public string Input { get; set; }
 
+        [Option('a', "approot", Required = true, HelpText = "Application Root Path", Default = false)]
+        public string AppRoot { get; set; }
+
         [Option('z', "compress", Required = false, HelpText = "Compress file", Default = false)]
         public bool Compress { get; set; }
 

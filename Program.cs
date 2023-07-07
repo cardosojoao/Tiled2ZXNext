@@ -1,9 +1,6 @@
-﻿using System;
-using System.IO;
-
-
+﻿using CommandLine;
+using System;
 using System.Reflection;
-using CommandLine;
 
 namespace Tiled2ZXNext
 {
@@ -30,13 +27,6 @@ namespace Tiled2ZXNext
                             main.Run(o);
                         }
                     });
-
-
-
-
-
-
-
             }
             catch (Exception ex)
             {

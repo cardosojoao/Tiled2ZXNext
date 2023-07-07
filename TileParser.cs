@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Xml.Serialization;
-using System.IO;
-using CommandLine;
-using System.Reflection;
 
 namespace Tiled2ZXNext
 {
@@ -247,7 +243,7 @@ namespace Tiled2ZXNext
             int GroupType = GetPropertyInt(layer.Properties, "Type");
 
             data = WriteObjectsLayerCompress(layer);
-            
+
             output.Append(data[0]);
             output.Append(data[1]);
 
@@ -269,35 +265,73 @@ namespace Tiled2ZXNext
             List<StringBuilder> output = new() { header, data };
             List<int> spriteSheets = new();
 
+            bool haveError = false;
+            StringBuilder error = new();
+            foreach (Object obj in layer.Objects)
+            {
+                if (obj.Visible)
+                {
+                    if (!CheckObject(obj))
+                    {
+                        string objID = obj.Id + "-" + (obj.Name.Length > 0 ? obj.Name : "<na>");
+                        error.Clear();
+                        error.Append("Object ");
+                        error.Append(objID);
+                        error.Append($" Incorrect Width {obj.Width} or Height {obj.Height}, must be an even value\r\n");
+                        Console.WriteLine(error.ToString());
+                        haveError = true;
+                    }
+                }
+            }
+            if (haveError)
+            {
+                throw new Exception("Incorrect height or Width must be even.");
+            }
+
+
             int layerMask = GetPropertyInt(layer.Properties, "LayerMask");
             int layerId = GetPropertyInt(layer.Properties, "Layer");
-            int ObjectType = GetPropertyInt(layer.Properties, "ObjectType");
-            int EventsID = GetPropertyInt(layer.Properties, "EventsConfig");
-            int GroupType = GetPropertyInt(layer.Properties, "Type");
+            string tagName = GetProperty(layer.Properties, "Tag");            
+            //int eventsID = GetPropertyInt(layer.Properties, "EventsConfig");
+            int blockType = GetPropertyInt(layer.Properties, "Type");
+            string bodyType = GetProperty(layer.Properties, "BodyType").ToLower();
+            string eventName = GetProperty(layer.Properties, "EventName");
+
+            int eventIndex = Controller.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
+            int tagIndex = Controller.Tables["TagName"].Items.FindIndex(r => r.Equals(tagName, StringComparison.CurrentCultureIgnoreCase));
+
             //int GroupType = GroupTypeConvert(GetPropertyInt(layer.Properties, "Type"), true);
 
             headerType.Append("\t\tdb $");
-            headerType.Append(GroupType.ToString("X2"));
-            headerType.Append("\t\t; data type\r\n");
+            headerType.Append(blockType.ToString("X2"));
+            headerType.Append("\t\t; data block type\r\n");
 
             layerMask *= 16;
             layerMask += layerId;
             header.Append("\t\tdb $");
-            header.Append(layer.Objects.Count.ToString("X2"));
+
+            header.Append(layer.Objects.Count(c => c.Visible).ToString("X2"));  // only visible objects count
             header.Append("\t\t; Objects count\r\n");
             header.Append("\t\tdb $");
-            header.Append(ObjectType.ToString("X2"));
-            header.Append("\t\t; Type\r\n");
+            header.Append(tagIndex.ToString("X2"));
+            header.Append("\t\t; Tag [");
+            header.Append(tagName);
+            header.Append("]\r\n");
             header.Append("\t\tdb $");
             header.Append(layerMask.ToString("X2"));
             header.Append("\t\t; Layer\r\n");
             header.Append("\t\tdb $");
-            header.Append(EventsID.ToString("X2"));
-            header.Append("\t\t; Events config\r\n");
+            header.Append(BodyTypeInt(bodyType).ToString("X2"));
+            header.Append("\t\t; Body Type 0=trigger , 4=rigid\r\n"); // to be removed
+            header.Append("\t\tdb $");
+            header.Append(eventIndex.ToString("X2"));
+            header.Append("\t\t; Event ID [");
+            header.Append(eventName);
+            header.Append("]\r\n");
+            
 
 
-
-            lengthData += 4;
+            lengthData += 5;
 
             if (layer.Name.ToLower() == "collision")
             {
@@ -309,25 +343,30 @@ namespace Tiled2ZXNext
             }
             foreach (Object obj in layer.Objects)
             {
-                data.Append("\t\tdb $");
-                data.Append(Double2Hex(obj.X));
-                data.Append(",$");
-                data.Append(Double2Hex(obj.Y));
-                data.Append(",$");
-                data.Append(Double2Hex(obj.Width));
-                data.Append(",$");
-                data.Append(Double2Hex(obj.Height));
-                lengthData += 4;
-                if (obj.Gid != null)
-                {
-                    var gidData = GetParsedGid((int)obj.Gid);
-                    SpriteSheetsBlock(spriteSheets, gidData.tileSheet.TileSheetID);
 
+                if (obj.Visible)
+                {
+
+                    data.Append("\t\tdb $");
+                    data.Append(Double2Hex(obj.X));
                     data.Append(",$");
-                    data.Append(Double2Hex(gidData.gid));
-                    lengthData++;
+                    data.Append(Double2Hex(obj.Y));
+                    data.Append(",$");
+                    data.Append(Double2Hex(obj.Width));
+                    data.Append(",$");
+                    data.Append(Double2Hex(obj.Height));
+                    lengthData += 4;
+                    if (obj.Gid != null)
+                    {
+                        var gidData = GetParsedGid((int)obj.Gid);
+                        SpriteSheetsBlock(spriteSheets, gidData.tileSheet.TileSheetID);
+
+                        data.Append(",$");
+                        data.Append(Double2Hex(gidData.gid));
+                        lengthData++;
+                    }
+                    data.Append("\r\n");
                 }
-                data.Append("\r\n");
             }
 
             if (spriteSheets.Count > 0)
@@ -358,6 +397,42 @@ namespace Tiled2ZXNext
             return output;
         }
 
+        private static int BodyTypeInt(string bodyType)
+        {
+            switch (bodyType)
+            {
+                case "trigger":
+                    return 0;
+                case "rigid":
+                    return 4;
+                default:
+                    return 4;
+            }
+        }
+
+        private bool CheckObject(Object obj)
+        {
+            bool result = true;
+
+
+            if (obj.Height % 2 == 0)
+            {
+                obj.Y += (obj.Height / 2);
+            }
+            else
+            {
+                result = false;
+            }
+            if (obj.Width % 2 == 0)
+            {
+                obj.X += (obj.Width / 2);
+            }
+            else
+            {
+                result = false;
+            }
+            return result;
+        }
         /// <summary>
         /// process a tile layer using a pre existing buffer, each tile layer write on top of previous layers tiles
         /// The finall result is the merge of all layers (using overwrite)
@@ -387,7 +462,7 @@ namespace Tiled2ZXNext
                             extend >>= 28;                     // bit 31 -> bit 11
                             tileId &= 0b11111111;
                             var gidData = GetParsedGid((int)tileId);     // tile index is 0 based
-                            uint paletteIndex = (uint)gidData.tileSheet.PaletteIndex<<4;
+                            uint paletteIndex = (uint)gidData.tileSheet.PaletteIndex << 4;
                             extend |= paletteIndex;     // add pallete index
                             tileId = (uint)gidData.gid - 1;         // the gid is always +1, we need to ensure that the ranges are from 0..63 for the first block and 64..127 for the second block
                             tileMap.Tiles[index] = (new Tile() { Settings = extend, TileID = tileId });
@@ -524,7 +599,7 @@ namespace Tiled2ZXNext
         /// <returns>tupple with gid and sprite sheet converted</returns>
         private (int gid, Tileset tileSheet) GetParsedGid(int gid)
         {
-            Tileset tileSheet =null ;
+            Tileset tileSheet = null;
             foreach (Tileset tileSet in this.Tilesets)
             {
                 if (gid >= tileSet.Firstgid && gid <= tileSet.Lastgid)
@@ -549,48 +624,6 @@ namespace Tiled2ZXNext
                 spriteSheets.Add(spriteSheetID);
             }
         }
-
-        /// <summary>
-        /// NOT USED
-        /// other parser to 8x8 tiles
-        /// </summary>
-        /// <param name="gidSize8"></param>
-        /// <returns></returns>
-        public int CalcGid8x8(int gidSize8)
-        {
-            int gid = gidSize8 % 16;
-            int row = gidSize8 >> 5;
-            gid >>= 1;
-            gid = row * 8 + gid;
-
-            int cella = gidSize8 & 0b00000001;      // col
-            cella <<= 6;
-            int cellb = gidSize8 & 0b00010000;      // row
-            cellb <<= 3;
-            cella |= cellb;
-            gid |= cella;
-            return gid;
-        }
-
-
-        /// <summary>
-        /// NOT USED
-        /// parse the Tiled tile id and convert to remy format where each sprite 16x16 contain 4 8x8 sprites sequentially
-        /// </summary>
-        /// <param name="gidSize8"></param>
-        /// <returns></returns>
-        public static int CalcGid8(int gidSize8)
-        {
-            int p1 = (gidSize8 / 16);
-            int p2 = gidSize8 % 8;
-            int p3 = p2 / 2;
-            int p4 = (gidSize8 >> 3) & 0b1;
-
-            int gid = (p1 * 16) + p2 + (p3 * 2) + (p4 * 2);
-
-            return gid;
-        }
-
     }
 
 
