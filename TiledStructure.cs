@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json;
+﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Tiled2ZXNext
@@ -57,8 +52,11 @@ namespace Tiled2ZXNext
         public int? Gid { get; set; }
     }
 
-    public class Layer
+    public partial class Layer
     {
+        [JsonPropertyName("layers")]
+        public List<Layer> Layers { get; set; }
+
         [JsonPropertyName("data")]
         public List<uint> Data { get; set; }
 
@@ -99,10 +97,15 @@ namespace Tiled2ZXNext
         public List<Property> Properties { get; set; }
     }
 
-    public class Tileset
+    public partial class Tileset
     {
         [JsonPropertyName("firstgid")]
         public int Firstgid { get; set; }
+
+        /// <summary>
+        /// first GID to be reported to parser
+        /// </summary>
+        public int FirstgidMap { get; set; }
 
         [JsonPropertyName("source")]
         public string Source { get; set; }
@@ -116,7 +119,10 @@ namespace Tiled2ZXNext
         /// <summary>
         /// Sprite sheet id ( each sprite sheet is 8K and can have 32 sprites of 16x16 or 128 of 8x8)
         /// </summary>
-        public int SpriteSheetID { get; set; }
+        public int TileSheetID { get; set; }
+        public int PaletteIndex { get; set; }
+
+        public int Order { get; set; }
 
     }
 

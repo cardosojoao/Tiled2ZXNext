@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -31,6 +32,7 @@ namespace Tiled2ZXNext
                 param = param.Replace("%1", inputFile).Replace("%2", outputfileAssembler);
 
                 execResult = ExecuteCommand(pathExe, param);
+                Console.WriteLine($"Result={execResult}");
             }
 
             if (zipConfig != null && execResult == 0)
@@ -43,6 +45,11 @@ namespace Tiled2ZXNext
                 param = param.Replace("%1", outputfileAssembler).Replace("%2", outputfileCompress);
 
                 execResult = ExecuteCommand(pathExe, param);
+                Console.WriteLine($"Result={execResult}");
+            }
+            else
+            {
+                Console.WriteLine("ERROR: Skip compress step");
             }
 
             BuildList(o.RoomPath, "*.zx0", o.RoomPath + "\\list.txt");
@@ -51,6 +58,7 @@ namespace Tiled2ZXNext
 
         static int ExecuteCommand(string exec, string parameters)
         {
+            Console.WriteLine("execute  " + exec, parameters);
             ProcessStartInfo startinfo = new ProcessStartInfo(exec, parameters);
             startinfo.ErrorDialog = true;
             startinfo.CreateNoWindow = true;
@@ -86,7 +94,7 @@ namespace Tiled2ZXNext
                 listOut.Append(file);
                 listOut.Append("\r\n");
             }
-
+            Console.WriteLine("output file " + outputFile);
             File.WriteAllText(outputFile, listOut.ToString());
         }
     }
