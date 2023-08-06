@@ -19,13 +19,13 @@
 
         private string nameField;
 
-        private byte tilewidthField;
+        private int tilewidthField;
 
-        private byte tileheightField;
+        private int tileheightField;
 
         private ushort tilecountField;
 
-        private byte columnsField;
+        private int columnsField;
 
         private TilesetTileProperty[] propertiesField;
 
@@ -102,7 +102,7 @@
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public byte tilewidth
+        public int tilewidth
         {
             get
             {
@@ -116,7 +116,7 @@
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public byte tileheight
+        public int tileheight
         {
             get
             {
@@ -144,7 +144,7 @@
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public byte columns
+        public int columns
         {
             get
             {
@@ -179,9 +179,9 @@
     {
         private string SourceField;
 
-        private byte WidthField;
+        private int WidthField;
 
-        private byte HeightField;
+        private int HeightField;
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
@@ -199,7 +199,7 @@
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public byte width
+        public int width
         {
             get
             {
@@ -213,7 +213,7 @@
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public byte Height
+        public int Height
         {
             get
             {

@@ -52,8 +52,11 @@ namespace Tiled2ZXNext
         public int? Gid { get; set; }
     }
 
-    public class Layer
+    public partial class Layer
     {
+        [JsonPropertyName("layers")]
+        public List<Layer> Layers { get; set; }
+
         [JsonPropertyName("data")]
         public List<uint> Data { get; set; }
 
@@ -94,10 +97,15 @@ namespace Tiled2ZXNext
         public List<Property> Properties { get; set; }
     }
 
-    public class Tileset
+    public partial class Tileset
     {
         [JsonPropertyName("firstgid")]
         public int Firstgid { get; set; }
+
+        /// <summary>
+        /// first GID to be reported to parser
+        /// </summary>
+        public int FirstgidMap { get; set; }
 
         [JsonPropertyName("source")]
         public string Source { get; set; }

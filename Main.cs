@@ -132,18 +132,18 @@ namespace Tiled2ZXNext
                     set.PaletteIndex = int.Parse(GetTileSetProperty(tileSetData.properties, "PaletteIndex"));
 
                     // if tile properties are setup, get the palette index and TileSheetID (checking if they are defined)
-                    if (tileSetData.tile.properties != null)
-                    {
-                        if (ExistProperty(tileSetData.tile.properties, "TileSheetId"))
-                        {
-                            set.TileSheetID = int.Parse(GetTileSetProperty(tileSetData.tile.properties, "TileSheetId"));
-                        }
-                        if (ExistProperty(tileSetData.tile.properties, "PaletteIndex"))
-                        {
-                            set.PaletteIndex = int.Parse(GetTileSetProperty(tileSetData.tile.properties, "PaletteIndex"));
-                        }
+                    //if (tileSetData.tile.properties != null)
+                    //{
+                    //    if (ExistProperty(tileSetData.tile.properties, "TileSheetId"))
+                    //    {
+                    //        set.TileSheetID = int.Parse(GetTileSetProperty(tileSetData.tile.properties, "TileSheetId"));
+                    //    }
+                    //    if (ExistProperty(tileSetData.tile.properties, "PaletteIndex"))
+                    //    {
+                    //        set.PaletteIndex = int.Parse(GetTileSetProperty(tileSetData.tile.properties, "PaletteIndex"));
+                    //    }
 
-                    }
+                    //}
                 }
             }
         }

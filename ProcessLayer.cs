@@ -8,51 +8,51 @@ namespace Tiled2ZXNext
     {
         public StringBuilder ProcessLayer(TiledParser tiledData)
         {
-            StringBuilder full = new(2048);
+            StringBuilder layerCode = new(2048);
             string fileName = TiledParser.GetProperty(tiledData.Properties, "FileName");
 
-            full.Append(fileName);
-            full.Append(":\r\n");
+            layerCode.Append(fileName);
+            layerCode.Append(":\r\n");
 
-            // we going to process the layers by type
-            List<Layer> tileLayers = tiledData.Layers.FindAll(l => l.Type == "tilelayer");
-            if (tileLayers.Count > 0)
+            List<IProcess> blocks = new();
+            // get root folders group
+
+            List<Layer> groups = tiledData.Layers.FindAll(l => l.Type == "group" && l.Visible);
+
+            // select Layer 2 group layers
+            Layer groupLayer = groups.Find(g => g.Name.Equals("layer2", System.StringComparison.InvariantCultureIgnoreCase));
+            if (groupLayer != null)
             {
-                TileMap tilemap = new(tileLayers[0].Height, tileLayers[0].Width);
-                foreach (Layer layer in tileLayers)
-                {
-                    if (layer.Visible)
-                    {
-                        tiledData.ParseLayer(layer, tilemap);
-                    }
-                }
-                StringBuilder tile = tiledData.WriteTiledLayer(tilemap);
-                full.Append(tile);
+                blocks.Add(new ProcessLayer2(groupLayer, tiledData));
             }
 
-            List<Layer> objectGroup = tiledData.Layers.FindAll(l => l.Type == "objectgroup");
-            foreach (Layer layer in objectGroup)
+            // select Tilemap group layers
+            groupLayer = groups.Find(g => g.Name.Equals("tilemap", System.StringComparison.InvariantCultureIgnoreCase));
+            if (groupLayer != null)
             {
-                if (layer.Visible)
-                {
-                    full.Append(fileName);
-                    full.Append('_');
-                    full.Append(layer.Name);
-                    full.Append('_');
-                    full.Append(layer.Id);
-                    full.Append(":\r\n");
+                blocks.Add(new ProcessTileMap(groupLayer, tiledData));
+            }
 
-                    full.Append(tiledData.WriteObjectsLayer(layer));
-                }
+            // select Collision group layers
+            groupLayer = groups.Find(g => g.Name.Equals("collision", System.StringComparison.InvariantCultureIgnoreCase));
+            if (groupLayer != null)
+            {
+                blocks.Add(new ProcessCollision(groupLayer, tiledData));
+            }
+
+
+            foreach (IProcess process in blocks)
+            {
+                layerCode.Append(process.Execute());
             }
             // add terminator to scene
-            full.Append(fileName);
-            full.Append("_eof\r\n");
-            full.Append("\t\tdb $");
-            full.Append(255.ToString("X2"));
-            full.Append("\t\t; end of file\r\n");
+            layerCode.Append(fileName);
+            layerCode.Append("_eof\r\n");
+            layerCode.Append("\t\tdb $");
+            layerCode.Append(255.ToString("X2"));
+            layerCode.Append("\t\t; end of file\r\n");
 
-            return full;
+            return layerCode;
         }
 
 
