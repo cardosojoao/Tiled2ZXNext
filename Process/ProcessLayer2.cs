@@ -126,9 +126,9 @@ namespace Tiled2ZXNext
                     areaCode.Append("\t\t");
                     areaCode.Append("db $");
                 }
-                areaCode.Append(cell.TileID.ToString("X2")); _size++;
-                areaCode.Append(",$");
                 areaCode.Append(cell.Settings.ToString("X2")); _size++;
+                areaCode.Append(",$");
+                areaCode.Append(cell.TileID.ToString("X2")); _size++;
                 rowCellCount++;
                 if (rowCellCount > 7)
                 {
@@ -169,16 +169,24 @@ namespace Tiled2ZXNext
             if (cell.TileID > 0)
             {
                 uint tileId = cell.TileID;
-                const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
-                const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;
-                uint extend = tileId & (FLIPPED_HORIZONTALLY_FLAG + FLIPPED_VERTICALLY_FLAG);
-                // 0b11000000_00000000_00000000_00000000;
-                // 0b00000000_00000000_00001100_00000000;
-                extend >>= 28;                     // bit 31 -> bit 11
+                const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;  // bit 3: mirror X    //  1000    8 /2    = 4
+                const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;    // bit 2: mirror Y    //  0100    4 /2    = 2
+                const uint FLIPPED_ROTATE90_FLAG = 0x20000000;      // bit 1: Rotate      //  0010    10/2    = 5
+                                                                    // 1010 0 00 00 00
+                const uint MASK = 0xe0000000;
+
+                uint extend = tileId & (MASK);
+                // 0b11100000_00000000_00000000_00000000;
+                // 0b00000000_00000000_00000000_00001110;
+                extend >>= 28;                     // bit 31 -> bit 3
+                if ((extend & (uint)2) > 0)
+                {
+                    extend ^= (uint)8;
+                }
                 tileId &= 0xffff;
                 var gidData = _tileData.GetParsedGid((int)tileId);     // tile index is 0 based
                 uint paletteIndex = (uint)gidData.tileSheet.PaletteIndex << 4;
-                extend |= paletteIndex;                 // add pallete index
+                //extend |= paletteIndex;                 // add pallete index
                 tileId = (uint)gidData.gid - 1;         // the gid is always +1, we need to ensure that the ranges are from 0..63 for the first block and 64..127 for the second block
                 // if we don't have the tileset just add it
                 if (_tileSets.FindIndex(t => t.TileSheetID == gidData.tileSheet.TileSheetID) == -1)
