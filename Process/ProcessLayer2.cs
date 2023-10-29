@@ -16,13 +16,10 @@ namespace Tiled2ZXNext
             _groupLayer = layer;
             LayersArea = new List<LayerAreas>();
             _tileData = tiledData;
-            
-            
         }
 
         public StringBuilder Execute()
         {
-            
             LayersArea.Clear();
             foreach (Layer layer in _groupLayer.Layers)
             {
@@ -59,9 +56,6 @@ namespace Tiled2ZXNext
         private StringBuilder WriteLayer2Area(LayerAreas layer)
         {
             StringBuilder data = new(1024);
-            //data.Append("\t\tdb $");
-            //data.Append(_type.ToString("X2")); _size++;
-            //data.Append($"\t\t; data type Layer2-{layer.Name}\r\n");
             data.Append(WriteLayer2TileSets());
             data.Append("\t\tdb $");
             data.Append(layer.Areas.Count.ToString("X2")); _size++;
@@ -97,22 +91,15 @@ namespace Tiled2ZXNext
             int y = area.Cells[0].Y;
 
             (int width, int height) = area.GetSize();
-
-
             areaCode.Append("\t\tdb $");
             areaCode.Append(x.ToString("X2")); _size++;
-
             areaCode.Append(",$");
             areaCode.Append(y.ToString("X2")); _size++;
-
             areaCode.Append(",$");
             areaCode.Append(width.ToString("X2")); _size++;
-
             areaCode.Append(",$");
             areaCode.Append(height.ToString("X2")); _size++;
-
             areaCode.Append("\t\t; x, y, width, height\r\n");
-
 
             int rowCellCount = 0;
             foreach (Cell cell in area.Cells)
@@ -172,7 +159,6 @@ namespace Tiled2ZXNext
                 const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;  // bit 3: mirror X    //  1000    8 /2    = 4
                 const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;    // bit 2: mirror Y    //  0100    4 /2    = 2
                 const uint FLIPPED_ROTATE90_FLAG = 0x20000000;      // bit 1: Rotate      //  0010    10/2    = 5
-                                                                    // 1010 0 00 00 00
                 const uint MASK = 0xe0000000;
 
                 uint extend = tileId & (MASK);

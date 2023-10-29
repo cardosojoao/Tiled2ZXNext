@@ -123,15 +123,16 @@ namespace Tiled2ZXNext
             {
                 if (obj.Visible)
                 {
+                    data.Append("\t\tdw $");
+                    data.Append(TiledParser.Double2Hex(obj.X + Controller.Config.Offset.x,"X4"));
+                    data.Append(",$");
+                    data.Append(TiledParser.Double2Hex(obj.Y + Controller.Config.Offset.y,"X4"));
+                    data.Append("\r\n");
                     data.Append("\t\tdb $");
-                    data.Append(TiledParser.Double2Hex(obj.X));
-                    data.Append(",$");
-                    data.Append(TiledParser.Double2Hex(obj.Y));
-                    data.Append(",$");
                     data.Append(TiledParser.Double2Hex(obj.Width));
                     data.Append(",$");
                     data.Append(TiledParser.Double2Hex(obj.Height));
-                    lengthData += 4;
+                    lengthData += 6;
                     data.Append("\r\n");
                 }
             }

@@ -19,7 +19,6 @@ namespace Tiled2ZXNext
         public StringBuilder Execute()
         {
             StringBuilder tileMapCode = new();
-
             if (_groupLayer.Layers.Count > 0)
             {
                 // create tileMap buffer
@@ -72,7 +71,6 @@ namespace Tiled2ZXNext
                             {
                                 extend ^= (uint)8;
                             }
-
                             tileId &= 0xffff;
                             var gidData = _tileData.GetParsedGid((int)tileId);     // tile index is 0 based
                             uint paletteIndex = (uint)gidData.tileSheet.PaletteIndex << 4;
@@ -83,8 +81,6 @@ namespace Tiled2ZXNext
                             {
                                 _tileSets.Add(gidData.tileSheet);
                             }
-
-
                         }
                         index++;
                     }
@@ -95,7 +91,6 @@ namespace Tiled2ZXNext
             {
                 return false;
             }
-
         }
 
         private StringBuilder WriteTiledLayer(TileMap tilemap)
@@ -146,7 +141,6 @@ namespace Tiled2ZXNext
             headerType.Append(", $");
             headerType.Append(tileSheet1.ToString("X2"));
             headerType.Append("\t\t; Tile sheet Id  00..fe=valid, ff=not defined\r\n");
-
             // insert header at begin
             header.Insert(0, headerType);
             header.Append(data);
@@ -161,6 +155,7 @@ namespace Tiled2ZXNext
                 tile.TileID = MapTile(tile.TileID);
             }
         }
+        
         private uint MapTile(uint gid)
         {
             uint gidMap = 0;

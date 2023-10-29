@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using System.Xml.Serialization;
@@ -17,9 +19,10 @@ namespace Tiled2ZXNext
         public string OutputRoomFile { get; set; }
         public string OutputMapFile { get; set; }
 
-        public static readonly Dictionary<string, Table> Tables  =  new();
+        public static readonly Dictionary<string, Table> Tables = new();
 
         private Options _options;
+        public static Config Config { get; set; } = new();
 
 
         public void Run(Options o)
@@ -27,10 +30,17 @@ namespace Tiled2ZXNext
             _options = o;
             inputFile = o.Input;
 
+
+
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("appconfig.json", optional: true, reloadOnChange: false)
+                .Build();
+            Config.Offset = config.GetRequiredSection("offset").Get<Offset>();
+            Config.Zip = config.GetRequiredSection("zip").Get<Command>();
+            Config.Assembler = config.GetRequiredSection("assembler").Get<Command>();
+
             inputPath = Path.GetDirectoryName(inputFile);
-
             string data = File.ReadAllText(inputFile);
-
 
             TiledParser tiledData = JsonSerializer.Deserialize<TiledParser>(data);
 
@@ -72,16 +82,16 @@ namespace Tiled2ZXNext
                 {
                     string[] tableParts = table.Split(':');
                     Table tableSettings = new Table() { Name = tableParts[0], FilePath = tableParts[1] };
-                    Tables.Add(tableSettings.Name, tableSettings );
+                    Tables.Add(tableSettings.Name, tableSettings);
                     Console.WriteLine($"Table={tableSettings.Name} Path={tableSettings.FilePath}");
                     // read the file content    
-                    List<string> tableData = new (File.ReadAllLines(tableSettings.FilePath.Replace("~", _options.AppRoot)));
+                    List<string> tableData = new(File.ReadAllLines(tableSettings.FilePath.Replace("~", _options.AppRoot)));
                     // find table begin
-                    int tableIndex = tableData.FindIndex(r=> r.Contains( "Table:"+tableSettings.Name, StringComparison.InvariantCultureIgnoreCase));
+                    int tableIndex = tableData.FindIndex(r => r.Contains("Table:" + tableSettings.Name, StringComparison.InvariantCultureIgnoreCase));
                     // if table exists
-                    if(tableIndex>0)
+                    if (tableIndex > 0)
                     {   // loop through content until find and empty line
-                        for(int line=tableIndex+1; line<tableData.Count; line++)
+                        for (int line = tableIndex + 1; line < tableData.Count; line++)
                         {
                             string item = tableData[line];
                             if (item == string.Empty)
@@ -236,6 +246,25 @@ namespace Tiled2ZXNext
 
     }
 
+
+    public class Config
+    {
+        public Offset Offset { get; set; }
+        public Command? Zip { get; set; }
+        public Command? Assembler { get; set; }
+    }
+
+
+    public class Command
+    {
+        public string? App { get; set; }
+        public string? Args { get; set; }
+    }
+    public class Offset
+    {
+        public double x { get; set; }
+        public double y { get; set; }
+    }
 
     public class Table
     {

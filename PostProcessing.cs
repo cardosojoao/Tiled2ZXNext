@@ -14,20 +14,21 @@ namespace Tiled2ZXNext
         {
             int execResult = -1;
 
-            IConfiguration config = new ConfigurationBuilder()
-                .AddJsonFile("appconfig.json", optional: true, reloadOnChange: false)
-                .Build();
+            //IConfiguration config = new ConfigurationBuilder()
+            //    .AddJsonFile("appconfig.json", optional: true, reloadOnChange: false)
+            //    .Build();
 
-            var zipConfig = config.GetSection("zip");
-            var assemblerConfig = config.GetSection("assembler");
+            //var zipConfig = config.GetSection("zip");
+            //var assemblerConfig = config.GetSection("assembler");
+
 
             string outputfileAssembler = Path.Combine(o.RoomPath, fileName + ".bin");
             string inputFile = Path.Combine(o.RoomPath, outputFile);
 
-            if (assemblerConfig != null)
+            if (Controller.Config.Assembler != null)
             {
-                string pathExe = assemblerConfig.GetSection("app").Value;
-                string param = assemblerConfig.GetSection("args").Value;
+                string pathExe = Controller.Config.Assembler.App; // assemblerConfig.GetSection("app").Value;
+                string param = Controller.Config.Assembler.Args; // assemblerConfig.GetSection("args").Value;
 
                 param = param.Replace("%1", inputFile).Replace("%2", outputfileAssembler);
 
@@ -35,10 +36,10 @@ namespace Tiled2ZXNext
                 Console.WriteLine($"Result={execResult}");
             }
 
-            if (zipConfig != null && execResult == 0)
+            if (Controller.Config.Zip != null && execResult == 0)
             {
-                string pathExe = zipConfig.GetSection("app").Value;
-                string param = zipConfig.GetSection("args").Value;
+                string pathExe = Controller.Config.Zip.App;     // zipConfig.GetSection("app").Value;
+                string param = Controller.Config.Zip.Args;      // zipConfig.GetSection("args").Value;
 
                 string outputfileCompress = Path.Combine(Path.GetDirectoryName(outputfileAssembler), Path.GetFileNameWithoutExtension(outputfileAssembler) + ".zx0");
 

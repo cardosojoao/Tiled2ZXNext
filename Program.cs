@@ -24,6 +24,7 @@ namespace Tiled2ZXNext
                         else
                         {
                             Controller main = new();
+                            
                             main.Run(o);
                         }
                     });

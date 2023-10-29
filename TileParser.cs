@@ -465,16 +465,16 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="value">value</param>
         /// <returns>hexadecimal value</returns>
-        public static string Double2Hex(double value)
+        public static string Double2Hex(double value, string format = "X2")
         {
             string result;
             if (value >= 0)
             {
-                result = ((int)Math.Round(value, 0)).ToString("X2");
+                result = ((int)Math.Round(value, 0)).ToString(format);
             }
             else
             {
-                result = ((int)Math.Round(value, 0)).ToString("X2").Substring(6, 2);
+                result = ((int)Math.Round(value, 0)).ToString(format).Substring(6, 2);
             }
             return result;
 
