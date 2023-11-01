@@ -9,19 +9,9 @@ namespace Tiled2ZXNext
 {
     public partial class Controller
     {
-
         public void PostProcessing(Options o)
         {
             int execResult = -1;
-
-            //IConfiguration config = new ConfigurationBuilder()
-            //    .AddJsonFile("appconfig.json", optional: true, reloadOnChange: false)
-            //    .Build();
-
-            //var zipConfig = config.GetSection("zip");
-            //var assemblerConfig = config.GetSection("assembler");
-
-
             string outputfileAssembler = Path.Combine(o.RoomPath, fileName + ".bin");
             string inputFile = Path.Combine(o.RoomPath, outputFile);
 

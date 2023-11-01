@@ -26,6 +26,13 @@ namespace Tiled2ZXNext
                 blocks.Add(new ProcessLayer2(groupLayer, tiledData));
             }
 
+            // select Collision group layers
+            groupLayer = groups.Find(g => g.Name.Equals("collision", System.StringComparison.InvariantCultureIgnoreCase));
+            if (groupLayer != null)
+            {
+                blocks.Add(new ProcessCollision(groupLayer, tiledData));
+            }
+
             // select Tilemap group layers
             groupLayer = groups.Find(g => g.Name.Equals("tilemap", System.StringComparison.InvariantCultureIgnoreCase));
             if (groupLayer != null)
@@ -33,12 +40,6 @@ namespace Tiled2ZXNext
                 blocks.Add(new ProcessTileMap(groupLayer, tiledData));
             }
 
-            // select Collision group layers
-            groupLayer = groups.Find(g => g.Name.Equals("collision", System.StringComparison.InvariantCultureIgnoreCase));
-            if (groupLayer != null)
-            {
-                blocks.Add(new ProcessCollision(groupLayer, tiledData));
-            }
 
 
             foreach (IProcess process in blocks)
