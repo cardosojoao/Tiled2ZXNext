@@ -18,7 +18,7 @@ namespace Tiled2ZXNext
         public StringBuilder Execute()
         {
             StringBuilder collisionCode = new();
-            string fileName = TiledParser.GetProperty(_tiledData.Properties, "FileName");
+            string fileName = TiledParser.GetProperty(_tiledData, "FileName");
             foreach (Layer layer in _groupLayer.Layers)
             {
                 if (layer.Visible)
@@ -102,7 +102,7 @@ namespace Tiled2ZXNext
             header.Append("\t\t; Layer\r\n");
             header.Append("\t\tdb $");
             header.Append(BodyTypeInt(bodyType).ToString("X2"));
-            header.Append("\t\t; Body Type 0=trigger , 4=rigid\r\n"); // to be removed
+            header.Append("\t\t; Body Type 0=trigger , 4=rigid\r\n");   // to be removed
             header.Append("\t\tdb $");
             header.Append(eventIndex.ToString("X2"));
             header.Append("\t\t; Event ID [");
@@ -138,7 +138,7 @@ namespace Tiled2ZXNext
             }
 
             headerType.Append("\t\tdw $");
-            headerType.Append(lengthData.ToString("X4"));           // size must be 2B long (map is over 256 Bytes)
+            headerType.Append(lengthData.ToString("X4"));               // size must be 2B long (map is over 256 Bytes)
             headerType.Append("\t\t; Block size\r\n");
             // insert header at begin
             header.Insert(0, headerType);

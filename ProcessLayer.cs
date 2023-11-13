@@ -9,7 +9,7 @@ namespace Tiled2ZXNext
         public StringBuilder ProcessLayer(TiledParser tiledData)
         {
             StringBuilder layerCode = new(2048);
-            string fileName = TiledParser.GetProperty(tiledData.Properties, "FileName");
+            string fileName = TiledParser.GetProperty(tiledData, "FileName");
 
             layerCode.Append(fileName);
             layerCode.Append(":\r\n");

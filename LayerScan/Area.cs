@@ -10,22 +10,29 @@ namespace Tiled2ZXNext
 {
     public class Area
     {
+        private readonly int _tileSize;
         public List<Cell> Cells { get; private set; } = new List<Cell>();
 
-        public Area() { }
+
+        public Area(int tileSize)
+        {
+            _tileSize = tileSize;
+        }
 
         /// <summary>
         /// set the size of area and populates with default values
         /// </summary>
         /// <param name="width">width of area</param>
         /// <param name="height">height of area</param>
-        public Area(int width, int height)
+        public Area(int width, int height, int tileSize)
         {
+            _tileSize = tileSize;
+            int step = tileSize / 8;
             Cells = new List<Cell>(width * height);
 
-            for (int r = 0; r < height; r++)
+            for (int r = 0; r < height; r += step)
             {
-                for (int c = 0; c < width; c++)
+                for (int c = 0; c < width; c += step)
                 {
                     Cell cell = new() { X = c, Y = r, TileID = 0, Source = 0 };
                     Cells.Add(cell);
@@ -78,6 +85,7 @@ namespace Tiled2ZXNext
         /// <returns></returns>
         public int Fill()
         {
+
             (int width, int height) size = GetSize();
             int fill = (int)((((float)Cells.Count) / ((float)(size.width * size.height))) * 100);
             return fill;
@@ -89,8 +97,9 @@ namespace Tiled2ZXNext
         /// <param name="index">initial cell to start counting</param>
         /// <param name="length">number of cells to count</param>
         /// <returns>width and height</returns>
-        public  (int width, int height) GetSize(int index, int length)
+        public (int width, int height) GetSize(int index, int length)
         {
+            int step = _tileSize / 8;
             int lx = int.MaxValue;
             int rx = int.MinValue;
             int ty = int.MaxValue;
@@ -104,7 +113,8 @@ namespace Tiled2ZXNext
                 ty = Math.Min(cell.Y, ty);
                 by = Math.Max(cell.Y, by);
             }
-            return (rx - lx + 1, by - ty + 1);
+            // size will report number of cells horiz and vertical
+            return ((rx - lx + step) / step, (by - ty + step) / step);
         }
 
         /// <summary>
@@ -112,8 +122,9 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="cells">collection of cells</param>
         /// <returns>width and height</returns>
-        public static  (int width, int height) GetSize(List<Cell> cells)
+        public static (int width, int height) GetSize(List<Cell> cells, int tileSize)
         {
+            int step = tileSize / 8;
             int lx = int.MaxValue;
             int rx = int.MinValue;
             int ty = int.MaxValue;
@@ -126,7 +137,9 @@ namespace Tiled2ZXNext
                 ty = Math.Min(cell.Y, ty);
                 by = Math.Max(cell.Y, by);
             }
-            return (rx - lx + 1, by - ty + 1);
+            //return (rx - lx + 1, by - ty + 1);
+            // size will report number of cells horiz and vertical
+            return ((rx - lx + step) / step, (by - ty + step) / step);
         }
 
         /// <summary>
@@ -146,17 +159,17 @@ namespace Tiled2ZXNext
         public Area Explode()
         {
             (int width, int height) size = GetSize();
-            Area area = new Area(size.width, size.height);
 
+            int step = _tileSize / 8;
+            Area area = new Area(size.width, size.height, 8);
             // get the offset of area
             int x = Cells[0].X;
             int y = Cells[0].Y;
-
             foreach (Cell cell in Cells)
             {
                 // we need to ensure that we use the offset to have the correct position in exploded area
-                int xa = cell.X - x; 
-                int ya = cell.Y - y;
+                int xa = (cell.X - x)/step;
+                int ya = (cell.Y - y)/step;
 
                 int index = ya * size.width + xa;
                 area.Cells[index].TileID = cell.TileID;
@@ -175,9 +188,9 @@ namespace Tiled2ZXNext
         /// <returns>collection smaller areas</returns>
         public List<Area> SplitHoriz()
         {
-            List<Area> areas = new List<Area>();        // list of new areas
-            int i = 0;                                  // index of area cell
-            Area newArea = new();                       // new area object
+            List<Area> areas = new List<Area>();            // list of new areas
+            int i = 0;                                      // index of area cell
+            Area newArea = new(_tileSize);                  // new area object
 
             while (i < Cells.Count)
             {
@@ -186,17 +199,18 @@ namespace Tiled2ZXNext
                 if (areaCurrentSize.width <= 4 && areaCurrentSize.width <= 4)
                 {
                     areas.Add(Explode());
+                    Cells.RemoveRange(i, Cells.Count);
                     break;
                 }
 
                 List<Cell> row = GetRow(i);        // get next row
-                (int width, int height) rowSize = Area.GetSize(row);
-                (int width, int height) areaSize = Area.GetSize(newArea.Cells);
+                (int width, int height) rowSize = Area.GetSize(row, _tileSize);
+                (int width, int height) areaSize = Area.GetSize(newArea.Cells, _tileSize);
 
                 // check if we have 100% of row fill
-                bool rowOK = Area.GetSize(row).width == row.Count;
+                bool rowOK = Area.GetSize(row, _tileSize).width == row.Count;
                 // check if width of new area and row is the same, if first row area is always good
-                bool areaOK = newArea.Cells.Count == 0 ? true : Area.GetSize(newArea.Cells).width == row.Count;
+                bool areaOK = newArea.Cells.Count == 0 ? true : Area.GetSize(newArea.Cells, _tileSize).width == row.Count;
 
                 // if row is 100% and area+row are 100% add row to area
                 if (rowOK && areaOK)
@@ -211,7 +225,7 @@ namespace Tiled2ZXNext
                     if (newArea.Cells.Count > 0)
                     {
                         areas.Add(newArea);
-                        newArea = new Area();
+                        newArea = new Area(_tileSize);
                     }
                     else
                     {
@@ -233,11 +247,11 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="area">area to be splited</param>
         /// <returns>collection of smaller areas</returns>
-        public  List<Area> SplitVert()
+        public List<Area> SplitVert()
         {
             int i = 0;                                  // index of area cell
             List<Area> areas = new List<Area>();        // list of new areas
-            Area openArea = new();                       // current open area object
+            Area openArea = new(_tileSize);                       // current open area object
 
             while (i < Cells.Count)
             {
@@ -248,9 +262,12 @@ namespace Tiled2ZXNext
                     areas.Add(Explode());
                     break;
                 }
-                List<Cell> col = GetCol(i);                                // get next row
-                (int width, int height) colSize = Area.GetSize(col);             // size of column
-                (int width, int height) areaSize = Area.GetSize(openArea.Cells);  // size of current new area
+                List<Cell> col = GetCol(i);                                // get next col
+
+
+                
+                (int width, int height) colSize = Area.GetSize(col, _tileSize);             // size of column
+                (int width, int height) areaSize = Area.GetSize(openArea.Cells, _tileSize);  // size of current new area
 
 
                 // check if we have 100% of row fill
@@ -274,7 +291,7 @@ namespace Tiled2ZXNext
                     if (openArea.Cells.Count > 0)
                     {
                         areas.Add(openArea);
-                        openArea = new Area();
+                        openArea = new Area(_tileSize);
                     }
                     else
                     {

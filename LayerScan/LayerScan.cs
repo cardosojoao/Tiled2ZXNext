@@ -9,14 +9,15 @@ namespace Tiled2ZXNext
 {
     public class LayerScan
     {
-        //public List<LayerAreas> LayerAreas { get; set; } = new List<LayerAreas>();
         private readonly LayerAreas _layerAreas;
         private readonly Layer _layer;
+        private readonly int _tileSize;
 
-        public LayerScan(Layer layer)
+        public LayerScan(Layer layer, int tileSize)
         {
             _layer = layer;
             _layerAreas = new() { Name = layer.Name };
+            _tileSize = tileSize;
         }
 
         /// <summary>
@@ -25,7 +26,6 @@ namespace Tiled2ZXNext
         /// <param name="grouplayer"></param>
         public LayerAreas ScanAreas()
         {
-
             List<int> spriteSheets = new();
             int GroupType = TiledParser.GetPropertyInt(_layer.Properties, "Type");
             int index = 0;
@@ -35,16 +35,12 @@ namespace Tiled2ZXNext
                 for (int col = 0; col < _layer.Width; col++)
                 {
                     uint tileId = (uint)_layer.Data[index];
-                    Cell cell = new Cell() { TileID = tileId, X = col, Y = row };
+                    Cell cell = new Cell() { TileID = tileId, X = col, Y = (_tileSize == 16 ? row - 1 : row) };  // tile 16 the left bottom corner is the coord from tiled
                     if (tileId != 0 && !_layerAreas.Included(cell))
                     {
-                        Area area = _layer.ScanArea(cell);
+                        Area area = _layer.ScanArea(cell, _tileSize);
                         area.SortHoriz();
                         _layerAreas.Areas.Add(area);
-                        //Area area = new();
-                        //layerAreas.Areas.Add(area);
-                        //area.ScanArea(cell, _layer);
-                        //area.SortHoriz();
                     }
                     index++;
                 }
@@ -86,72 +82,5 @@ namespace Tiled2ZXNext
             return newAreas;
         }
 
-
-
-        ///// <summary>
-        ///// try to split the area in small chunks with 100% filled
-        ///// check row by row (horizontal)
-        ///// </summary>
-        ///// <param name="area">are to split in smaller areas</param>
-        ///// <returns>collection smaller areas</returns>
-        //private static List<Area> SplitHoriz(Area area)
-        //{
-        //    List<Area> areas = new List<Area>();        // list of new areas
-        //    int i = 0;                                  // index of area cell
-        //    Area newArea = new();                       // new area object
-
-        //    while (i < area.Cells.Count)
-        //    {
-        //        // if area is equal or smaller than 4x4 just stop and add the area
-        //        (int width, int height) areaCurrentSize = area.GetSize();
-        //        if (areaCurrentSize.width <= 4 && areaCurrentSize.width <= 4)
-        //        {
-        //            areas.Add(area.Explode());
-        //            break;
-        //        }
-
-        //        List<Cell> row = GetRow(area, i);        // get next row
-        //        (int width, int height) rowSize = Area.GetSize(row);
-        //        (int width, int height) areaSize = Area.GetSize(newArea.Cells);
-
-        //        // check if we have 100% of row fill
-        //        bool rowOK = Area.GetSize(row).width == row.Count;
-        //        // check if width of new area and row is the same, if first row area is always good
-        //        bool areaOK = newArea.Cells.Count == 0 ? true : Area.GetSize(newArea.Cells).width == row.Count;
-
-        //        // if row is 100% and area+row are 100% add row to area
-        //        if (rowOK && areaOK)
-        //        {
-        //            newArea.Cells.AddRange(row);
-        //            area.Cells.RemoveRange(i, row.Count);
-        //        }
-        //        else
-        //        {
-        //            // if row isn´t 100% or doesn't have the same width of new area
-        //            // if exist a new area save it and reset new area
-        //            if (newArea.Cells.Count > 0)
-        //            {
-        //                areas.Add(newArea);
-        //                newArea = new Area();
-        //            }
-        //            else
-        //            {
-        //                // if we skip the row
-        //                i += row.Count;
-        //            }
-        //        }
-        //    }
-        //    if (newArea.Cells.Count > 0)
-        //    {
-        //        areas.Add(newArea);
-        //    }
-        //    return areas;
-        //}
-
-
-
-
-
     }
-
 }

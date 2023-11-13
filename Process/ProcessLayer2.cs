@@ -11,6 +11,7 @@ namespace Tiled2ZXNext
         private readonly List<Tileset> _tileSets = new();
         private int _type;
         private int _size;
+        private int _tileSize;
         public ProcessLayer2(Layer layer, TiledParser tiledData)
         {
             _groupLayer = layer;
@@ -26,7 +27,8 @@ namespace Tiled2ZXNext
                 if (layer.Visible)
                 {
                     _type = TiledParser.GetPropertyInt(layer.Properties, "Type");
-                    LayerScan layerScan = new LayerScan(layer);
+                    _tileSize = TiledParser.GetPropertyInt(layer.Properties, "Size");
+                    LayerScan layerScan = new LayerScan(layer, _tileSize);
                     layerScan.ScanAreas();
                     LayerAreas layerAreas = layerScan.SplitAreas();
                     layerAreas.Name = layer.Name;
@@ -42,7 +44,7 @@ namespace Tiled2ZXNext
                 _size = 0;
                 layer2Code.Append("\t\tdb $");
                 layer2Code.Append(_type.ToString("X2"));
-                layer2Code.Append($"\t\t; data type Layer2-{layer.Name}\r\n");
+                layer2Code.Append($"\t\t; data type Layer2({_tileSize}x{_tileSize}) - {layer.Name}\r\n");
                 StringBuilder body = WriteLayer2Area(layer);
                 layer2Code.Append("\t\tdw $");
                 layer2Code.Append(_size.ToString("X4"));

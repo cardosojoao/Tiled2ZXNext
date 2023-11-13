@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Xml.Serialization;
@@ -47,7 +48,7 @@ namespace Tiled2ZXNext
             ResolveTileSets(tiledData.Tilesets);
             ResolveTables(tiledData.Properties);
 
-            fileName = TiledParser.GetProperty(tiledData.Properties, "FileName");
+            fileName = TiledParser.GetProperty(tiledData, "FileName");
             string extension = "asm";
             outputFile = fileName + "." + extension;
 
@@ -138,8 +139,8 @@ namespace Tiled2ZXNext
                     set.Parsedgid = set.Firstgid - 1;
 
 
-                    set.TileSheetID = int.Parse(GetTileSetProperty(tileSetData.properties, "TileSheetId"));
-                    set.PaletteIndex = int.Parse(GetTileSetProperty(tileSetData.properties, "PaletteIndex"));
+                    set.TileSheetID = int.Parse(GetTileSetProperty(tileSetData, "TileSheetId"));        //  unique id of tilesheet
+                    set.PaletteIndex = int.Parse(GetTileSetProperty(tileSetData, "PaletteIndex"));      //  palette id or -1 if no palette 
 
                     // if tile properties are setup, get the palette index and TileSheetID (checking if they are defined)
                     //if (tileSetData.tile.properties != null)
@@ -181,33 +182,39 @@ namespace Tiled2ZXNext
         /// <param name="properties">collection of properties</param>
         /// <param name="name">property name</param>
         /// <returns>property value or empty if not found</returns>
-        private static string GetTileSetProperty(TilesetTileProperty[] properties, string name)
+        private static string GetTileSetProperty(tileset tileSet, string name)
         {
-            string value = string.Empty;
-            foreach (TilesetTileProperty prop in properties)
-            {
-                if (prop.name.ToLower() == name.ToLower())
-                {
-                    value = prop.value;
-                    break;
-                }
-            }
-            return value;
+            if (tileSet.properties == null) throw new ArgumentNullException($"tileSet: missing [properties] of {tileSet.name}");
+            TilesetTileProperty prop = tileSet.properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return prop?.value ?? "";
+
+            //foreach (TilesetTileProperty prop in properties)
+            //{
+            //    if (prop.name.ToLower() == name.ToLower())
+            //    {
+            //        value = prop.value;
+            //        break;
+            //    }
+            //}
+            //return value;
         }
 
 
         private static string GetMapProperty(List<Property> properties, string name)
         {
-            string value = string.Empty;
-            foreach (Property prop in properties)
-            {
-                if (prop.Name.ToLower() == name.ToLower())
-                {
-                    value = prop.Value;
-                    break;
-                }
-            }
-            return value;
+            if (properties == null) throw new ArgumentNullException($"missing [properties]");
+            Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return prop?.Value ?? "";
+            //string value = string.Empty;
+            //foreach (Property prop in properties)
+            //{
+            //    if (prop.Name.ToLower() == name.ToLower())
+            //    {
+            //        value = prop.Value;
+            //        break;
+            //    }
+            //}
+            //return value;
         }
 
         /// <summary>
@@ -216,32 +223,40 @@ namespace Tiled2ZXNext
         /// <param name="properties">list of properties</param>
         /// <param name="name">property name</param>
         /// <returns></returns>
-        private static bool ExistProperty(TilesetTileProperty[] properties, string name)
+        private static bool ExistProperty(tileset tileSet, string name)
         {
-            bool found = false;
-            foreach (TilesetTileProperty prop in properties)
-            {
-                if (prop.name.ToLower() == name.ToLower())
-                {
-                    found = true;
-                    break;
-                }
-            }
-            return found;
+            if (tileSet.properties == null) throw new ArgumentNullException($"tileSet: missing [properties] of {tileSet.name}");
+            TilesetTileProperty prop = tileSet.properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return prop == null ? false : true;
+
+            //bool found = false;
+            //foreach (TilesetTileProperty prop in properties)
+            //{
+            //    if (prop.name.ToLower() == name.ToLower())
+            //    {
+            //        found = true;
+            //        break;
+            //    }
+            //}
+            //return found;
         }
 
         private static bool ExistMapProperty(List<Property> properties, string name)
         {
-            bool found = false;
-            foreach (Property prop in properties)
-            {
-                if (prop.Name.ToLower() == name.ToLower())
-                {
-                    found = true;
-                    break;
-                }
-            }
-            return found;
+            if (properties == null) throw new ArgumentNullException($"missing [properties]");
+            Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return prop == null ? false : true;
+
+            //bool found = false;
+            //foreach (Property prop in properties)
+            //{
+            //    if (prop.Name.ToLower() == name.ToLower())
+            //    {
+            //        found = true;
+            //        break;
+            //    }
+            //}
+            //return found;
         }
 
     }
