@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using Microsoft.Extensions.Primitives;
+using System.IO;
 using System.Text;
+using Tiled2ZXNext.Extensions;
 
 namespace Tiled2ZXNext
 {
@@ -14,26 +16,26 @@ namespace Tiled2ZXNext
         public StringBuilder ProcessMap(TiledParser tiledData)
         {
             StringBuilder result = new StringBuilder(100);
-            string fileName = TiledParser.GetProperty(tiledData.Properties, "FileName");
+            string fileName = tiledData.Properties.GetProperty( "FileName");
 
             result.Append('m');
             result.Append(fileName);
             result.Append(":\r\n");
             result.Append(".Left:\t\t");
             result.Append("db\t");
-            result.Append(TiledParser.GetProperty(tiledData.Properties, "roomleft"));
+            result.Append(tiledData.Properties.GetProperty( "roomleft"));
             result.Append("\r\n");
             result.Append(".Right:\t\t");
             result.Append("db\t");
-            result.Append(TiledParser.GetProperty(tiledData.Properties, "roomright"));
+            result.Append(tiledData.Properties.GetProperty( "roomright"));
             result.Append("\r\n");
             result.Append(".Top:\t\t");
             result.Append("db\t");
-            result.Append(TiledParser.GetProperty(tiledData.Properties, "roomtop"));
+            result.Append(tiledData.Properties.GetProperty( "roomtop"));
             result.Append("\r\n");
             result.Append(".Bottom:\t");
             result.Append("db\t");
-            result.Append(TiledParser.GetProperty(tiledData.Properties, "roombottom"));
+            result.Append(tiledData.Properties.GetProperty( "roombottom"));
             result.Append("\r\n");
             return result;
         }

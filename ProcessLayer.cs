@@ -1,15 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Tiled2ZXNext.Extensions;
+using Model = Tiled2ZXNext.Models;
 
 namespace Tiled2ZXNext
 {
     public partial class Controller
     {
-        public StringBuilder ProcessLayer(TiledParser tiledData)
+        public StringBuilder ProcessLayer(Model.Scene tiledData)
         {
             StringBuilder layerCode = new(2048);
-            string fileName = TiledParser.GetProperty(tiledData, "FileName");
+            string fileName = tiledData.Properties.GetProperty( "FileName");
 
             layerCode.Append(fileName);
             layerCode.Append(":\r\n");
@@ -17,10 +19,10 @@ namespace Tiled2ZXNext
             List<IProcess> blocks = new();
             // get root folders group
 
-            List<Layer> groups = tiledData.Layers.FindAll(l => l.Type == "group" && l.Visible);
+            List<Model.Layer> groups = tiledData.Layers.FindAll(l => l.Type == "group" && l.Visible);
 
             // select Layer 2 group layers
-            Layer groupLayer = groups.Find(g => g.Name.Equals("layer2", System.StringComparison.InvariantCultureIgnoreCase));
+            Model.Layer groupLayer = groups.Find(g => g.Name.Equals("layer2", System.StringComparison.InvariantCultureIgnoreCase));
             if (groupLayer != null)
             {
                 blocks.Add(new ProcessLayer2(groupLayer, tiledData));

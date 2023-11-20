@@ -4,10 +4,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tiled2ZXNext.Models;
 
 namespace Tiled2ZXNext
 {
-    public partial class Layer
+    public class LayerParser : Layer
     {
         private int _tileSize;
         public Area ScanArea(Cell cell, int tileSize)

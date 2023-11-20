@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Security;
 using System.Text;
+using Tiled2ZXNext.Models;
 
 namespace Tiled2ZXNext
 {
-    public class TiledParser : TiledRoot
+    public class TiledParser : Scene
     {
         List<int> spriteSheets;
 
@@ -16,55 +17,9 @@ namespace Tiled2ZXNext
         }
 
 
-        /// <summary>
-        /// get property value as string
-        /// </summary>
-        /// <param name="properties">collection of properties</param>
-        /// <param name="name">property name</param>
-        /// <returns>propery value</returns>
-        public static string GetProperty(List<Property> properties, string name)
-        {
-            return properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).Value;
-        }
-        public static string GetProperty(TiledParser tiledData, string name)
-        {
-            if (tiledData.Properties == null) throw new ArgumentNullException($"tileData.Properties {tiledData.Type}");
-            return tiledData.Properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))?.Value ?? "";
-        }
 
 
-        /// <summary>
-        /// get property value as int
-        /// </summary>
-        /// <param name="properties">properties</param>
-        /// <param name="name">property name</param>
-        /// <returns>value as int in case error 255</returns>
-        public static int GetPropertyInt(List<Property> properties, string name)
-        {
-            if (properties == null) throw new ArgumentNullException("properties");
-            Property? prop  = properties.Find(p => p.Name.Equals( name, StringComparison.InvariantCultureIgnoreCase));
-            return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.Value);
-        }
 
-        /// <summary>
-        /// convert double to hexadecimal value
-        /// </summary>
-        /// <param name="value">value</param>
-        /// <returns>hexadecimal value</returns>
-        public static string Double2Hex(double value, string format = "X2")
-        {
-            string result;
-            if (value >= 0)
-            {
-                result = ((int)Math.Round(value, 0)).ToString(format);
-            }
-            else
-            {
-                result = ((int)Math.Round(value, 0)).ToString(format).Substring(6, 2);
-            }
-            return result;
-
-        }
 
         
 

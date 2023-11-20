@@ -1,15 +1,18 @@
-﻿using System;
+﻿using Microsoft.Extensions.Primitives;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tiled2ZXNext.Extensions;
+using Model = Tiled2ZXNext.Models;
 
 namespace Tiled2ZXNext
 {
     public class ProcessCollision : IProcess
     {
-        private readonly Layer _groupLayer;
-        private readonly TiledParser _tiledData;
-        public ProcessCollision(Layer layer, TiledParser tiledData)
+        private readonly Model.Layer _groupLayer;
+        private readonly Model.Scene _tiledData;
+        public ProcessCollision(Model.Layer layer, Model.Scene tiledData)
         {
             _groupLayer = layer;
             _tiledData = tiledData;
@@ -18,8 +21,8 @@ namespace Tiled2ZXNext
         public StringBuilder Execute()
         {
             StringBuilder collisionCode = new();
-            string fileName = TiledParser.GetProperty(_tiledData, "FileName");
-            foreach (Layer layer in _groupLayer.Layers)
+            string fileName = _tiledData.Properties.GetProperty("FileName");
+            foreach (Model.Layer layer in _groupLayer.Layers)
             {
                 if (layer.Visible)
                 {
@@ -40,7 +43,7 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="layer">layer</param>
         /// <returns>string builder collection with header and data</returns>
-        private static StringBuilder WriteObjectsLayer(Layer layer)
+        private static StringBuilder WriteObjectsLayer(Model.Layer layer)
         {
             int lengthData = 0;
             StringBuilder data = new(1024);
@@ -50,7 +53,7 @@ namespace Tiled2ZXNext
 
             bool haveError = false;
             StringBuilder error = new();
-            foreach (Object obj in layer.Objects)
+            foreach (Model.Object obj in layer.Objects)
             {
                 if (obj.Visible)
                 {
@@ -72,12 +75,12 @@ namespace Tiled2ZXNext
             }
 
 
-            int layerMask = TiledParser.GetPropertyInt(layer.Properties, "LayerMask");
-            int layerId = TiledParser.GetPropertyInt(layer.Properties, "Layer");
-            string tagName = TiledParser.GetProperty(layer.Properties, "Tag");
-            int blockType = TiledParser.GetPropertyInt(layer.Properties, "Type");
-            string bodyType = TiledParser.GetProperty(layer.Properties, "BodyType").ToLower();
-            string eventName = TiledParser.GetProperty(layer.Properties, "EventName");
+            int layerMask = layer.Properties.GetPropertyInt("LayerMask");
+            int layerId = layer.Properties.GetPropertyInt("Layer");
+            string tagName = layer.Properties.GetProperty("Tag");
+            int blockType = layer.Properties.GetPropertyInt("Type");
+            string bodyType = layer.Properties.GetProperty("BodyType").ToLower();
+            string eventName = layer.Properties.GetProperty("EventName");
 
             int eventIndex = Controller.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
             int tagIndex = Controller.Tables["TagName"].Items.FindIndex(r => r.Equals(tagName, StringComparison.CurrentCultureIgnoreCase));
@@ -119,19 +122,20 @@ namespace Tiled2ZXNext
             {
                 data.Append("\t\t; X, Y, Width, Height, Gid\r\n");
             }
-            foreach (Object obj in layer.Objects)
+            foreach (Model.Object obj in layer.Objects)
             {
                 if (obj.Visible)
                 {
                     data.Append("\t\tdw $");
-                    data.Append(TiledParser.Double2Hex(obj.X + Controller.Config.Offset.x,"X4"));
+                    data.Append((obj.X + Controller.Config.Offset.x).Double2Hex( "X4"));
                     data.Append(",$");
-                    data.Append(TiledParser.Double2Hex(obj.Y + Controller.Config.Offset.y,"X4"));
-                    data.Append("\r\n");
-                    data.Append("\t\tdb $");
-                    data.Append(TiledParser.Double2Hex(obj.Width));
+                    data.Append((obj.Y + Controller.Config.Offset.y).Double2Hex( "X4"));
+                    // data.Append("\r\n");
+                    //data.Append("\t\tdb $");
                     data.Append(",$");
-                    data.Append(TiledParser.Double2Hex(obj.Height));
+                    data.Append(obj.Width.Double2Hex());
+                    data.Append(",$");
+                    data.Append(obj.Height.Double2Hex());
                     lengthData += 6;
                     data.Append("\r\n");
                 }
@@ -151,7 +155,7 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        private static bool CheckObject(Object obj)
+        private static bool CheckObject(Model.Object obj)
         {
             bool result = true;
             if (obj.Height % 2 == 0)

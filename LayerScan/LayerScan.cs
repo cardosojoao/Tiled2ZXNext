@@ -4,6 +4,8 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
+using Tiled2ZXNext.Extensions;
+using Tiled2ZXNext.Models;
 
 namespace Tiled2ZXNext
 {
@@ -27,7 +29,7 @@ namespace Tiled2ZXNext
         public LayerAreas ScanAreas()
         {
             List<int> spriteSheets = new();
-            int GroupType = TiledParser.GetPropertyInt(_layer.Properties, "Type");
+            int GroupType = _layer.Properties.GetPropertyInt("Type");
             int index = 0;
 
             for (int row = 0; row < _layer.Height; row++)

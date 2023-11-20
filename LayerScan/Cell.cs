@@ -56,7 +56,7 @@ namespace Tiled2ZXNext
             {
                 return -1;
             }
-            else if (cella.X < cellb.X)
+            else if (cella.X > cellb.X)
             {   
                 return 1;
             }

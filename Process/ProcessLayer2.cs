@@ -1,18 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Tiled2ZXNext.Extensions;
+using Model = Tiled2ZXNext.Models;
 
 namespace Tiled2ZXNext
 {
     public class ProcessLayer2 : IProcess
     {
         public List<LayerAreas> LayersArea { get; private set; }
-        private readonly Layer _groupLayer;
-        private readonly TiledParser _tileData;
-        private readonly List<Tileset> _tileSets = new();
+        private readonly Model.Layer _groupLayer;
+        private readonly Model.Scene _tileData;
+        private readonly List<Model.Tileset> _tileSets = new();
         private int _type;
         private int _size;
         private int _tileSize;
-        public ProcessLayer2(Layer layer, TiledParser tiledData)
+        public ProcessLayer2(Model.Layer layer, Model.Scene tiledData)
         {
             _groupLayer = layer;
             LayersArea = new List<LayerAreas>();
@@ -22,12 +24,12 @@ namespace Tiled2ZXNext
         public StringBuilder Execute()
         {
             LayersArea.Clear();
-            foreach (Layer layer in _groupLayer.Layers)
+            foreach (Model.Layer layer in _groupLayer.Layers)
             {
                 if (layer.Visible)
                 {
-                    _type = TiledParser.GetPropertyInt(layer.Properties, "Type");
-                    _tileSize = TiledParser.GetPropertyInt(layer.Properties, "Size");
+                    _type = layer.Properties.GetPropertyInt("Type");
+                    _tileSize = layer.Properties.GetPropertyInt( "Size");
                     LayerScan layerScan = new LayerScan(layer, _tileSize);
                     layerScan.ScanAreas();
                     LayerAreas layerAreas = layerScan.SplitAreas();
@@ -88,11 +90,13 @@ namespace Tiled2ZXNext
         }
         private StringBuilder AreaParseCode(Area area)
         {
-            StringBuilder areaCode = new();
-            int x = area.Cells[0].X;
-            int y = area.Cells[0].Y;
+            (int x, int y, int width, int height) = area.GetSize();
 
-            (int width, int height) = area.GetSize();
+            StringBuilder areaCode = new();
+            //int x = area.Cells[0].X;
+            //int y = area.Cells[0].Y;
+
+            
             areaCode.Append("\t\tdb $");
             areaCode.Append(x.ToString("X2")); _size++;
             areaCode.Append(",$");
@@ -192,7 +196,7 @@ namespace Tiled2ZXNext
         /// <param name="tileset1"></param>
         /// <param name="Tileset2"></param>
         /// <returns></returns>
-        private static int CompareTileset(Tileset tileset1, Tileset Tileset2)
+        private static int CompareTileset( Model.Tileset tileset1, Model.Tileset Tileset2)
         {
             if (tileset1.Firstgid == Tileset2.Firstgid)
             {
@@ -213,7 +217,7 @@ namespace Tiled2ZXNext
             // sort tile sets by gid number, to remap the gid in the layers
             _tileSets.Sort(CompareTileset);
             int firstGid = 0;
-            foreach (Tileset tileset in _tileSets)
+            foreach (Model.Tileset tileset in _tileSets)
             {
                 tileset.FirstgidMap = firstGid;
                 firstGid += 64;
@@ -234,7 +238,7 @@ namespace Tiled2ZXNext
         private uint MapCell(uint gid)
         {
             uint gidMap = 0;
-            foreach (Tileset tileset in _tileSets)
+            foreach (Model.Tileset tileset in _tileSets)
             {
                 if (gid >= tileset.Firstgid && gid <= tileset.Lastgid)
                 {
