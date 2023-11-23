@@ -46,19 +46,21 @@ namespace Tiled2ZXNext
             inputPath = Path.GetDirectoryName(inputFile);
             string data = File.ReadAllText(inputFile);
 
-            TiledParser tiledData = JsonSerializer.Deserialize<TiledParser>(data);
+            TiledParser sceneRaw = JsonSerializer.Deserialize<TiledParser>(data);
 
             //ResolveTileSets(tiledData.Tilesets);
             //ResolveTables(tiledData.Properties);
 
-            fileName = tiledData.Properties.GetProperty( "FileName");
+            fileName = sceneRaw.Properties.GetProperty( "FileName");
             string extension = "asm";
             outputFile = fileName + "." + extension;
 
-            Entities.Scene scene = SceneMapper.Map(tiledData, Entities.Scene.Instance, _options);      // migrated
+            Entities.Scene scene = SceneMapper.Map(sceneRaw, Entities.Scene.Instance, _options);      // migrated
+            scene.Layers = LayerMapper.Map(sceneRaw.Layers);
+
 
             // get map settings
-            StringBuilder mapData = ProcessMap(tiledData);
+            StringBuilder mapData = ProcessMap(sceneRaw);
             Console.WriteLine("output map file " + outputFile);
             // write map to final location
             OutputMap(o, mapData);
@@ -67,60 +69,13 @@ namespace Tiled2ZXNext
             BuildList(o.MapPath, "*.asm", o.MapPath + "\\list.txt");
 
             // get layers data
-            StringBuilder layerData = ProcessLayer(tiledData);
+            StringBuilder layerData = ProcessLayer(scene);
             Console.WriteLine("output layer file " + outputFile);
             // write layers to final location
             OutputLayer(o, layerData);
 
             PostProcessing(o);
         }
-
-
-
-
-
-
-        /// <summary>
-        /// get the sprite sheet id from tileset
-        /// </summary>
-        /// <param name="properties">collection of properties</param>
-        /// <param name="name">property name</param>
-        /// <returns>property value or empty if not found</returns>
-        //private static string GetTileSetProperty(tileset tileSet, string name)
-        //{
-        //    if (tileSet.properties == null) throw new ArgumentNullException($"tileSet: missing [properties] of {tileSet.name}");
-        //    TilesetTileProperty prop = tileSet.properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-        //    return prop?.value ?? "";
-        //}
-
-
-        //private static string GetMapProperty(List<Property> properties, string name)
-        //{
-        //    if (properties == null) throw new ArgumentNullException($"missing [properties]");
-        //    Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-        //    return prop?.Value ?? "";
-        //}
-
-        /// <summary>
-        /// check if property exists
-        /// </summary>
-        /// <param name="properties">list of properties</param>
-        /// <param name="name">property name</param>
-        /// <returns></returns>
-        //private static bool ExistProperty(tileset tileSet, string name)
-        //{
-        //    if (tileSet.properties == null) throw new ArgumentNullException($"tileSet: missing [properties] of {tileSet.name}");
-        //    TilesetTileProperty prop = tileSet.properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-        //    return prop == null ? false : true;
-        //}
-
-        //private static bool ExistProperty(List<Property> properties, string name)
-        //{
-        //    if (properties == null) throw new ArgumentNullException($"missing [properties]");
-        //    Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-        //    return prop != null;
-        //}
-
     }
 
 

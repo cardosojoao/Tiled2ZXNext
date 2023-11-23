@@ -8,13 +8,13 @@ namespace Tiled2ZXNext
     public class ProcessLayer2 : IProcess
     {
         public List<LayerAreas> LayersArea { get; private set; }
-        private readonly Model.Layer _groupLayer;
+        private readonly Entities.Layer _groupLayer;
         private readonly Entities.Scene _scene;
-        private readonly List<Model.Tileset> _tileSets = new();
+        private readonly List<Entities.Tileset> _tileSets = new();
         private int _type;
         private int _size;
         private int _tileSize;
-        public ProcessLayer2(Model.Layer layer, Entities.Scene scene)
+        public ProcessLayer2(Entities.Layer layer, Entities.Scene scene)
         {
             _groupLayer = layer;
             LayersArea = new List<LayerAreas>();
@@ -24,7 +24,7 @@ namespace Tiled2ZXNext
         public StringBuilder Execute()
         {
             LayersArea.Clear();
-            foreach (Model.Layer layer in _groupLayer.Layers)
+            foreach (Entities.Layer layer in _groupLayer.Layers)
             {
                 if (layer.Visible)
                 {
@@ -196,7 +196,7 @@ namespace Tiled2ZXNext
         /// <param name="tileset1"></param>
         /// <param name="Tileset2"></param>
         /// <returns></returns>
-        private static int CompareTileset( Model.Tileset tileset1, Model.Tileset Tileset2)
+        private static int CompareTileset( Entities.Tileset tileset1, Entities.Tileset Tileset2)
         {
             if (tileset1.Firstgid == Tileset2.Firstgid)
             {
@@ -217,7 +217,7 @@ namespace Tiled2ZXNext
             // sort tile sets by gid number, to remap the gid in the layers
             _tileSets.Sort(CompareTileset);
             int firstGid = 0;
-            foreach (Model.Tileset tileset in _tileSets)
+            foreach (Entities.Tileset tileset in _tileSets)
             {
                 tileset.FirstgidMap = firstGid;
                 firstGid += 64;
@@ -238,7 +238,7 @@ namespace Tiled2ZXNext
         private uint MapCell(uint gid)
         {
             uint gidMap = 0;
-            foreach (Model.Tileset tileset in _tileSets)
+            foreach (Entities.Tileset tileset in _tileSets)
             {
                 if (gid >= tileset.Firstgid && gid <= tileset.Lastgid)
                 {

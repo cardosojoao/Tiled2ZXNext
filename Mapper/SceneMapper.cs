@@ -11,6 +11,7 @@ using System.Xml.Serialization;
 using Tiled2ZXNext.Models;
 using System.Reflection.Metadata;
 
+
 namespace Tiled2ZXNext.Mapper
 {
     public class SceneMapper
@@ -25,8 +26,9 @@ namespace Tiled2ZXNext.Mapper
             scene.TileMapPalette = sceneRaw.Properties.GetPropertyInt("PaletteTileMap");
             scene.SpritesPalette = sceneRaw.Properties.GetPropertyInt("PaletteSprite");
             scene.Layer2Palette = sceneRaw.Properties.GetPropertyInt("PaletteLayer2");
+            scene.Properties = PropertyMapper.Map(sceneRaw.Properties);
 
-            ResolveTileSets(sceneRaw.Tilesets, options.Input);
+            scene.Tilesets = ResolveTileSets(sceneRaw.Tilesets, options.Input);
 
             if (sceneRaw.Properties.ExistProperty("Tables"))
             {
@@ -73,93 +75,87 @@ namespace Tiled2ZXNext.Mapper
             return tables;
         }
 
-        private static void ResolveTileSets(List<Model.Tileset> tileSetsRaw, string inputPath)
-        {
-            //Dictionary<string, List<Tileset>> resolved = new();
+        //private static void ResolveTileSetsold(List<Model.Tileset> tileSetsRaw, string inputPath)
+        //{
+        //    //Dictionary<string, List<Tileset>> resolved = new();
 
-            Dictionary<string, TileSetXMl> tilesSetData = new();
+        //    Dictionary<string, TileSetXMl> tilesSetData = new();
 
-            int order = 0;       // order of load 
-            foreach (Model.Tileset tileSetRaw in tileSetsRaw)
-            {
-                Entity.Tileset tileset = new();
-                tileset.Order = order;                  // judt to keep in mind the physical order of tilesheet that is align with gid's
-                //tileSetRaw.Order = order;      
-                string file = Path.Combine(inputPath, tileSetRaw.Source);
-                TileSetXMl tileSetData = ReadTileSet(file);
-                tileset.Lastgid = tileSetData.tilecount + tileSetRaw.Firstgid - 1;
-                //tileSetRaw.Lastgid = tileSetData.tilecount + tileSetRaw.Firstgid - 1;
-                if (!Entity.Scene.Instance.Tilesets.ContainsKey(tileSetData.image.source))
-                {
-                    Entity.Scene.Instance.Tilesets.Add(tileSetData.image.source, new List<Entity.Tileset>());
-                    tilesSetData.Add(tileSetData.image.source, tileSetData);
-                }
-                Entity.Scene.Instance.Tilesets[tileSetData.image.source].Add(tileset);
-                order++;
-            }
+        //    int order = 0;       // order of load 
+        //    foreach (Model.Tileset tileSetRaw in tileSetsRaw)
+        //    {
+        //        Entity.Tileset tileset = new();
+        //        tileset.Order = order;                  // judt to keep in mind the physical order of tilesheet that is align with gid's
+        //        //tileSetRaw.Order = order;      
+        //        string file = Path.Combine(inputPath, tileSetRaw.Source);
+        //        TileSetXMl tileSetData = ReadTileSet(file);
+        //        tileset.Lastgid = tileSetData.tilecount + tileSetRaw.Firstgid - 1;
+        //        //tileSetRaw.Lastgid = tileSetData.tilecount + tileSetRaw.Firstgid - 1;
+        //        if (!Entity.Scene.Instance.Tilesets.ContainsKey(tileSetData.image.source))
+        //        {
+        //            Entity.Scene.Instance.Tilesets.Add(tileSetData.image.source, new List<Entity.Tileset>());
+        //            tilesSetData.Add(tileSetData.image.source, tileSetData);
+        //        }
+        //        Entity.Scene.Instance.Tilesets[tileSetData.image.source].Add(tileset);
+        //        order++;
+        //    }
 
-            foreach (KeyValuePair<string, List<Entity.Tileset>> sets in Entity.Scene.Instance.Tilesets)
-            {
-                foreach (Entity.Tileset set in sets.Value)
-                {
-                    TileSetXMl tileSetData = tilesSetData[sets.Key];
-                    set.Parsedgid = set.Firstgid - 1;
-                    set.TileSheetID = tileSetData.GetPropertyInt("TileSheetId");        //  unique id of tilesheet
-                    set.PaletteIndex = tileSetData.GetPropertyInt("PaletteIndex");      //  palette id or -1 if no palette 
-                }
-            }
-        }
+        //    foreach (KeyValuePair<string, List<Entity.Tileset>> sets in Entity.Scene.Instance.Tilesets)
+        //    {
+        //        foreach (Entity.Tileset set in sets.Value)
+        //        {
+        //            TileSetXMl tileSetData = tilesSetData[sets.Key];
+        //            set.Parsedgid = set.Firstgid - 1;
+        //            set.TileSheetID = tileSetData.GetPropertyInt("TileSheetId");        //  unique id of tilesheet
+        //            set.PaletteIndex = tileSetData.GetPropertyInt("PaletteIndex");      //  palette id or -1 if no palette 
+        //        }
+        //    }
+        //}
 
 
 
-        private void ResolveTileSets2(List<Model.Tileset> tileSetsRaw, string input)
+        private static List<Entity.Tileset> ResolveTileSets(List<Model.Tileset> tileSetsRaw, string inputPath)
         {
             Dictionary<string, List<Model.Tileset>> resolved = new();
-            Dictionary<string, tileset> tilesSetData = new();
+            Dictionary<string, TileSetXMl> tilesSetData = new();
 
             int order = 0;       // order of load 
             foreach (Model.Tileset tileSet in tileSetsRaw)
             {
                 tileSet.Order = order;      // judt to keep in mind the physical order of tilesheet that is align with gid's
                 string file = Path.Combine(inputPath, tileSet.Source);
-                tileset tileSetData = ReadTileSet(file);
+                TileSetXMl tileSetData = ReadTileSet(file);
 
                 tileSet.Lastgid = tileSetData.tilecount + tileSet.Firstgid - 1;
                 if (!resolved.ContainsKey(tileSetData.image.source))
                 {
-                    resolved.Add(tileSetData.image.source, new List<Tileset>());
+                    resolved.Add(tileSetData.image.source, new List<Model.Tileset>());
                     tilesSetData.Add(tileSetData.image.source, tileSetData);
                 }
                 resolved[tileSetData.image.source].Add(tileSet);
                 order++;
             }
+            List<Entity.Tileset> tilesets = new();
 
-            foreach (KeyValuePair<string, List<Tileset>> sets in resolved)
+
+            foreach (KeyValuePair<string, List<Model.Tileset>> sets in resolved)
             {
-                foreach (Tileset set in sets.Value)
+                foreach (Model.Tileset setRaw in sets.Value)
                 {
-                    tileset tileSetData = tilesSetData[sets.Key];
-                    set.Parsedgid = set.Firstgid - 1;
-
-
-                    set.TileSheetID = int.Parse(GetTileSetProperty(tileSetData.properties, "TileSheetId"));
-                    set.PaletteIndex = int.Parse(GetTileSetProperty(tileSetData.properties, "PaletteIndex"));
-
-                    // if tile properties are setup, get the palette index and TileSheetID (checking if they are defined)
-                    //if (tileSetData.tile.properties != null)
-                    //{
-                    //    if (ExistProperty(tileSetData.tile.properties, "TileSheetId"))
-                    //    {
-                    //        set.TileSheetID = int.Parse(GetTileSetProperty(tileSetData.tile.properties, "TileSheetId"));
-                    //    }
-                    //    if (ExistProperty(tileSetData.tile.properties, "PaletteIndex"))
-                    //    {
-                    //        set.PaletteIndex = int.Parse(GetTileSetProperty(tileSetData.tile.properties, "PaletteIndex"));
-                    //    }
-
-                    //}
+                    Entity.Tileset tileset = new();
+                    tilesets.Add(tileset);
+                    tileset.Source = setRaw.Source;
+                    tileset.Order = setRaw.Order;
+                    tileset.Lastgid = setRaw.Lastgid;
+                    tileset.Firstgid = setRaw.Firstgid;
+                    tileset.FirstgidMap = setRaw.FirstgidMap;
+                    TileSetXMl tileSetData = tilesSetData[sets.Key];
+                    tileset.Parsedgid = setRaw.Firstgid - 1;
+                    tileset.TileSheetID = tileSetData.properties.GetPropertyInt( "TileSheetId");
+                    tileset.PaletteIndex = tileSetData.properties.GetPropertyInt( "PaletteIndex");
                 }
             }
+            return tilesets;
         }
 
 

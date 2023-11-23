@@ -5,7 +5,7 @@ using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using Tiled2ZXNext.Extensions;
-using Tiled2ZXNext.Models;
+using Tiled2ZXNext.Entities;
 
 namespace Tiled2ZXNext
 {

@@ -11,18 +11,31 @@ namespace Tiled2ZXNext.Extensions
     public static class PropertyExtensions
     {
 
-        public static bool ExistProperty(this List<Property> properties, string name)
+        public static bool ExistProperty(this List<Models.Property> properties, string name)
         {
             if (properties == null) throw new ArgumentNullException($"missing [properties]");
-            Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            Models.Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             return prop != null;
         }
 
-
-        public static string GetProperty(this List<Property> properties, string name)
+        public static bool ExistProperty(this List<Entities.Property> properties, string name)
         {
             if (properties == null) throw new ArgumentNullException($"missing [properties]");
-            Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            Entities.Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return prop != null;
+        }
+
+        public static string GetProperty(this List<Models.Property> properties, string name)
+        {
+            if (properties == null) throw new ArgumentNullException($"missing [properties]");
+            Models.Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return prop?.Value ?? "";
+        }
+
+        public static string GetProperty(this List<Entities.Property> properties, string name)
+        {
+            if (properties == null) throw new ArgumentNullException($"missing [properties]");
+            Entities.Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             return prop?.Value ?? "";
         }
 
@@ -32,17 +45,17 @@ namespace Tiled2ZXNext.Extensions
         /// <param name="properties">collection of properties</param>
         /// <param name="name">property name</param>
         /// <returns>property value or empty if not found</returns>
-        public static string GetProperty(this TileSetXMl tileSet, string name)
+        public static string GetProperty(this TilesetTileProperty[] properties, string name)
         {
-            if (tileSet.properties == null) throw new ArgumentNullException($"tileSet: missing [properties] of {tileSet.name}");
-            TilesetTileProperty prop = tileSet.properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            //if (tileSet.properties == null) throw new ArgumentNullException($"tileSet: missing [properties] of {tileSet.name}");
+            TilesetTileProperty prop = properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             return prop?.value ?? "";
         }
 
-        public static int GetPropertyInt(this TileSetXMl tileSet, string name)
+        public static int GetPropertyInt(this TilesetTileProperty[] properties, string name)
         {
-            if (tileSet.properties == null) throw new ArgumentNullException($"tileSet: missing [properties] of {tileSet.name}");
-            TilesetTileProperty prop = tileSet.properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            //if (properties == null) throw new ArgumentNullException($"tileSet: missing [properties] of {tileSet.name}");
+            TilesetTileProperty prop = properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             //return prop?.value ?? "";
             return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.value);
         }
@@ -63,10 +76,17 @@ namespace Tiled2ZXNext.Extensions
         /// <param name="properties">properties</param>
         /// <param name="name">property name</param>
         /// <returns>value as int in case error 255</returns>
-        public static int GetPropertyInt(this List<Property> properties, string name)
+        public static int GetPropertyInt(this List<Entities.Property> properties, string name)
         {
             if (properties == null) throw new ArgumentNullException("properties");
-            Property? prop = properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            Entities.Property? prop = properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.Value);
+        }
+
+        public static int GetPropertyInt(this List<Models.Property> properties, string name)
+        {
+            if (properties == null) throw new ArgumentNullException("properties");
+            Models.Property? prop = properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.Value);
         }
 

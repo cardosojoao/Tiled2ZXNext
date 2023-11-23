@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tiled2ZXNext.Models;
-
-namespace Tiled2ZXNext
+﻿namespace Tiled2ZXNext.Entities
 {
-    public class LayerParser : Layer
+    public partial class  Layer
     {
         private int _tileSize;
         public Area ScanArea(Cell cell, int tileSize)

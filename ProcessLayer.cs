@@ -8,7 +8,7 @@ namespace Tiled2ZXNext
 {
     public partial class Controller
     {
-        public StringBuilder ProcessLayer(Model.Scene tiledData)
+        public StringBuilder ProcessLayer(Entities.Scene tiledData)
         {
             StringBuilder layerCode = new(2048);
             string fileName = tiledData.Properties.GetProperty( "FileName");
@@ -19,10 +19,10 @@ namespace Tiled2ZXNext
             List<IProcess> blocks = new();
             // get root folders group
 
-            List<Model.Layer> groups = tiledData.Layers.FindAll(l => l.Type == "group" && l.Visible);
+            List<Entities.Layer> groups = tiledData.Layers.FindAll(l => l.Type == "group" && l.Visible);
 
             // select Layer 2 group layers
-            Model.Layer groupLayer = groups.Find(g => g.Name.Equals("layer2", System.StringComparison.InvariantCultureIgnoreCase));
+            Entities.Layer groupLayer = groups.Find(g => g.Name.Equals("layer2", System.StringComparison.InvariantCultureIgnoreCase));
             if (groupLayer != null)
             {
                 blocks.Add(new ProcessLayer2(groupLayer, tiledData));

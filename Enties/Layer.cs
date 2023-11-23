@@ -25,8 +25,6 @@ namespace Tiled2ZXNext.Entities
 
         public int Y { get; set; }
 
-        public string Draworder { get; set; }
-
         public List<Object> Objects { get; set; }
 
         public List<Property> Properties { get; set; }

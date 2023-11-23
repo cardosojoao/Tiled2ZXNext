@@ -11,19 +11,19 @@ namespace Tiled2ZXNext
 {
     public class ProcessCollision : IProcess
     {
-        private readonly Model.Layer _groupLayer;
-        private readonly Model.Scene _tiledData;
-        public ProcessCollision(Model.Layer layer, Model.Scene tiledData)
+        private readonly Entities.Layer _groupLayer;
+        private readonly Entities.Scene _scene;
+        public ProcessCollision(Entities.Layer layer, Entities.Scene scene)
         {
             _groupLayer = layer;
-            _tiledData = tiledData;
+            _scene = scene;
         }
 
         public StringBuilder Execute()
         {
             StringBuilder collisionCode = new();
-            string fileName = _tiledData.Properties.GetProperty("FileName");
-            foreach (Model.Layer layer in _groupLayer.Layers)
+            string fileName = _scene.Properties.GetProperty("FileName");
+            foreach (Entities.Layer layer in _groupLayer.Layers)
             {
                 if (layer.Visible)
                 {
@@ -44,7 +44,7 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="layer">layer</param>
         /// <returns>string builder collection with header and data</returns>
-        private static StringBuilder WriteObjectsLayer(Model.Layer layer)
+        private static StringBuilder WriteObjectsLayer(Entities.Layer layer)
         {
             int lengthData = 0;
             StringBuilder data = new(1024);
@@ -54,7 +54,7 @@ namespace Tiled2ZXNext
 
             bool haveError = false;
             StringBuilder error = new();
-            foreach (Model.Object obj in layer.Objects)
+            foreach (Entities.Object obj in layer.Objects)
             {
                 if (obj.Visible)
                 {
@@ -123,7 +123,7 @@ namespace Tiled2ZXNext
             {
                 data.Append("\t\t; X, Y, Width, Height, Gid\r\n");
             }
-            foreach (Model.Object obj in layer.Objects)
+            foreach (Entities.Object obj in layer.Objects)
             {
                 if (obj.Visible)
                 {
@@ -156,7 +156,7 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        private static bool CheckObject(Model.Object obj)
+        private static bool CheckObject(Entities.Object obj)
         {
             bool result = true;
             if (obj.Height % 2 == 0)
