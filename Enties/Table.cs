@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tiled2ZXNext.Enties
+namespace Tiled2ZXNext.Entities
 {
     public class Table
     {

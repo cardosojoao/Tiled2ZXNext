@@ -9,16 +9,16 @@ namespace Tiled2ZXNext
     {
         public List<LayerAreas> LayersArea { get; private set; }
         private readonly Model.Layer _groupLayer;
-        private readonly Model.Scene _tileData;
+        private readonly Entities.Scene _scene;
         private readonly List<Model.Tileset> _tileSets = new();
         private int _type;
         private int _size;
         private int _tileSize;
-        public ProcessLayer2(Model.Layer layer, Model.Scene tiledData)
+        public ProcessLayer2(Model.Layer layer, Entities.Scene scene)
         {
             _groupLayer = layer;
             LayersArea = new List<LayerAreas>();
-            _tileData = tiledData;
+            _scene = scene;
         }
 
         public StringBuilder Execute()
@@ -176,7 +176,7 @@ namespace Tiled2ZXNext
                     extend ^= (uint)8;
                 }
                 tileId &= 0xffff;
-                var gidData = _tileData.GetParsedGid((int)tileId);     // tile index is 0 based
+                var gidData = _scene.GetParsedGid((int)tileId);     // tile index is 0 based
                 uint paletteIndex = (uint)gidData.tileSheet.PaletteIndex << 4;
                 //extend |= paletteIndex;                 // add pallete index
                 tileId = (uint)gidData.gid - 1;         // the gid is always +1, we need to ensure that the ranges are from 0..63 for the first block and 64..127 for the second block

@@ -23,25 +23,7 @@ namespace Tiled2ZXNext
 
         
 
-        /// <summary>
-        /// resolve GID by set gid to index of specific sprite sheet
-        /// </summary>
-        /// <param name="gid">Tiled sprite GID</param>
-        /// <returns>tupple with gid and sprite sheet converted</returns>
-        public  (int gid, Tileset tileSheet) GetParsedGid(int gid)
-        {
-            Tileset tileSheet = null;
-            foreach (Tileset tileSet in this.Tilesets)
-            {
-                if (gid >= tileSet.Firstgid && gid <= tileSet.Lastgid)
-                {
-                    // we are going to load the two tilesheets in memory sequential the number can be sequential //  gid -= tileSet.Parsedgid;
-                    tileSheet = tileSet;
-                    break;
-                }
-            }
-            return (gid, tileSheet);
-        }
+
 
         /// <summary>
         /// keep track of all different Sprite sheets where used in the current block

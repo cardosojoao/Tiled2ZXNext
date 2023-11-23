@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
 using Model = Tiled2ZXNext.Models;
 
@@ -82,8 +83,8 @@ namespace Tiled2ZXNext
             string bodyType = layer.Properties.GetProperty("BodyType").ToLower();
             string eventName = layer.Properties.GetProperty("EventName");
 
-            int eventIndex = Controller.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
-            int tagIndex = Controller.Tables["TagName"].Items.FindIndex(r => r.Equals(tagName, StringComparison.CurrentCultureIgnoreCase));
+            int eventIndex = Scene.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
+            int tagIndex = Scene.Instance.Tables["TagName"].Items.FindIndex(r => r.Equals(tagName, StringComparison.CurrentCultureIgnoreCase));
 
             headerType.Append("\t\tdb $");
             headerType.Append(blockType.ToString("X2"));

@@ -3,35 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Tiled2ZXNext.Extensions;
-using Tiled2ZXNext.Enties;
+using Tiled2ZXNext.Entities;
 using System.IO;
 using Model = Tiled2ZXNext.Models;
+using Entity = Tiled2ZXNext.Entities;
 using System.Xml.Serialization;
 using Tiled2ZXNext.Models;
+using System.Reflection.Metadata;
 
-namespace Tiled2ZXNext.Mappers
+namespace Tiled2ZXNext.Mapper
 {
     public class SceneMapper
     {
-        public static Enties.Scene Map(Model.Scene tiledData, Options options)
+        public static Entities.Scene Map(Model.Scene sceneRaw, Entity.Scene scene , Options options)
         {
-            Enties.Scene scene = new()
-            {
-                FileName = tiledData.Properties.GetProperty("FileName")
-            };
-            scene.LeftScene.SceneID = tiledData.Properties.GetPropertyInt("roomleft");
-            scene.RightScene.SceneID = tiledData.Properties.GetPropertyInt("roomright");
-            scene.TopScene.SceneID = tiledData.Properties.GetPropertyInt("roomtop");
-            scene.BottomScene.SceneID = tiledData.Properties.GetPropertyInt("roombottom");
-            scene.TileMapPalette = tiledData.Properties.GetPropertyInt("PaletteTileMap");
-            scene.SpritesPalette = tiledData.Properties.GetPropertyInt("PaletteSprite");
-            scene.Layer2Palette = tiledData.Properties.GetPropertyInt("PaletteLayer2");
+            scene.FileName = sceneRaw.Properties.GetProperty("FileName");
+            scene.LeftScene.SceneID = sceneRaw.Properties.GetPropertyInt("roomleft");
+            scene.RightScene.SceneID = sceneRaw.Properties.GetPropertyInt("roomright");
+            scene.TopScene.SceneID = sceneRaw.Properties.GetPropertyInt("roomtop");
+            scene.BottomScene.SceneID = sceneRaw.Properties.GetPropertyInt("roombottom");
+            scene.TileMapPalette = sceneRaw.Properties.GetPropertyInt("PaletteTileMap");
+            scene.SpritesPalette = sceneRaw.Properties.GetPropertyInt("PaletteSprite");
+            scene.Layer2Palette = sceneRaw.Properties.GetPropertyInt("PaletteLayer2");
 
-            ResolveTileSets(tiledData.Tilesets, options.Input);
+            ResolveTileSets(sceneRaw.Tilesets, options.Input);
 
-            if (tiledData.Properties.ExistProperty("Tables"))
+            if (sceneRaw.Properties.ExistProperty("Tables"))
             {
-                scene.Tables.Append<string, Table>(ResolveTables(tiledData.Properties, options.AppRoot));
+                scene.Tables.Append<string, Table>(ResolveTables(sceneRaw.Properties, options.AppRoot));
             }
             return scene;
         }
@@ -74,31 +73,34 @@ namespace Tiled2ZXNext.Mappers
             return tables;
         }
 
-        private static void ResolveTileSets(List<Tileset> tileSets, string inputPath)
+        private static void ResolveTileSets(List<Model.Tileset> tileSetsRaw, string inputPath)
         {
-            Dictionary<string, List<Tileset>> resolved = new();
+            //Dictionary<string, List<Tileset>> resolved = new();
+
             Dictionary<string, TileSetXMl> tilesSetData = new();
 
             int order = 0;       // order of load 
-            foreach (Tileset tileSet in tileSets)
+            foreach (Model.Tileset tileSetRaw in tileSetsRaw)
             {
-                tileSet.Order = order;      // judt to keep in mind the physical order of tilesheet that is align with gid's
-                string file = Path.Combine(inputPath, tileSet.Source);
+                Entity.Tileset tileset = new();
+                tileset.Order = order;                  // judt to keep in mind the physical order of tilesheet that is align with gid's
+                //tileSetRaw.Order = order;      
+                string file = Path.Combine(inputPath, tileSetRaw.Source);
                 TileSetXMl tileSetData = ReadTileSet(file);
-
-                tileSet.Lastgid = tileSetData.tilecount + tileSet.Firstgid - 1;
-                if (!resolved.ContainsKey(tileSetData.image.source))
+                tileset.Lastgid = tileSetData.tilecount + tileSetRaw.Firstgid - 1;
+                //tileSetRaw.Lastgid = tileSetData.tilecount + tileSetRaw.Firstgid - 1;
+                if (!Entity.Scene.Instance.Tilesets.ContainsKey(tileSetData.image.source))
                 {
-                    resolved.Add(tileSetData.image.source, new List<Tileset>());
+                    Entity.Scene.Instance.Tilesets.Add(tileSetData.image.source, new List<Entity.Tileset>());
                     tilesSetData.Add(tileSetData.image.source, tileSetData);
                 }
-                resolved[tileSetData.image.source].Add(tileSet);
+                Entity.Scene.Instance.Tilesets[tileSetData.image.source].Add(tileset);
                 order++;
             }
 
-            foreach (KeyValuePair<string, List<Tileset>> sets in resolved)
+            foreach (KeyValuePair<string, List<Entity.Tileset>> sets in Entity.Scene.Instance.Tilesets)
             {
-                foreach (Tileset set in sets.Value)
+                foreach (Entity.Tileset set in sets.Value)
                 {
                     TileSetXMl tileSetData = tilesSetData[sets.Key];
                     set.Parsedgid = set.Firstgid - 1;

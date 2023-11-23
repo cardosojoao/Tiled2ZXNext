@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Xml.Serialization;
-using Tiled2ZXNext.Mappers;
-using Tiled2ZXNext.Enties;
+using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Models;
+using Tiled2ZXNext.Mapper;
 
 namespace Tiled2ZXNext
 {
@@ -55,7 +55,7 @@ namespace Tiled2ZXNext
             string extension = "asm";
             outputFile = fileName + "." + extension;
 
-            Enties.Scene scene = SceneMapper.Map(tiledData, _options);      // migrated
+            Entities.Scene scene = SceneMapper.Map(tiledData, Entities.Scene.Instance, _options);      // migrated
 
             // get map settings
             StringBuilder mapData = ProcessMap(tiledData);

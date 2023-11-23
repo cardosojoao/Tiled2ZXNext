@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Mapper\" />
+    <Folder Include="Parsers\" />
     <Folder Include="TileSet\" />
   </ItemGroup>
 

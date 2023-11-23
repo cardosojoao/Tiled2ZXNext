@@ -8,12 +8,12 @@ namespace Tiled2ZXNext
     public class ProcessTileMap : IProcess
     {
         private readonly Model.Layer _groupLayer;
-        private readonly Model.Scene _tileData;
+        private readonly Entities.Scene _tileData;
         private readonly List<Model.Tileset> _tileSets = new();
-        public ProcessTileMap(Model.Layer layer, Model.Scene tiledData)
+        public ProcessTileMap(Model.Layer layer, Entities.Scene scene)
         {
             _groupLayer = layer;
-            _tileData = tiledData;
+            _tileData = scene;
         }
 
 
