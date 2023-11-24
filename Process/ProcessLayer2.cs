@@ -1,22 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
-using Model = Tiled2ZXNext.Models;
 
 namespace Tiled2ZXNext
 {
     public class ProcessLayer2 : IProcess
     {
         public List<LayerAreas> LayersArea { get; private set; }
-        private readonly Entities.Layer _groupLayer;
-        private readonly Entities.Scene _scene;
-        private readonly List<Entities.Tileset> _tileSets = new();
+        private readonly Layer _rootLayer;
+        private readonly Scene _scene;
+        private readonly List<Tileset> _tileSets = new();
         private int _type;
         private int _size;
         private int _tileSize;
-        public ProcessLayer2(Entities.Layer layer, Entities.Scene scene)
+        public ProcessLayer2(Layer layer, Scene scene)
         {
-            _groupLayer = layer;
+            _rootLayer = layer;
             LayersArea = new List<LayerAreas>();
             _scene = scene;
         }
@@ -24,7 +24,7 @@ namespace Tiled2ZXNext
         public StringBuilder Execute()
         {
             LayersArea.Clear();
-            foreach (Entities.Layer layer in _groupLayer.Layers)
+            foreach (Layer layer in _rootLayer.Layers)
             {
                 if (layer.Visible)
                 {
@@ -48,9 +48,7 @@ namespace Tiled2ZXNext
                 layer2Code.Append(_type.ToString("X2"));
                 layer2Code.Append($"\t\t; data type Layer2({_tileSize}x{_tileSize}) - {layer.Name}\r\n");
                 StringBuilder body = WriteLayer2Area(layer);
-                layer2Code.Append("\t\tdw $");
-                layer2Code.Append(_size.ToString("X4"));
-                layer2Code.Append($"\t\t; Size of block\r\n");
+                layer2Code.Append("\t\tdw $").Append(_size.ToString("X4")).Append($"\t\t; Size of block\r\n");
                 layer2Code.Append(body);
             }
             return layer2Code;
@@ -61,9 +59,9 @@ namespace Tiled2ZXNext
         {
             StringBuilder data = new(1024);
             data.Append(WriteLayer2TileSets());
-            data.Append("\t\tdb $");
-            data.Append(layer.Areas.Count.ToString("X2")); _size++;
-            data.Append("\t\t; areas count\r\n");
+            data.Append("\t\tdb $").Append(layer.Areas.Count.ToString("X2")).Append("\t\t; areas count\r\n");
+            _size++;
+            
             int areaIndex = 0;
             foreach (Area area in layer.Areas)
             {
@@ -81,22 +79,16 @@ namespace Tiled2ZXNext
             int tileSheet0 = _tileSets[0].TileSheetID;
             int tileSheet1 = _tileSets.Count > 1 ? _tileSets[1].TileSheetID : 255;
             // always show two tilesheets
-            code.Append("\t\tdb $");
-            code.Append(tileSheet0.ToString("X2")); _size++;
-            code.Append(",$");
-            code.Append(tileSheet1.ToString("X2")); _size++;
-            code.Append("\t\t; Tile sheet Id  00..fe=valid, ff=not defined\r\n");
+            code.Append("\t\tdb $").Append(tileSheet0.ToString("X2")); 
+            _size++;
+            code.Append(",$").Append(tileSheet1.ToString("X2")).Append("\t\t; Tile sheet Id  00..fe=valid, ff=not defined\r\n");
+            _size++;
             return code;
         }
         private StringBuilder AreaParseCode(Area area)
         {
             (int x, int y, int width, int height) = area.GetSize();
-
             StringBuilder areaCode = new();
-            //int x = area.Cells[0].X;
-            //int y = area.Cells[0].Y;
-
-            
             areaCode.Append("\t\tdb $");
             areaCode.Append(x.ToString("X2")); _size++;
             areaCode.Append(",$");
@@ -196,7 +188,7 @@ namespace Tiled2ZXNext
         /// <param name="tileset1"></param>
         /// <param name="Tileset2"></param>
         /// <returns></returns>
-        private static int CompareTileset( Entities.Tileset tileset1, Entities.Tileset Tileset2)
+        private static int CompareTileset( Tileset tileset1, Tileset Tileset2)
         {
             if (tileset1.Firstgid == Tileset2.Firstgid)
             {
@@ -217,10 +209,10 @@ namespace Tiled2ZXNext
             // sort tile sets by gid number, to remap the gid in the layers
             _tileSets.Sort(CompareTileset);
             int firstGid = 0;
-            foreach (Entities.Tileset tileset in _tileSets)
+            foreach (Tileset tileset in _tileSets)
             {
                 tileset.FirstgidMap = firstGid;
-                firstGid += 64;
+                firstGid += 64;                     // Todo: this depends on the tilesheet tile size 
             }
         }
 
@@ -238,7 +230,7 @@ namespace Tiled2ZXNext
         private uint MapCell(uint gid)
         {
             uint gidMap = 0;
-            foreach (Entities.Tileset tileset in _tileSets)
+            foreach (Tileset tileset in _tileSets)
             {
                 if (gid >= tileset.Firstgid && gid <= tileset.Lastgid)
                 {

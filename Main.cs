@@ -46,10 +46,7 @@ namespace Tiled2ZXNext
             inputPath = Path.GetDirectoryName(inputFile);
             string data = File.ReadAllText(inputFile);
 
-            TiledParser sceneRaw = JsonSerializer.Deserialize<TiledParser>(data);
-
-            //ResolveTileSets(tiledData.Tilesets);
-            //ResolveTables(tiledData.Properties);
+            Models.Scene sceneRaw = JsonSerializer.Deserialize<Models.Scene>(data);
 
             fileName = sceneRaw.Properties.GetProperty( "FileName");
             string extension = "asm";
@@ -60,7 +57,7 @@ namespace Tiled2ZXNext
 
 
             // get map settings
-            StringBuilder mapData = ProcessMap(sceneRaw);
+            StringBuilder mapData = ProcessMap(scene);
             Console.WriteLine("output map file " + outputFile);
             // write map to final location
             OutputMap(o, mapData);

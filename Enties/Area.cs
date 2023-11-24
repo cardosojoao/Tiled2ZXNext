@@ -6,7 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tiled2ZXNext
+namespace Tiled2ZXNext.Entities
 {
     public class Area
     {
@@ -40,6 +40,10 @@ namespace Tiled2ZXNext
             }
         }
 
+        /// <summary>
+        /// add range of cells to area
+        /// </summary>
+        /// <param name="range"></param>
         public Area(List<Cell> range)
         {
             Cells.AddRange(range);
@@ -87,7 +91,7 @@ namespace Tiled2ZXNext
         {
 
             (int x, int y, int width, int height) size = GetSize();
-            int fill = (int)((((float)Cells.Count) / ((float)(size.width * size.height))) * 100);
+            int fill = (int)(Cells.Count / (float)(size.width * size.height) * 100);
             return fill;
         }
 
@@ -156,6 +160,11 @@ namespace Tiled2ZXNext
             return area;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public Area Explode()
         {
             (int x, int y, int width, int height) size = GetSize();
@@ -209,13 +218,13 @@ namespace Tiled2ZXNext
                 }
 
                 List<Cell> row = GetRow(i);        // get next row
-                (int x, int y, int width, int height) rowSize = Area.GetSize(row, _tileSize);
-                (int x, int y, int width, int height) areaSize = Area.GetSize(newArea.Cells, _tileSize);
+                (int x, int y, int width, int height) rowSize = GetSize(row, _tileSize);
+                (int x, int y, int width, int height) areaSize = GetSize(newArea.Cells, _tileSize);
 
                 // check if we have 100% of row fill
-                bool rowOK = Area.GetSize(row, _tileSize).width == row.Count;
+                bool rowOK = GetSize(row, _tileSize).width == row.Count;
                 // check if width of new area and row is the same, if first row area is always good
-                bool areaOK = newArea.Cells.Count == 0 ? true : Area.GetSize(newArea.Cells, _tileSize).width == row.Count;
+                bool areaOK = newArea.Cells.Count == 0 ? true : GetSize(newArea.Cells, _tileSize).width == row.Count;
 
                 // if row is 100% and area+row are 100% add row to area
                 if (rowOK && areaOK)
@@ -269,8 +278,8 @@ namespace Tiled2ZXNext
                 }
                 List<Cell> col = GetCol(i);                                // get next col
 
-                (int x, int y, int width, int height) colSize = Area.GetSize(col, _tileSize);             // size of column
-                (int x, int y, int width, int height) areaSize = Area.GetSize(openArea.Cells, _tileSize);  // size of current new area
+                (int x, int y, int width, int height) colSize = GetSize(col, _tileSize);             // size of column
+                (int x, int y, int width, int height) areaSize = GetSize(openArea.Cells, _tileSize);  // size of current new area
 
                 // check if we have 100% of row fill
                 bool colOK = colSize.height == col.Count;

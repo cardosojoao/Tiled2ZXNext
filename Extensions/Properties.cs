@@ -90,11 +90,11 @@ namespace Tiled2ZXNext.Extensions
             return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.Value);
         }
 
-        public static string GetProperty(this TiledParser tiledData, string name)
-        {
-            if (tiledData.Properties == null) throw new ArgumentNullException($"tileData.Properties {tiledData.Type}");
-            return tiledData.Properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))?.Value ?? "";
-        }
+        //public static string GetProperty(this TiledParser tiledData, string name)
+        //{
+        //    if (tiledData.Properties == null) throw new ArgumentNullException($"tileData.Properties {tiledData.Type}");
+        //    return tiledData.Properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))?.Value ?? "";
+        //}
 
         /// <summary>
         /// get property value as string

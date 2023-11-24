@@ -1,8 +1,16 @@
-﻿namespace Tiled2ZXNext.Entities
+﻿using Tiled2ZXNext.Entities;
+
+namespace Tiled2ZXNext.Entities
 {
     public partial class  Layer
     {
         private int _tileSize;
+        /// <summary>
+        /// scan area starting with cell
+        /// </summary>
+        /// <param name="cell">start cell</param>
+        /// <param name="tileSize">size of cell</param>
+        /// <returns>Area with all the cells</returns>
         public Area ScanArea(Cell cell, int tileSize)
         {
             _tileSize = tileSize;

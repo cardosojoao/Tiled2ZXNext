@@ -1,18 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using Tiled2ZXNext.Extensions;
-using Model = Tiled2ZXNext.Models;
+using Tiled2ZXNext.Entities;
 
 namespace Tiled2ZXNext
 {
     public class ProcessTileMap : IProcess
     {
-        private readonly Entities.Layer _groupLayer;
-        private readonly Entities.Scene _tileData;
-        private readonly List<Entities.Tileset> _tileSets = new();
-        public ProcessTileMap(Entities.Layer layer, Entities.Scene scene)
+        private readonly Layer _rootLayer;
+        private readonly Scene _tileData;
+        private readonly List<Tileset> _tileSets = new();
+        
+        /// <summary>
+        /// process TileMap layers by merging all the layers into a single one
+        /// </summary>
+        /// <param name="layer">parent layer</param>
+        /// <param name="scene">scene</param>
+        public ProcessTileMap(Layer layer, Scene scene)
         {
-            _groupLayer = layer;
+            _rootLayer = layer;
             _tileData = scene;
         }
 
@@ -20,11 +26,11 @@ namespace Tiled2ZXNext
         public StringBuilder Execute()
         {
             StringBuilder tileMapCode = new();
-            if (_groupLayer.Layers.Count > 0)
+            if (_rootLayer.Layers.Count > 0)
             {
                 // create tileMap buffer
-                TileMap tileMap = new(_groupLayer.Layers[0].Height, _groupLayer.Layers[0].Width);
-                foreach (Entities.Layer layer in _groupLayer.Layers)
+                TileMap tileMap = new(_rootLayer.Layers[0].Height, _rootLayer.Layers[0].Width);
+                foreach (Layer layer in _rootLayer.Layers)
                 {
                     if (layer.Visible)
                     {
@@ -45,7 +51,7 @@ namespace Tiled2ZXNext
         /// <param name="layer">tile layer to process</param>
         /// <param name="tileMap">buffer</param>
         /// <returns>true is was a valid layer of false is not</returns>
-        public bool MergeLayerTileMap(Entities.Layer layer, TileMap tileMap)
+        public bool MergeLayerTileMap(Layer layer, TileMap tileMap)
         {
             if (layer.Type == "tilelayer")
             {
@@ -157,10 +163,16 @@ namespace Tiled2ZXNext
             }
         }
         
+
+        /// <summary>
+        /// re-assign the 
+        /// </summary>
+        /// <param name="gid"></param>
+        /// <returns></returns>
         private uint MapTile(uint gid)
         {
             uint gidMap = 0;
-            foreach (Entities.Tileset tileset in _tileSets)
+            foreach (Tileset tileset in _tileSets)
             {
                 if (gid >= tileset.Firstgid && gid <= tileset.Lastgid)
                 {
@@ -176,14 +188,20 @@ namespace Tiled2ZXNext
             // sort tile sets by gid number, to remap the gid in the layers
             _tileSets.Sort(CompareTileset);
             int firstGid = 0;
-            foreach (Entities.Tileset tileset in _tileSets)
+            foreach (Tileset tileset in _tileSets)
             {
                 tileset.FirstgidMap = firstGid;
                 firstGid += 64;
             }
         }
 
-        private static int CompareTileset(Entities.Tileset tileset1, Entities.Tileset Tileset2)
+        /// <summary>
+        /// sort tileset by firstgid
+        /// </summary>
+        /// <param name="tileset1"></param>
+        /// <param name="Tileset2"></param>
+        /// <returns></returns>
+        private static int CompareTileset(Tileset tileset1, Tileset Tileset2)
         {
             if (tileset1.Firstgid == Tileset2.Firstgid)
             {

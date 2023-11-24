@@ -5,17 +5,16 @@ using System.Linq;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
-using Model = Tiled2ZXNext.Models;
 
 namespace Tiled2ZXNext
 {
     public class ProcessCollision : IProcess
     {
-        private readonly Entities.Layer _groupLayer;
-        private readonly Entities.Scene _scene;
-        public ProcessCollision(Entities.Layer layer, Entities.Scene scene)
+        private readonly Layer _rootLayer;
+        private readonly Scene _scene;
+        public ProcessCollision(Layer layer, Scene scene)
         {
-            _groupLayer = layer;
+            _rootLayer = layer;
             _scene = scene;
         }
 
@@ -23,7 +22,7 @@ namespace Tiled2ZXNext
         {
             StringBuilder collisionCode = new();
             string fileName = _scene.Properties.GetProperty("FileName");
-            foreach (Entities.Layer layer in _groupLayer.Layers)
+            foreach (Layer layer in _rootLayer.Layers)
             {
                 if (layer.Visible)
                 {
@@ -44,7 +43,7 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="layer">layer</param>
         /// <returns>string builder collection with header and data</returns>
-        private static StringBuilder WriteObjectsLayer(Entities.Layer layer)
+        private static StringBuilder WriteObjectsLayer(Layer layer)
         {
             int lengthData = 0;
             StringBuilder data = new(1024);
@@ -86,36 +85,19 @@ namespace Tiled2ZXNext
             int eventIndex = Scene.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
             int tagIndex = Scene.Instance.Tables["TagName"].Items.FindIndex(r => r.Equals(tagName, StringComparison.CurrentCultureIgnoreCase));
 
-            headerType.Append("\t\tdb $");
-            headerType.Append(blockType.ToString("X2"));
-            headerType.Append("\t\t; data block type\r\n");
+            headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
 
+            // merge layer mask with lasyID in a single byte
             layerMask *= 16;
             layerMask += layerId;
-            header.Append("\t\tdb $");
-
-            header.Append(layer.Objects.Count(c => c.Visible).ToString("X2"));  // only visible objects count
-            header.Append("\t\t; Objects count\r\n");
-            header.Append("\t\tdb $");
-            header.Append(tagIndex.ToString("X2"));
-            header.Append("\t\t; Tag [");
-            header.Append(tagName);
-            header.Append("]\r\n");
-            header.Append("\t\tdb $");
-            header.Append(layerMask.ToString("X2"));
-            header.Append("\t\t; Layer\r\n");
-            header.Append("\t\tdb $");
-            header.Append(BodyTypeInt(bodyType).ToString("X2"));
-            header.Append("\t\t; Body Type 0=trigger , 4=rigid\r\n");   // to be removed
-            header.Append("\t\tdb $");
-            header.Append(eventIndex.ToString("X2"));
-            header.Append("\t\t; Event ID [");
-            header.Append(eventName);
-            header.Append("]\r\n");
-
+            header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).Append("\t\t; Objects count\r\n");
+            header.Append("\t\tdb $").Append(tagIndex.ToString("X2")).Append("\t\t; Tag [").Append(tagName).Append("]\r\n");
+            header.Append("\t\tdb $").Append(layerMask.ToString("X2")).Append("\t\t; Layer\r\n");
+            header.Append("\t\tdb $").Append(BodyTypeInt(bodyType).ToString("X2")).Append("\t\t; Body Type 0=trigger , 4=rigid\r\n");   // to be removed
+            header.Append("\t\tdb $").Append(eventIndex.ToString("X2")).Append("\t\t; Event ID [").Append(eventName).Append("]\r\n");
             lengthData += 5;
 
-            if (layer.Name.ToLower() == "collision")
+            if (layer.Name.Equals("collision", StringComparison.InvariantCultureIgnoreCase))
             {
                 data.Append("\t\t; X, Y, Width, Height\r\n");
             }
@@ -127,24 +109,17 @@ namespace Tiled2ZXNext
             {
                 if (obj.Visible)
                 {
-                    data.Append("\t\tdw $");
-                    data.Append((obj.X + Controller.Config.Offset.x).Double2Hex( "X4"));
-                    data.Append(",$");
-                    data.Append((obj.Y + Controller.Config.Offset.y).Double2Hex( "X4"));
-                    // data.Append("\r\n");
-                    //data.Append("\t\tdb $");
-                    data.Append(",$");
-                    data.Append(obj.Width.Double2Hex());
-                    data.Append(",$");
-                    data.Append(obj.Height.Double2Hex());
-                    lengthData += 6;
+                    data.Append("\t\tdw $").Append((obj.X + Controller.Config.Offset.x).Double2Hex( "X4"));
+                    data.Append(",$").Append((obj.Y + Controller.Config.Offset.y).Double2Hex( "X4"));
+                    data.Append(",$").Append(obj.Width.Double2Hex());
+                    data.Append(",$").Append(obj.Height.Double2Hex());
                     data.Append("\r\n");
+                    lengthData += 6;
                 }
             }
 
-            headerType.Append("\t\tdw $");
-            headerType.Append(lengthData.ToString("X4"));               // size must be 2B long (map is over 256 Bytes)
-            headerType.Append("\t\t; Block size\r\n");
+            // size must be 2B long (map is over 256 Bytes)
+            headerType.Append("\t\tdw $").Append(lengthData.ToString("X4")).Append("\t\t; Block size\r\n");
             // insert header at begin
             header.Insert(0, headerType);
             header.Append(data);

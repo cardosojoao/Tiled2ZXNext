@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tiled2ZXNext.Extensions;
 using Tiled2ZXNext.Entities;
+using Tiled2ZXNext.Entities;
 
 namespace Tiled2ZXNext
 {
@@ -23,13 +24,13 @@ namespace Tiled2ZXNext
         }
 
         /// <summary>
-        /// 
+        /// Areas are always rectangles
         /// </summary>
         /// <param name="grouplayer"></param>
         public LayerAreas ScanAreas()
         {
-            List<int> spriteSheets = new();
-            int GroupType = _layer.Properties.GetPropertyInt("Type");
+            //List<int> spriteSheets = new();
+            //int GroupType = _layer.Properties.GetPropertyInt("Type");
             int index = 0;
 
             for (int row = 0; row < _layer.Height; row++)
@@ -51,6 +52,10 @@ namespace Tiled2ZXNext
         }
 
 
+        /// <summary>
+        /// try to split areas in smaller areas  with a bigger fill percentage (fill percentage is the number of cells filled in the area)
+        /// </summary>
+        /// <returns></returns>
         public LayerAreas SplitAreas()
         {
             LayerAreas newAreas = new();
@@ -83,6 +88,5 @@ namespace Tiled2ZXNext
             }
             return newAreas;
         }
-
     }
 }
