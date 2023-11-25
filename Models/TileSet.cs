@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Tiled2ZXNext.Models
 {
-    public partial class Tileset
+    public partial class TileSet
     {
         [JsonPropertyName("firstgid")]
         public int Firstgid { get; set; }

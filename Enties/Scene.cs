@@ -44,15 +44,15 @@ namespace Tiled2ZXNext.Entities
         public (int gid, Tileset tileSheet) GetParsedGid(int gid)
         {
             Tileset tileSheet = null;
-            //foreach (Tileset tileSet in Tilesets.Values)
-            //{
-            //    if (gid >= tileSet.Firstgid && gid <= tileSet.Lastgid)
-            //    {
-            //        // we are going to load the two tilesheets in memory sequential the number can be sequential //  gid -= tileSet.Parsedgid;
-            //        tileSheet = tileSet;
-            //        break;
-            //    }
-            //}
+            foreach (Tileset tileSet in Tilesets)
+            {
+                if (gid >= tileSet.Firstgid && gid <= tileSet.Lastgid)
+                {
+                    // we are going to load the two tilesheets in memory sequential the number can be sequential //  gid -= tileSet.Parsedgid;
+                    tileSheet = tileSet;
+                    break;
+                }
+            }
             return (gid, tileSheet);
         }
     }

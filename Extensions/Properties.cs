@@ -63,7 +63,7 @@ namespace Tiled2ZXNext.Extensions
                     
 
 
-        public static bool ExistProperty(this TileSetXMl tileSet, string name)
+        public static bool ExistProperty(this tileset tileSet, string name)
         {
             if (tileSet.properties == null) throw new ArgumentNullException($"tileSet: missing [properties] of {tileSet.name}");
             TilesetTileProperty prop = tileSet.properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));

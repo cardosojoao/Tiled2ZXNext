@@ -28,7 +28,9 @@ namespace Tiled2ZXNext.Mapper
             scene.Layer2Palette = sceneRaw.Properties.GetPropertyInt("PaletteLayer2");
             scene.Properties = PropertyMapper.Map(sceneRaw.Properties);
 
-            scene.Tilesets = ResolveTileSets(sceneRaw.Tilesets, options.Input);
+        
+                string inputPath =  Path.GetDirectoryName(options.Input);
+            scene.Tilesets = ResolveTileSets(sceneRaw.Tilesets, inputPath);
 
             if (sceneRaw.Properties.ExistProperty("Tables"))
             {
@@ -114,22 +116,22 @@ namespace Tiled2ZXNext.Mapper
 
 
 
-        private static List<Entity.Tileset> ResolveTileSets(List<Model.Tileset> tileSetsRaw, string inputPath)
+        private static List<Entity.Tileset> ResolveTileSets(List<Model.TileSet> tileSetsRaw, string inputPath)
         {
-            Dictionary<string, List<Model.Tileset>> resolved = new();
-            Dictionary<string, TileSetXMl> tilesSetData = new();
+            Dictionary<string, List<Model.TileSet>> resolved = new();
+            Dictionary<string, Model.tileset> tilesSetData = new();
 
             int order = 0;       // order of load 
-            foreach (Model.Tileset tileSet in tileSetsRaw)
+            foreach (Model.TileSet tileSet in tileSetsRaw)
             {
                 tileSet.Order = order;      // judt to keep in mind the physical order of tilesheet that is align with gid's
                 string file = Path.Combine(inputPath, tileSet.Source);
-                TileSetXMl tileSetData = ReadTileSet(file);
+                Model.tileset tileSetData = ReadTileSet(file);
 
                 tileSet.Lastgid = tileSetData.tilecount + tileSet.Firstgid - 1;
                 if (!resolved.ContainsKey(tileSetData.image.source))
                 {
-                    resolved.Add(tileSetData.image.source, new List<Model.Tileset>());
+                    resolved.Add(tileSetData.image.source, new List<Model.TileSet>());
                     tilesSetData.Add(tileSetData.image.source, tileSetData);
                 }
                 resolved[tileSetData.image.source].Add(tileSet);
@@ -138,9 +140,9 @@ namespace Tiled2ZXNext.Mapper
             List<Entity.Tileset> tilesets = new();
 
 
-            foreach (KeyValuePair<string, List<Model.Tileset>> sets in resolved)
+            foreach (KeyValuePair<string, List<Model.TileSet>> sets in resolved)
             {
-                foreach (Model.Tileset setRaw in sets.Value)
+                foreach (Model.TileSet setRaw in sets.Value)
                 {
                     Entity.Tileset tileset = new();
                     tilesets.Add(tileset);
@@ -149,7 +151,7 @@ namespace Tiled2ZXNext.Mapper
                     tileset.Lastgid = setRaw.Lastgid;
                     tileset.Firstgid = setRaw.Firstgid;
                     tileset.FirstgidMap = setRaw.FirstgidMap;
-                    TileSetXMl tileSetData = tilesSetData[sets.Key];
+                    Model.tileset tileSetData = tilesSetData[sets.Key];
                     tileset.Parsedgid = setRaw.Firstgid - 1;
                     tileset.TileSheetID = tileSetData.properties.GetPropertyInt( "TileSheetId");
                     tileset.PaletteIndex = tileSetData.properties.GetPropertyInt( "PaletteIndex");
@@ -164,14 +166,14 @@ namespace Tiled2ZXNext.Mapper
         /// </summary>
         /// <param name="pathFile"></param>
         /// <returns></returns>
-        private static TileSetXMl ReadTileSet(string pathFile)
+        private static Model.tileset ReadTileSet(string pathFile)
         {
-            XmlSerializer serializer = new(typeof(TileSetXMl));
-            TileSetXMl tileSet;
+            XmlSerializer serializer = new(typeof(Model.tileset));
+            Model.tileset tileSet;
             using (Stream reader = new FileStream(pathFile, FileMode.Open))
             {
                 // Call the Deserialize method to restore the object's state.
-                tileSet = (TileSetXMl)serializer.Deserialize(reader);
+                tileSet = (Model.tileset)serializer.Deserialize(reader);
             }
             return tileSet;
         }

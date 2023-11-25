@@ -41,7 +41,7 @@ namespace Tiled2ZXNext.Models
         public int Tileheight { get; set; }
 
         [JsonPropertyName("tilesets")]
-        public List<Tileset> Tilesets { get; set; }
+        public List<TileSet> Tilesets { get; set; }
 
         [JsonPropertyName("tilewidth")]
         public int Tilewidth { get; set; }

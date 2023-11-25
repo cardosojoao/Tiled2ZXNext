@@ -7,7 +7,7 @@
     [System.ComponentModel.DesignerCategory("code")]
     [System.Xml.Serialization.XmlType(AnonymousType = true)]
     [System.Xml.Serialization.XmlRoot(Namespace = "", IsNullable = false)]
-    public partial class TileSetXMl
+    public partial class tileset
     {
         private TilesetImage imageField;
 

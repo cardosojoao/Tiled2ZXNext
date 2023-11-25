@@ -29,8 +29,16 @@ namespace Tiled2ZXNext.Mapper
             layer.Y = layerRaw.Y;
             layer.Id = layerRaw.Id;
             layer.Visible = layerRaw.Visible;
-            layer.Objects = ParseObjects(layerRaw.Objects);
-            layer.Properties = PropertyMapper.Map(layerRaw.Properties);
+            layer.Data = layerRaw.Data;
+
+            if (layerRaw.Objects != null)
+            {
+                layer.Objects = ParseObjects(layerRaw.Objects);
+            }
+            if (layerRaw.Properties != null)
+            {
+                layer.Properties = PropertyMapper.Map(layerRaw.Properties);
+            }
         
             if (layerRaw.Layers != null)
             {
