@@ -240,6 +240,7 @@ namespace Tiled2ZXNext.Entities
                     {
                         areas.Add(newArea);
                         newArea = new Area(_tileSize);
+                        i += row.Count;
                     }
                     else
                     {

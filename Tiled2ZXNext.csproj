@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>1.5.1</Version>
+    <Version>1.6.0</Version>
     <Authors>João Cardoso</Authors>
     <Company>Bapa Dreams</Company>
     <Description>Parser to Tiled convert tile map into asm file</Description>

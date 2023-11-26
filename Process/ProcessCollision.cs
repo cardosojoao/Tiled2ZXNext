@@ -111,7 +111,8 @@ namespace Tiled2ZXNext
                 {
                     data.Append("\t\tdw $").Append((obj.X + Controller.Config.Offset.x).Double2Hex( "X4"));
                     data.Append(",$").Append((obj.Y + Controller.Config.Offset.y).Double2Hex( "X4"));
-                    data.Append(",$").Append(obj.Width.Double2Hex());
+                    data.Append("\r\n");
+                    data.Append("\t\tdb $").Append(obj.Width.Double2Hex());
                     data.Append(",$").Append(obj.Height.Double2Hex());
                     data.Append("\r\n");
                     lengthData += 6;
