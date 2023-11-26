@@ -12,7 +12,8 @@ namespace Tiled2ZXNext.Entities
     {
         private readonly int _tileSize;
         public List<Cell> Cells { get; private set; } = new List<Cell>();
-
+        public int X { get; set; }
+        public int Y { get; set; }
 
         public Area(int tileSize)
         {
@@ -44,9 +45,10 @@ namespace Tiled2ZXNext.Entities
         /// add range of cells to area
         /// </summary>
         /// <param name="range"></param>
-        public Area(List<Cell> range)
+        public Area(List<Cell> range, int tileSize)
         {
             Cells.AddRange(range);
+            _tileSize = tileSize;
         }
         /// <summary>
         /// is cell included in area
@@ -89,7 +91,7 @@ namespace Tiled2ZXNext.Entities
         /// <returns></returns>
         public int Fill()
         {
-
+            if (Cells.Count == 0) return 0;
             (int x, int y, int width, int height) size = GetSize();
             int fill = (int)(Cells.Count / (float)(size.width * size.height) * 100);
             return fill;
@@ -155,7 +157,7 @@ namespace Tiled2ZXNext.Entities
         /// <returns>new area</returns>
         public Area Get(int index, int length)
         {
-            Area area = new Area(Cells.GetRange(index, length));
+            Area area = new Area(Cells.GetRange(index, length), 8);
             Cells.RemoveRange(index, length);
             return area;
         }
@@ -173,11 +175,13 @@ namespace Tiled2ZXNext.Entities
             Area area = new Area(size.width, size.height, 8);
             // get the offset of area
 
+            area.X = size.x;
+            area.Y = size.y;
+
             int x = size.x;
             int y = size.y;
             // int x = Cells[0].X;
             //; int y = Cells[0].Y;
-
 
             foreach (Cell cell in Cells)
             {

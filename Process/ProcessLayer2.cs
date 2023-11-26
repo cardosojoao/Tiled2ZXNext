@@ -31,9 +31,14 @@ namespace Tiled2ZXNext
                     _type = layer.Properties.GetPropertyInt("Type");
                     _tileSize = layer.Properties.GetPropertyInt( "Size");
                     LayerScan layerScan = new LayerScan(layer, _tileSize);
-                    layerScan.ScanAreas();
-                    LayerAreas layerAreas = layerScan.SplitAreas();
+
+                    LayerAreas layerAreas =  layerScan.ScanLayer();
                     layerAreas.Name = layer.Name;
+
+
+                    //layerScan.ScanAreas();
+                    //LayerAreas layerAreas = layerScan.SplitAreas();
+                    //layerAreas.Name = layer.Name;
                     LayerConvertCells(layerAreas);
                     TileSetUpdate();
                     MapLayer(layerAreas);
@@ -90,9 +95,9 @@ namespace Tiled2ZXNext
             (int x, int y, int width, int height) = area.GetSize();
             StringBuilder areaCode = new();
             areaCode.Append("\t\tdb $");
-            areaCode.Append(x.ToString("X2")); _size++;
+            areaCode.Append( area.X.ToString("X2")); _size++;
             areaCode.Append(",$");
-            areaCode.Append(y.ToString("X2")); _size++;
+            areaCode.Append(area.Y.ToString("X2")); _size++;
             areaCode.Append(",$");
             areaCode.Append(width.ToString("X2")); _size++;
             areaCode.Append(",$");
