@@ -16,21 +16,6 @@ namespace Tiled2ZXNext.Entities
         /// Collections of areas
         /// </summary>
         public List<Area> Areas { get; set; } = new List<Area>();
-        /// <summary>
-        /// Check if cells is already include in one of the areas
-        /// </summary>
-        /// <param name="cell"></param>
-        /// <returns></returns>
-        public bool Included(Cell cell)
-        {
-            foreach (Area area in Areas)
-            {
-                if (area.Included(cell))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+
     }
 }

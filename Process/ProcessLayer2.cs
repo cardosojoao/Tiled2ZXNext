@@ -31,14 +31,8 @@ namespace Tiled2ZXNext
                     _type = layer.Properties.GetPropertyInt("Type");
                     _tileSize = layer.Properties.GetPropertyInt( "Size");
                     LayerScan layerScan = new LayerScan(layer, _tileSize);
-
                     LayerAreas layerAreas =  layerScan.ScanLayer();
                     layerAreas.Name = layer.Name;
-
-
-                    //layerScan.ScanAreas();
-                    //LayerAreas layerAreas = layerScan.SplitAreas();
-                    //layerAreas.Name = layer.Name;
                     LayerConvertCells(layerAreas);
                     TileSetUpdate();
                     MapLayer(layerAreas);
