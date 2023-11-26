@@ -1,4 +1,8 @@
 {
+  "offset": {
+    "x": 32,
+    "y" : 32 
+  },
   "assembler": {
     "app": "d:\\devl\\zx\\sjasmplus\\sjasmplus.exe",
     "args": "\"%1\" --raw=\"%2\""

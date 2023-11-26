@@ -1,30 +1,36 @@
-﻿using CommandLine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
+using Tiled2ZXNext.Extensions;
+using Tiled2ZXNext.Entities;
 
 namespace Tiled2ZXNext
 {
     public class ProcessTileMap : IProcess
     {
-        private readonly Layer _groupLayer;
-        private readonly TiledParser _tileData;
+        private readonly Layer _rootLayer;
+        private readonly Scene _tileData;
         private readonly List<Tileset> _tileSets = new();
-        public ProcessTileMap(Layer layer, TiledParser tiledData)
+        
+        /// <summary>
+        /// process TileMap layers by merging all the layers into a single one
+        /// </summary>
+        /// <param name="layer">parent layer</param>
+        /// <param name="scene">scene</param>
+        public ProcessTileMap(Layer layer, Scene scene)
         {
-            _groupLayer = layer;
-            _tileData = tiledData;
+            _rootLayer = layer;
+            _tileData = scene;
         }
 
 
         public StringBuilder Execute()
         {
             StringBuilder tileMapCode = new();
-
-            if (_groupLayer.Layers.Count > 0)
+            if (_rootLayer.Layers.Count > 0)
             {
                 // create tileMap buffer
-                TileMap tileMap = new(_groupLayer.Layers[0].Height, _groupLayer.Layers[0].Width);
-                foreach (Layer layer in _groupLayer.Layers)
+                TileMap tileMap = new(_rootLayer.Layers[0].Height, _rootLayer.Layers[0].Width);
+                foreach (Layer layer in _rootLayer.Layers)
                 {
                     if (layer.Visible)
                     {
@@ -49,7 +55,7 @@ namespace Tiled2ZXNext
         {
             if (layer.Type == "tilelayer")
             {
-                tileMap.Type = TiledParser.GetPropertyInt(layer.Properties, "Type");
+                tileMap.Type = layer.Properties.GetPropertyInt( "Type");
                 int index = 0;
                 for (int row = 0; row < layer.Height; row++)
                 {
@@ -72,7 +78,6 @@ namespace Tiled2ZXNext
                             {
                                 extend ^= (uint)8;
                             }
-
                             tileId &= 0xffff;
                             var gidData = _tileData.GetParsedGid((int)tileId);     // tile index is 0 based
                             uint paletteIndex = (uint)gidData.tileSheet.PaletteIndex << 4;
@@ -83,8 +88,6 @@ namespace Tiled2ZXNext
                             {
                                 _tileSets.Add(gidData.tileSheet);
                             }
-
-
                         }
                         index++;
                     }
@@ -95,7 +98,6 @@ namespace Tiled2ZXNext
             {
                 return false;
             }
-
         }
 
         private StringBuilder WriteTiledLayer(TileMap tilemap)
@@ -146,7 +148,6 @@ namespace Tiled2ZXNext
             headerType.Append(", $");
             headerType.Append(tileSheet1.ToString("X2"));
             headerType.Append("\t\t; Tile sheet Id  00..fe=valid, ff=not defined\r\n");
-
             // insert header at begin
             header.Insert(0, headerType);
             header.Append(data);
@@ -161,6 +162,13 @@ namespace Tiled2ZXNext
                 tile.TileID = MapTile(tile.TileID);
             }
         }
+        
+
+        /// <summary>
+        /// re-assign the 
+        /// </summary>
+        /// <param name="gid"></param>
+        /// <returns></returns>
         private uint MapTile(uint gid)
         {
             uint gidMap = 0;
@@ -187,6 +195,12 @@ namespace Tiled2ZXNext
             }
         }
 
+        /// <summary>
+        /// sort tileset by firstgid
+        /// </summary>
+        /// <param name="tileset1"></param>
+        /// <param name="Tileset2"></param>
+        /// <returns></returns>
         private static int CompareTileset(Tileset tileset1, Tileset Tileset2)
         {
             if (tileset1.Firstgid == Tileset2.Firstgid)

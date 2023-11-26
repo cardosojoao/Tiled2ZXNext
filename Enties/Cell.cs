@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tiled2ZXNext
+namespace Tiled2ZXNext.Entities
 {
-    public class Cell
+    public class Cell : Tile
     {
         public Cell()
         {
@@ -19,22 +19,19 @@ namespace Tiled2ZXNext
         public Direction Source { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
-        public uint TileID { get; set; }
-        public uint Settings { get; set; }
-
         public static int SortHoriz(Cell cella, Cell cellb)
         {
-            if(cella.Y<cellb.Y)
+            if (cella.Y < cellb.Y)
             {
                 return -1;
             }
-            else if(cella.Y>cellb.Y)
+            else if (cella.Y > cellb.Y)
             {
                 return 1;
             }
             else
             {
-                if(cella.X < cellb.X)
+                if (cella.X < cellb.X)
                 {
                     return -1;
                 }
@@ -56,8 +53,8 @@ namespace Tiled2ZXNext
             {
                 return -1;
             }
-            else if (cella.X < cellb.X)
-            {   
+            else if (cella.X > cellb.X)
+            {
                 return 1;
             }
             else
@@ -76,8 +73,6 @@ namespace Tiled2ZXNext
                 }
             }
         }
-
-
     }
 
     public enum Direction : int

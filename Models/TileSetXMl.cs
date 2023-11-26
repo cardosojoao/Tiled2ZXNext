@@ -1,12 +1,12 @@
-﻿namespace Tiled2ZXNext
+﻿namespace Tiled2ZXNext.Models
 {
 
     // NOTE: Generated code may require at least .NET Framework 4.5 or .NET Core/Standard 2.0.
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
+    [System.Serializable()]
+    [System.ComponentModel.DesignerCategory("code")]
+    [System.Xml.Serialization.XmlType(AnonymousType = true)]
+    [System.Xml.Serialization.XmlRoot(Namespace = "", IsNullable = false)]
     public partial class tileset
     {
         private TilesetImage imageField;
@@ -35,129 +35,129 @@
         {
             get
             {
-                return this.imageField;
+                return imageField;
             }
             set
             {
-                this.imageField = value;
+                imageField = value;
             }
         }
 
-        
+
 
         /// <remarks/>
         public TilesetTile tile
         {
             get
             {
-                return this.tileField;
+                return tileField;
             }
             set
             {
-                this.tileField = value;
+                tileField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public decimal version
         {
             get
             {
-                return this.versionField;
+                return versionField;
             }
             set
             {
-                this.versionField = value;
+                versionField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string tiledversion
         {
             get
             {
-                return this.tiledversionField;
+                return tiledversionField;
             }
             set
             {
-                this.tiledversionField = value;
+                tiledversionField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string name
         {
             get
             {
-                return this.nameField;
+                return nameField;
             }
             set
             {
-                this.nameField = value;
+                nameField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public int tilewidth
         {
             get
             {
-                return this.tilewidthField;
+                return tilewidthField;
             }
             set
             {
-                this.tilewidthField = value;
+                tilewidthField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public int tileheight
         {
             get
             {
-                return this.tileheightField;
+                return tileheightField;
             }
             set
             {
-                this.tileheightField = value;
+                tileheightField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public ushort tilecount
         {
             get
             {
-                return this.tilecountField;
+                return tilecountField;
             }
             set
             {
-                this.tilecountField = value;
+                tilecountField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public int columns
         {
             get
             {
-                return this.columnsField;
+                return columnsField;
             }
             set
             {
-                this.columnsField = value;
+                columnsField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("property", IsNullable = false)]
+        [System.Xml.Serialization.XmlArrayItem("property", IsNullable = false)]
         public TilesetTileProperty[] properties
         {
             get
@@ -172,9 +172,9 @@
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    [System.Serializable()]
+    [System.ComponentModel.DesignerCategory("code")]
+    [System.Xml.Serialization.XmlType(AnonymousType = true)]
     public partial class TilesetImage
     {
         private string SourceField;
@@ -184,52 +184,52 @@
         private int HeightField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string source
         {
             get
             {
-                return this.SourceField;
+                return SourceField;
             }
             set
             {
-                this.SourceField = value;
+                SourceField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public int width
         {
             get
             {
-                return this.WidthField;
+                return WidthField;
             }
             set
             {
-                this.WidthField = value;
+                WidthField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public int Height
         {
             get
             {
-                return this.HeightField;
+                return HeightField;
             }
             set
             {
-                this.HeightField = value;
+                HeightField = value;
             }
         }
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    [System.Serializable()]
+    [System.ComponentModel.DesignerCategory("code")]
+    [System.Xml.Serialization.XmlType(AnonymousType = true)]
     public partial class TilesetTile
     {
         private TilesetTileProperty[] propertiesField;
@@ -237,38 +237,38 @@
         private byte IdField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("property", IsNullable = false)]
+        [System.Xml.Serialization.XmlArrayItem("property", IsNullable = false)]
         public TilesetTileProperty[] properties
         {
             get
             {
-                return this.propertiesField;
+                return propertiesField;
             }
             set
             {
-                this.propertiesField = value;
+                propertiesField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public byte id
         {
             get
             {
-                return this.IdField;
+                return IdField;
             }
             set
             {
-                this.IdField = value;
+                IdField = value;
             }
         }
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    [System.Serializable()]
+    [System.ComponentModel.DesignerCategory("code")]
+    [System.Xml.Serialization.XmlType(AnonymousType = true)]
     public partial class TilesetTileProperty
     {
 
@@ -277,30 +277,30 @@
         private string valueField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string name
         {
             get
             {
-                return this.nameField;
+                return nameField;
             }
             set
             {
-                this.nameField = value;
+                nameField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string value
         {
             get
             {
-                return this.valueField;
+                return valueField;
             }
             set
             {
-                this.valueField = value;
+                valueField = value;
             }
         }
     }

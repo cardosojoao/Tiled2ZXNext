@@ -1,44 +1,45 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Tiled2ZXNext.Extensions;
 
 namespace Tiled2ZXNext
 {
     public partial class Controller
     {
-        public StringBuilder ProcessLayer(TiledParser tiledData)
+        public StringBuilder ProcessLayer(Entities.Scene scene)
         {
             StringBuilder layerCode = new(2048);
-            string fileName = TiledParser.GetProperty(tiledData.Properties, "FileName");
+            string fileName = scene.Properties.GetProperty( "FileName");
 
             layerCode.Append(fileName);
             layerCode.Append(":\r\n");
 
             List<IProcess> blocks = new();
             // get root folders group
-
-            List<Layer> groups = tiledData.Layers.FindAll(l => l.Type == "group" && l.Visible);
+            List<Entities.Layer> groups = scene.Layers.FindAll(l => l.Type == "group" && l.Visible);
 
             // select Layer 2 group layers
-            Layer groupLayer = groups.Find(g => g.Name.Equals("layer2", System.StringComparison.InvariantCultureIgnoreCase));
+            Entities.Layer groupLayer = groups.Find(g => g.Name.Equals("layer2", System.StringComparison.InvariantCultureIgnoreCase));
             if (groupLayer != null)
             {
-                blocks.Add(new ProcessLayer2(groupLayer, tiledData));
-            }
-
-            // select Tilemap group layers
-            groupLayer = groups.Find(g => g.Name.Equals("tilemap", System.StringComparison.InvariantCultureIgnoreCase));
-            if (groupLayer != null)
-            {
-                blocks.Add(new ProcessTileMap(groupLayer, tiledData));
+                blocks.Add(new ProcessLayer2(groupLayer, scene));
             }
 
             // select Collision group layers
             groupLayer = groups.Find(g => g.Name.Equals("collision", System.StringComparison.InvariantCultureIgnoreCase));
             if (groupLayer != null)
             {
-                blocks.Add(new ProcessCollision(groupLayer, tiledData));
+                blocks.Add(new ProcessCollision(groupLayer, scene));
             }
+
+            // select Tilemap group layers
+            groupLayer = groups.Find(g => g.Name.Equals("tilemap", System.StringComparison.InvariantCultureIgnoreCase));
+            if (groupLayer != null)
+            {
+                blocks.Add(new ProcessTileMap(groupLayer, scene));
+            }
+
 
 
             foreach (IProcess process in blocks)

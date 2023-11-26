@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using Microsoft.Extensions.Primitives;
+using System.IO;
 using System.Text;
+using Tiled2ZXNext.Extensions;
 
 namespace Tiled2ZXNext
 {
@@ -9,35 +11,21 @@ namespace Tiled2ZXNext
         /// <summary>
         /// Creat the room details for the map
         /// </summary>
-        /// <param name="tiledData"></param>
+        /// <param name="scene"></param>
         /// <returns></returns>
-        public StringBuilder ProcessMap(TiledParser tiledData)
+        public StringBuilder ProcessMap(Entities.Scene scene)
         {
             StringBuilder result = new StringBuilder(100);
-            string fileName = TiledParser.GetProperty(tiledData.Properties, "FileName");
-
+            string fileName = scene.Properties.GetProperty( "FileName");
             result.Append('m');
             result.Append(fileName);
             result.Append(":\r\n");
-            result.Append(".Left:\t\t");
-            result.Append("db\t");
-            result.Append(TiledParser.GetProperty(tiledData.Properties, "roomleft"));
-            result.Append("\r\n");
-            result.Append(".Right:\t\t");
-            result.Append("db\t");
-            result.Append(TiledParser.GetProperty(tiledData.Properties, "roomright"));
-            result.Append("\r\n");
-            result.Append(".Top:\t\t");
-            result.Append("db\t");
-            result.Append(TiledParser.GetProperty(tiledData.Properties, "roomtop"));
-            result.Append("\r\n");
-            result.Append(".Bottom:\t");
-            result.Append("db\t");
-            result.Append(TiledParser.GetProperty(tiledData.Properties, "roombottom"));
-            result.Append("\r\n");
+            result.Append(".Left:\t\tdb\t").Append(scene.Properties.GetProperty( "roomleft")).Append("\r\n");
+            result.Append(".Right:\t\tdb\t").Append(scene.Properties.GetProperty( "roomright")).Append("\r\n");
+            result.Append(".Top:\t\tdb\t").Append(scene.Properties.GetProperty( "roomtop")).Append("\r\n");
+            result.Append(".Bottom:\tdb\t").Append(scene.Properties.GetProperty( "roombottom")).Append("\r\n");
             return result;
         }
-
 
         public void OutputMap(Options o, StringBuilder mapData)
         {
