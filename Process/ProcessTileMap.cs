@@ -134,7 +134,7 @@ namespace Tiled2ZXNext
                 }
                 data.Append("\r\n");
             }
-            lengthData += 2;        // add the 2 tilesheets bytes
+            lengthData += 4;        // add the 2 tilesheets bytes
 
             headerType.Append("\t\tdw $");
             headerType.Append(lengthData.ToString("X4"));
@@ -142,11 +142,17 @@ namespace Tiled2ZXNext
             // select tilesheet id
             int tileSheet0 = _tileSets[0].TileSheetID;
             int tileSheet1 = _tileSets.Count > 1 ? _tileSets[1].TileSheetID : 255;
+            int tileSheet2 = _tileSets.Count > 2 ? _tileSets[2].TileSheetID : 255;
+            int tileSheet3 = _tileSets.Count > 3 ? _tileSets[3].TileSheetID : 255;
             // always show two tilesheets
             headerType.Append("\t\tdb $");
             headerType.Append(tileSheet0.ToString("X2"));
             headerType.Append(", $");
             headerType.Append(tileSheet1.ToString("X2"));
+            headerType.Append(", $");
+            headerType.Append(tileSheet2.ToString("X2"));
+            headerType.Append(", $");
+            headerType.Append(tileSheet3.ToString("X2"));
             headerType.Append("\t\t; Tile sheet Id  00..fe=valid, ff=not defined\r\n");
             // insert header at begin
             header.Insert(0, headerType);

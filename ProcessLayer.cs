@@ -40,6 +40,12 @@ namespace Tiled2ZXNext
                 blocks.Add(new ProcessTileMap(groupLayer, scene));
             }
 
+            // select Tilemap group layers
+            groupLayer = groups.Find(g => g.Name.Equals("locations", System.StringComparison.InvariantCultureIgnoreCase));
+            if (groupLayer != null)
+            {
+                blocks.Add(new ProcessLocations(groupLayer, scene));
+            }
 
 
             foreach (IProcess process in blocks)

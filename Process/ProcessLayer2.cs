@@ -34,11 +34,18 @@ namespace Tiled2ZXNext
                     LayerAreas layerAreas =  layerScan.ScanLayer();
                     layerAreas.Name = layer.Name;
                     LayerConvertCells(layerAreas);
-                    TileSetUpdate();
-                    MapLayer(layerAreas);
+                    // TileSetUpdate();
+                    //MapLayer(layerAreas);
                     LayersArea.Add(layerAreas);
                 }
             }
+
+            TileSetUpdate();
+            foreach (LayerAreas layer in LayersArea)
+            {
+                MapLayer(layer);
+            }
+
             StringBuilder layer2Code = new();
             foreach (LayerAreas layer in LayersArea)
             {
@@ -77,11 +84,15 @@ namespace Tiled2ZXNext
             // select tilesheet id
             int tileSheet0 = _tileSets[0].TileSheetID;
             int tileSheet1 = _tileSets.Count > 1 ? _tileSets[1].TileSheetID : 255;
+            int tileSheet2 = _tileSets.Count > 2 ? _tileSets[2].TileSheetID : 255;
+            int tileSheet3 = _tileSets.Count > 3 ? _tileSets[3].TileSheetID : 255;
             // always show two tilesheets
-            code.Append("\t\tdb $").Append(tileSheet0.ToString("X2")); 
-            _size++;
-            code.Append(",$").Append(tileSheet1.ToString("X2")).Append("\t\t; Tile sheet Id  00..fe=valid, ff=not defined\r\n");
-            _size++;
+            code.Append("\t\tdb $").Append(tileSheet0.ToString("X2")) 
+            .Append(",$").Append(tileSheet1.ToString("X2"))
+            .Append(",$").Append(tileSheet2.ToString("X2"))
+            .Append(",$").Append(tileSheet3.ToString("X2"))
+            .Append("\t\t; Tile sheet Id  00..fe=valid, ff=not defined\r\n");
+            _size+=4;
             return code;
         }
         private StringBuilder AreaParseCode(Area area)

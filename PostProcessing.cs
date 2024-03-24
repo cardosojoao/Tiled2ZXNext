@@ -49,7 +49,7 @@ namespace Tiled2ZXNext
 
         static int ExecuteCommand(string exec, string parameters)
         {
-            Console.WriteLine("execute  " + exec, parameters);
+            Console.WriteLine("execute  {0} {1}" , exec, parameters);
             ProcessStartInfo startinfo = new ProcessStartInfo(exec, parameters);
             startinfo.ErrorDialog = true;
             startinfo.CreateNoWindow = true;
