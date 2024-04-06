@@ -48,6 +48,13 @@ namespace Tiled2ZXNext
             }
 
 
+            // select Tilemap group layers
+            groupLayer = groups.Find(g => g.Name.Equals("path", System.StringComparison.InvariantCultureIgnoreCase));
+            if (groupLayer != null)
+            {
+                blocks.Add(new ProcessPaths(groupLayer, scene));
+            }
+
             foreach (IProcess process in blocks)
             {
                 layerCode.Append(process.Execute());

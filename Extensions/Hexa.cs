@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Tiled2ZXNext.Extensions
 {
-    public static  class Double
+    public static  class Hexa
     {
 
         /// <summary>
@@ -26,8 +26,20 @@ namespace Tiled2ZXNext.Extensions
                 result = ((int)Math.Round(value, 0)).ToString(format).Substring(6, 2);
             }
             return result;
-
         }
 
+        public static string Int2Hex(this int value, string format = "X2")
+        {
+            string result;
+            if (value >= 0)
+            {
+                result = value.ToString(format);
+            }
+            else
+            {
+                result = value.ToString(format).Substring(6, 2);
+            }
+            return result;
+        }
     }
 }

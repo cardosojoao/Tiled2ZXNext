@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Tiled2ZXNext.Entities;
+using Tiled2ZXNext.Models;
 using Entity = Tiled2ZXNext.Entities;
 using Model = Tiled2ZXNext.Models;
 
@@ -78,6 +80,19 @@ namespace Tiled2ZXNext.Mapper
                 obj.Id = objectRaw.Id;
                 obj.X = objectRaw.X;
                 obj.Y = objectRaw.Y;
+                obj.Type = objectRaw.Type;
+                if(objectRaw.Polygon != null)
+                {
+                    obj.Polygon = new();
+                    if (objectRaw.Properties != null)
+                    {
+                        obj.Polygon.Properties = PropertyMapper.Map(objectRaw.Properties);
+                    }
+                    foreach (Model.PolygonPoint point in objectRaw.Polygon)
+                    {
+                        obj.Polygon.Add( new Entity.PolygonPoint() { X = point.x, Y = point.y });
+                    }
+                }
                 objects.Add(obj);
             }
             return objects;

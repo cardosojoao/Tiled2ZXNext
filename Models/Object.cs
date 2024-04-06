@@ -37,6 +37,19 @@ namespace Tiled2ZXNext.Models
 
         [JsonPropertyName("gid")]
         public int? Gid { get; set; }
+
+        [JsonPropertyName("polygon")]
+        public Polygon Polygon { get; set; }
     }
 
+    public class Polygon : List<PolygonPoint>
+    {
+        public List<Property> Properties { get; set; }
+    }
+
+    public class PolygonPoint
+    {
+        public int x { get; set; }
+        public int y { get; set; }
+    }
 }
