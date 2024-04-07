@@ -108,9 +108,9 @@ namespace Tiled2ZXNext
                     x0 += (int)Controller.Config.Offset.x;
                     y0 += (int)Controller.Config.Offset.y;
 
-                    blockData.Append("\t\tdb $").Append(x0.Int2Hex("X4")).Append(", $").Append(y0.Int2Hex("X4"));
+                    blockData.Append("\t\tdw $").Append(x0.Int2Hex("X4")).Append(", $").Append(y0.Int2Hex("X4"));
                     blockData.Append("\t\t; X, Y\r\n");
-                    blockLength += 2;
+                    blockLength += 4;
                     blockData.Append("\t\tdb $").Append(moves.Count.Int2Hex("X2"));
                     blockData.Append("\t\t; Number of steps\r\n");
                     blockLength++;
