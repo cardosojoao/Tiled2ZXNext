@@ -81,7 +81,14 @@ namespace Tiled2ZXNext.Mapper
                 obj.X = objectRaw.X;
                 obj.Y = objectRaw.Y;
                 obj.Type = objectRaw.Type;
-                if(objectRaw.Polygon != null)
+
+                if (objectRaw.Properties != null)
+                {
+                    obj.Properties = PropertyMapper.Map(objectRaw.Properties);
+                }
+
+
+                if (objectRaw.Polygon != null)
                 {
                     obj.Polygon = new();
                     if (objectRaw.Properties != null)

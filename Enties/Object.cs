@@ -15,6 +15,7 @@ namespace Tiled2ZXNext.Entities
         public double Y { get; set; }
         public string Type { get; set; }
         public Polygon Polygon { get; set; }
+        public List<Property> Properties { get; set; }
     }
 
 

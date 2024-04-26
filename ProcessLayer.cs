@@ -55,6 +55,13 @@ namespace Tiled2ZXNext
                 blocks.Add(new ProcessPaths(groupLayer, scene));
             }
 
+            // select Tilemap group layers
+            groupLayer = groups.Find(g => g.Name.Equals("EEI", System.StringComparison.InvariantCultureIgnoreCase));
+            if (groupLayer != null)
+            {
+                blocks.Add(new ProcessEEI(groupLayer, scene));
+            }
+
             foreach (IProcess process in blocks)
             {
                 layerCode.Append(process.Execute());

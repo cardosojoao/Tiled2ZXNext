@@ -13,8 +13,8 @@ namespace Tiled2ZXNext.Mapper
             {
                 Entity.Property property = new Entity.Property();
                 property.Name = propertyRaw.Name;
-                property.Type = propertyRaw.Type;
-                property.Value = propertyRaw.Value;
+                property.Type = propertyRaw.Type.ToString();
+                property.Value = propertyRaw.Value.ToString();
                 properties.Add(property);
             }
             return properties;

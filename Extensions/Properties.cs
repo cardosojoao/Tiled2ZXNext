@@ -29,7 +29,7 @@ namespace Tiled2ZXNext.Extensions
         {
             if (properties == null) throw new ArgumentNullException($"missing [properties]");
             Models.Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-            return prop?.Value ?? "";
+            return prop?.Value.ToString() ?? "";
         }
 
         public static string GetProperty(this List<Entities.Property> properties, string name)
@@ -87,7 +87,7 @@ namespace Tiled2ZXNext.Extensions
         {
             if (properties == null) throw new ArgumentNullException("properties");
             Models.Property? prop = properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-            return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.Value);
+            return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.Value.ToString());
         }
 
         //public static string GetProperty(this TiledParser tiledData, string name)
