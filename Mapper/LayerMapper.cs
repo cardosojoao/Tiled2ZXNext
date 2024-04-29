@@ -22,17 +22,19 @@ namespace Tiled2ZXNext.Mapper
         private static Entity.Layer ParseLayer(Model.Layer layerRaw)
         {
 
-            Entity.Layer layer = new();
-            layer.Layers = new();
-            layer.Name = layerRaw.Name;
-            layer.Type = layerRaw.Type;
-            layer.Width = layerRaw.Width;
-            layer.Height = layerRaw.Height;
-            layer.X = layerRaw.X;
-            layer.Y = layerRaw.Y;
-            layer.Id = layerRaw.Id;
-            layer.Visible = layerRaw.Visible;
-            layer.Data = layerRaw.Data;
+            Entity.Layer layer = new()
+            {
+                Layers = new(),
+                Name = layerRaw.Name,
+                Type = layerRaw.Type,
+                Width = layerRaw.Width,
+                Height = layerRaw.Height,
+                X = layerRaw.X,
+                Y = layerRaw.Y,
+                Id = layerRaw.Id,
+                Visible = layerRaw.Visible,
+                Data = layerRaw.Data
+            };
 
             if (layerRaw.Objects != null)
             {
@@ -70,19 +72,21 @@ namespace Tiled2ZXNext.Mapper
 
         private static List<Entity.Object> ParseObjects(List<Model.Object> objectsRaw)
         {
-            List<Entity.Object> objects = new List<Entity.Object>();
+            List<Entity.Object> objects = new();
             foreach (Model.Object objectRaw in objectsRaw)
             {
-                Entity.Object obj = new Entity.Object();
-                obj.Name = objectRaw.Name;
-                obj.Width = objectRaw.Width;
-                obj.Height = objectRaw.Height;
-                obj.Visible = objectRaw.Visible;
-                obj.Id = objectRaw.Id;
-                obj.X = objectRaw.X;
-                obj.Y = objectRaw.Y;
-                obj.Type = objectRaw.Type;
-                obj.Template = objectRaw.Template;
+                Entity.Object obj = new()
+                {
+                    Name = objectRaw.Name,
+                    Width = objectRaw.Width,
+                    Height = objectRaw.Height,
+                    Visible = objectRaw.Visible,
+                    Id = objectRaw.Id,
+                    X = objectRaw.X,
+                    Y = objectRaw.Y,
+                    Type = objectRaw.Type,
+                    Template = objectRaw.Template
+                };
 
 
                 if (objectRaw.Properties != null)
@@ -92,10 +96,7 @@ namespace Tiled2ZXNext.Mapper
 
                 if (obj.Template != null)
                 {
-                    if(obj.Properties == null)
-                    {
-                        obj.Properties = new List<Entities.Property>();
-                    }
+                    obj.Properties ??= new List<Entities.Property>();
                     Entities.Template template;
                     if (!Entities.Scene.Instance.Templates.ContainsKey(obj.Template))
                     {

@@ -18,7 +18,6 @@ namespace Tiled2ZXNext
         private string inputFile;
         private string fileName;
         private string outputFile;
-        private string inputPath;
 
         public string OutputRoomFile { get; set; }
         public string OutputMapFile { get; set; }

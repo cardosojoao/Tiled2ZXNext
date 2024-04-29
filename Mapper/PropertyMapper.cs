@@ -8,13 +8,15 @@ namespace Tiled2ZXNext.Mapper
     {
         public static List<Entity.Property> Map(List<Model.Property> propertiesRaw)
         {
-            List<Entity.Property> properties = new List<Entity.Property>();
+            List<Entity.Property> properties = new();
             foreach (Model.Property propertyRaw in propertiesRaw)
             {
-                Entity.Property property = new Entity.Property();
-                property.Name = propertyRaw.Name;
-                property.Type = propertyRaw.Type.ToString();
-                property.Value = propertyRaw.Value.ToString();
+                Entity.Property property = new()
+                {
+                    Name = propertyRaw.Name,
+                    Type = propertyRaw.Type.ToString(),
+                    Value = propertyRaw.Value.ToString()
+                };
                 properties.Add(property);
             }
             return properties;
@@ -23,13 +25,15 @@ namespace Tiled2ZXNext.Mapper
 
         public static List<Entity.Property> Map(List<Model.XML.Property> propertiesRaw)
         {
-            List<Entity.Property> properties = new List<Entity.Property>();
+            List<Entity.Property> properties = new();
             foreach (Model.XML.Property propertyRaw in propertiesRaw)
             {
-                Entity.Property property = new Entity.Property();
-                property.Name = propertyRaw.Name;
-                property.Type = propertyRaw.Type.ToString();
-                property.Value = propertyRaw.Value.ToString();
+                Entity.Property property = new()
+                {
+                    Name = propertyRaw.Name,
+                    Type = propertyRaw.Type.ToString(),
+                    Value = propertyRaw.Value.ToString()
+                };
                 properties.Add(property);
             }
             return properties;

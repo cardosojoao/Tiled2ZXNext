@@ -160,15 +160,12 @@ namespace Tiled2ZXNext
         /// <returns>int type of body</returns>
         private static int BodyTypeInt(string bodyType)
         {
-            switch (bodyType)
+            return bodyType switch
             {
-                case "trigger":
-                    return 0;
-                case "rigid":
-                    return 4;
-                default:
-                    return 4;
-            }
+                "trigger" => 0,
+                "rigid" => 4,
+                _ => 4,
+            };
         }
     }
 }

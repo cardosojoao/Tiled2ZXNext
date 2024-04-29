@@ -17,10 +17,7 @@ namespace Tiled2ZXNext.Entities
         {
             get
             {
-                if (_instance == null)
-                {
-                    _instance = new Scene();
-                }
+                _instance ??= new Scene();
                 return _instance;
             }
         }

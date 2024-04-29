@@ -74,7 +74,6 @@ namespace Tiled2ZXNext
             {
                 if (obj.Visible)
                 {
-                    int blockLength = 0;
                     int pathObjectId = obj.Properties.GetPropertyInt("Path");
                     int pathId = GetPathId(pathObjectId);
                     int TemplateType = obj.Properties.GetPropertyInt("TemplateId");
