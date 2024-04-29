@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Models;
 using Entity = Tiled2ZXNext.Entities;
@@ -41,7 +42,7 @@ namespace Tiled2ZXNext.Mapper
             {
                 layer.Properties = PropertyMapper.Map(layerRaw.Properties);
             }
-        
+
             if (layerRaw.Layers != null)
             {
                 foreach (Model.Layer layerRawChild in layerRaw.Layers)
@@ -81,12 +82,37 @@ namespace Tiled2ZXNext.Mapper
                 obj.X = objectRaw.X;
                 obj.Y = objectRaw.Y;
                 obj.Type = objectRaw.Type;
+                obj.Template = objectRaw.Template;
+
 
                 if (objectRaw.Properties != null)
                 {
                     obj.Properties = PropertyMapper.Map(objectRaw.Properties);
                 }
 
+                if (obj.Template != null)
+                {
+                    if(obj.Properties == null)
+                    {
+                        obj.Properties = new List<Entities.Property>();
+                    }
+                    Entities.Template template;
+                    if (!Entities.Scene.Instance.Templates.ContainsKey(obj.Template))
+                    {
+                        string templatePath = Path.Combine(Entities.Scene.Instance.RootFolder, obj.Template);
+                        Models.XML.Template templateData = SceneMapper.ReadTemplate(templatePath);
+                        template = TemplateMapper.Map(templateData);
+                        Entities.Scene.Instance.Templates.Add(obj.Template, template);
+                    }
+                    template = Entities.Scene.Instance.Templates[obj.Template];
+                    foreach (var property in template.Properties)
+                    {
+                        if (obj.Properties.Find(p => p.Name == property.Name) == null)
+                        {
+                            obj.Properties.Add(property);
+                        }
+                    }
+                }
 
                 if (objectRaw.Polygon != null)
                 {
@@ -97,7 +123,7 @@ namespace Tiled2ZXNext.Mapper
                     }
                     foreach (Model.PolygonPoint point in objectRaw.Polygon)
                     {
-                        obj.Polygon.Add( new Entity.PolygonPoint() { X = point.x, Y = point.y });
+                        obj.Polygon.Add(new Entity.PolygonPoint() { X = point.x, Y = point.y });
                     }
                 }
                 objects.Add(obj);

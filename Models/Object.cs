@@ -24,7 +24,7 @@ namespace Tiled2ZXNext.Models
         public string Type { get; set; }
 
         [JsonPropertyName("visible")]
-        public bool Visible { get; set; }
+        public bool Visible { get; set; } = true;
 
         [JsonPropertyName("width")]
         public double Width { get; set; }
@@ -40,6 +40,9 @@ namespace Tiled2ZXNext.Models
 
         [JsonPropertyName("polygon")]
         public Polygon Polygon { get; set; }
+
+        [JsonPropertyName("template")]
+        public string Template { get; set; }
     }
 
     public class Polygon : List<PolygonPoint>

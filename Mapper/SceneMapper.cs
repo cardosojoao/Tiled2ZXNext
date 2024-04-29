@@ -16,8 +16,9 @@ namespace Tiled2ZXNext.Mapper
 {
     public class SceneMapper
     {
-        public static Entities.Scene Map(Model.Scene sceneRaw, Entity.Scene scene , Options options)
+        public static Entities.Scene Map(Model.Scene sceneRaw, Entity.Scene scene, Options options)
         {
+
             scene.FileName = sceneRaw.Properties.GetProperty("FileName");
             scene.LeftScene.SceneID = sceneRaw.Properties.GetPropertyInt("roomleft");
             scene.RightScene.SceneID = sceneRaw.Properties.GetPropertyInt("roomright");
@@ -28,8 +29,9 @@ namespace Tiled2ZXNext.Mapper
             scene.Layer2Palette = sceneRaw.Properties.GetPropertyInt("PaletteLayer2");
             scene.Properties = PropertyMapper.Map(sceneRaw.Properties);
 
-        
-                string inputPath =  Path.GetDirectoryName(options.Input);
+
+            string inputPath = Path.GetDirectoryName(options.Input);
+            scene.RootFolder = inputPath;
             scene.Tilesets = ResolveTileSets(sceneRaw.Tilesets, inputPath);
 
             if (sceneRaw.Properties.ExistProperty("Tables"))
@@ -45,7 +47,7 @@ namespace Tiled2ZXNext.Mapper
         /// <param name="props"></param>
         private static Dictionary<string, Table> ResolveTables(List<Model.Property> props, string appRoot)
         {
-            
+
             string[] tablesRaw = props.GetProperty("Tables").Split('\n');           //PropertyExtensions.GetProperty(props, "Tables").Split('\n');
             Dictionary<string, Table> tables = new();
             foreach (string table in tablesRaw)
@@ -153,8 +155,8 @@ namespace Tiled2ZXNext.Mapper
                     tileset.FirstgidMap = setRaw.FirstgidMap;
                     Model.tileset tileSetData = tilesSetData[sets.Key];
                     tileset.Parsedgid = setRaw.Firstgid - 1;
-                    tileset.TileSheetID = tileSetData.properties.GetPropertyInt( "TileSheetId");
-                    tileset.PaletteIndex = tileSetData.properties.GetPropertyInt( "PaletteIndex");
+                    tileset.TileSheetID = tileSetData.properties.GetPropertyInt("TileSheetId");
+                    tileset.PaletteIndex = tileSetData.properties.GetPropertyInt("PaletteIndex");
                 }
             }
             return tilesets;
@@ -176,6 +178,18 @@ namespace Tiled2ZXNext.Mapper
                 tileSet = (Model.tileset)serializer.Deserialize(reader);
             }
             return tileSet;
+        }
+
+        public static Model.XML.Template ReadTemplate(string pathFile)
+        {
+            XmlSerializer serializer = new(typeof(Model.XML.Template));
+            Model.XML.Template template;
+            using (Stream reader = new FileStream(pathFile, FileMode.Open))
+            {
+                // Call the Deserialize method to restore the object's state.
+                template = (Model.XML.Template)serializer.Deserialize(reader);
+            }
+            return template;
         }
 
     }

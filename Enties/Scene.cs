@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Models;
 
 namespace Tiled2ZXNext.Entities
@@ -22,6 +24,7 @@ namespace Tiled2ZXNext.Entities
                 return _instance;
             }
         }
+        public string RootFolder { get; set; }
         public string FileName { get; set; }
         public int SpritesPalette { get; set; }
         public int Layer2Palette { get; set; }
@@ -35,6 +38,7 @@ namespace Tiled2ZXNext.Entities
         public List<Tileset> Tilesets { get; set; } = new List<Tileset>();
         public List<Layer> Layers { get; set; } = new();
         public List<Property> Properties { get; set; } = new();
+        public Dictionary<string, Template> Templates { get; set; } = new Dictionary<string, Template> { };
 
         /// <summary>
         /// resolve GID by set gid to index of specific sprite sheet

@@ -43,17 +43,21 @@ namespace Tiled2ZXNext
             Config.Zip = config.GetRequiredSection("zip").Get<Command>();
             Config.Assembler = config.GetRequiredSection("assembler").Get<Command>();
 
-            inputPath = Path.GetDirectoryName(inputFile);
+            //inputPath = Path.GetDirectoryName(inputFile);
             string data = File.ReadAllText(inputFile);
 
             Models.Scene sceneRaw = JsonSerializer.Deserialize<Models.Scene>(data);
+            
 
             fileName = sceneRaw.Properties.GetProperty( "FileName");
             string extension = "asm";
             outputFile = fileName + "." + extension;
 
-            Entities.Scene scene = SceneMapper.Map(sceneRaw, Entities.Scene.Instance, _options);      // migrated
+            Entities.Scene scene = SceneMapper.Map( sceneRaw, Entities.Scene.Instance, _options);      // migrated
             scene.Layers = LayerMapper.Map(sceneRaw.Layers);
+
+            // Check templates
+
 
 
             // get map settings
