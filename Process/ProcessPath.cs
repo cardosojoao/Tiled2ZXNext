@@ -23,12 +23,14 @@ namespace Tiled2ZXNext
 
         public StringBuilder Execute()
         {
+            Console.WriteLine("Group " + _rootLayer.Name);
             StringBuilder locationsCode = new();
             string fileName = _scene.Properties.GetProperty("FileName");
             foreach (Layer layer in _rootLayer.Layers)
             {
                 if (layer.Visible && layer.Name.Equals("path", StringComparison.InvariantCultureIgnoreCase))
                 {
+                    Console.WriteLine("Layer " + layer.Name);
                     locationsCode.Append(fileName);
                     locationsCode.Append('_');
                     locationsCode.Append(layer.Name);

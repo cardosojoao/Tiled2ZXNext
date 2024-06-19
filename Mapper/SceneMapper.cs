@@ -20,10 +20,10 @@ namespace Tiled2ZXNext.Mapper
         {
 
             scene.FileName = sceneRaw.Properties.GetProperty("FileName");
-            scene.LeftScene.SceneID = sceneRaw.Properties.GetPropertyInt("roomleft");
-            scene.RightScene.SceneID = sceneRaw.Properties.GetPropertyInt("roomright");
-            scene.TopScene.SceneID = sceneRaw.Properties.GetPropertyInt("roomtop");
-            scene.BottomScene.SceneID = sceneRaw.Properties.GetPropertyInt("roombottom");
+            //scene.LeftScene.SceneID = sceneRaw.Properties.GetPropertyInt("roomleft");
+            //scene.RightScene.SceneID = sceneRaw.Properties.GetPropertyInt("roomright");
+            //scene.TopScene.SceneID = sceneRaw.Properties.GetPropertyInt("roomtop");
+            //scene.BottomScene.SceneID = sceneRaw.Properties.GetPropertyInt("roombottom");
             scene.TileMapPalette = sceneRaw.Properties.GetPropertyInt("PaletteTileMap");
             scene.SpritesPalette = sceneRaw.Properties.GetPropertyInt("PaletteSprite");
             scene.Layer2Palette = sceneRaw.Properties.GetPropertyInt("PaletteLayer2");

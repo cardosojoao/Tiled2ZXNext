@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
@@ -10,7 +11,7 @@ namespace Tiled2ZXNext
         public List<LayerAreas> LayersArea { get; private set; }
         private readonly Layer _rootLayer;
         private readonly Scene _scene;
-        private readonly List<Tileset> _tileSets = new();
+        private List<Tileset> _tileSets;
         private int _type;
         private int _size;
         private int _tileSize;
@@ -23,20 +24,28 @@ namespace Tiled2ZXNext
 
         public StringBuilder Execute()
         {
+            Console.WriteLine("Group " + _rootLayer.Name);
             LayersArea.Clear();
             foreach (Layer layer in _rootLayer.Layers)
             {
                 if (layer.Visible)
                 {
+                    _tileSets = new();
+                    Console.WriteLine("Layer " + layer.Name);
                     _type = layer.Properties.GetPropertyInt("Type");
-                    _tileSize = layer.Properties.GetPropertyInt( "Size");
+                    _tileSize = layer.Properties.GetPropertyInt("Size");
                     LayerScan layerScan = new LayerScan(layer, _tileSize);
-                    LayerAreas layerAreas =  layerScan.ScanLayer();
+                    LayerAreas layerAreas = layerScan.ScanLayer();
                     layerAreas.Name = layer.Name;
                     LayerConvertCells(layerAreas);
-                    // TileSetUpdate();
-                    //MapLayer(layerAreas);
-                    LayersArea.Add(layerAreas);
+                    layerAreas.TileSet = _tileSets;
+                    // we don't include empty areas, the engine is prepared for that scenario and will crash!
+                    if (layerAreas.Areas.Count > 0)
+                    {
+                        LayersArea.Add(layerAreas);
+                    }
+                    
+
                 }
             }
 
@@ -64,10 +73,10 @@ namespace Tiled2ZXNext
         private StringBuilder WriteLayer2Area(LayerAreas layer)
         {
             StringBuilder data = new(1024);
-            data.Append(WriteLayer2TileSets());
+            data.Append(WriteLayer2TileSets(layer.TileSet));
             data.Append("\t\tdb $").Append(layer.Areas.Count.ToString("X2")).Append("\t\t; areas count\r\n");
             _size++;
-            
+
             int areaIndex = 0;
             foreach (Area area in layer.Areas)
             {
@@ -78,21 +87,21 @@ namespace Tiled2ZXNext
             return data;
         }
 
-        private StringBuilder WriteLayer2TileSets()
+        private StringBuilder WriteLayer2TileSets(List<Tileset> tileSets)
         {
             StringBuilder code = new();
             // select tilesheet id
-            int tileSheet0 = _tileSets[0].TileSheetID;
-            int tileSheet1 = _tileSets.Count > 1 ? _tileSets[1].TileSheetID : 255;
-            int tileSheet2 = _tileSets.Count > 2 ? _tileSets[2].TileSheetID : 255;
-            int tileSheet3 = _tileSets.Count > 3 ? _tileSets[3].TileSheetID : 255;
+            int tileSheet0 = tileSets[0].TileSheetID;
+            int tileSheet1 = tileSets.Count > 1 ? tileSets[1].TileSheetID : 255;
+            int tileSheet2 = tileSets.Count > 2 ? tileSets[2].TileSheetID : 255;
+            int tileSheet3 = tileSets.Count > 3 ? tileSets[3].TileSheetID : 255;
             // always show two tilesheets
-            code.Append("\t\tdb $").Append(tileSheet0.ToString("X2")) 
+            code.Append("\t\tdb $").Append(tileSheet0.ToString("X2"))
             .Append(",$").Append(tileSheet1.ToString("X2"))
             .Append(",$").Append(tileSheet2.ToString("X2"))
             .Append(",$").Append(tileSheet3.ToString("X2"))
             .Append("\t\t; Tile sheet Id  00..fe=valid, ff=not defined\r\n");
-            _size+=4;
+            _size += 4;
             return code;
         }
         private StringBuilder AreaParseCode(Area area)
@@ -100,7 +109,7 @@ namespace Tiled2ZXNext
             (int x, int y, int width, int height) = area.GetSize();
             StringBuilder areaCode = new();
             areaCode.Append("\t\tdb $");
-            areaCode.Append( area.X.ToString("X2")); _size++;
+            areaCode.Append(area.X.ToString("X2")); _size++;
             areaCode.Append(",$");
             areaCode.Append(area.Y.ToString("X2")); _size++;
             areaCode.Append(",$");
@@ -198,7 +207,7 @@ namespace Tiled2ZXNext
         /// <param name="tileset1"></param>
         /// <param name="Tileset2"></param>
         /// <returns></returns>
-        private static int CompareTileset( Tileset tileset1, Tileset Tileset2)
+        private static int CompareTileset(Tileset tileset1, Tileset Tileset2)
         {
             if (tileset1.Firstgid == Tileset2.Firstgid)
             {

@@ -20,12 +20,14 @@ namespace Tiled2ZXNext
 
         public StringBuilder Execute()
         {
+            Console.WriteLine("Group " + _rootLayer.Name);
             StringBuilder collisionCode = new();
             string fileName = _scene.Properties.GetProperty("FileName");
             foreach (Layer layer in _rootLayer.Layers)
             {
                 if (layer.Visible)
                 {
+                    Console.WriteLine("Layer " + layer.Name);
                     collisionCode.Append(fileName);
                     collisionCode.Append('_');
                     collisionCode.Append(layer.Name);

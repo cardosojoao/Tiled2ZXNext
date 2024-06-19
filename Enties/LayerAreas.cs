@@ -17,5 +17,8 @@ namespace Tiled2ZXNext.Entities
         /// </summary>
         public List<Area> Areas { get; set; } = new List<Area>();
 
+        public List<Tileset> TileSet { get; set; }
+
+
     }
 }

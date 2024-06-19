@@ -54,10 +54,19 @@ namespace Tiled2ZXNext.Extensions
 
         public static int GetPropertyInt(this TilesetTileProperty[] properties, string name)
         {
-            if (properties == null) throw new ArgumentNullException(nameof(properties));
-            TilesetTileProperty? prop = properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-            //return prop?.value ?? "";
-            return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.value);
+            try
+            {
+                if (properties == null) throw new ArgumentNullException(nameof(properties));
+                TilesetTileProperty? prop = properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+                //return prop?.value ?? "";
+                return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.value);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("missing property " + name, ex);
+                
+            }
         }
 
                     

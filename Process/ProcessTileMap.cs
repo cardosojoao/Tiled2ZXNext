@@ -2,6 +2,7 @@
 using System.Text;
 using Tiled2ZXNext.Extensions;
 using Tiled2ZXNext.Entities;
+using System;
 
 namespace Tiled2ZXNext
 {
@@ -25,6 +26,7 @@ namespace Tiled2ZXNext
 
         public StringBuilder Execute()
         {
+            Console.WriteLine("Group " + _rootLayer.Name);
             StringBuilder tileMapCode = new();
             if (_rootLayer.Layers.Count > 0)
             {
@@ -34,6 +36,7 @@ namespace Tiled2ZXNext
                 {
                     if (layer.Visible)
                     {
+                        Console.WriteLine("Layer " + layer.Name);
                         MergeLayerTileMap(layer, tileMap);
                     }
                 }

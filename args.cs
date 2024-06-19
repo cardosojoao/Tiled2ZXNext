@@ -15,8 +15,8 @@ namespace Tiled2ZXNext
         [Option('a', "approot", Required = true, HelpText = "Application Root Path", Default = false)]
         public string AppRoot { get; set; }
 
-        [Option('z', "compress", Required = false, HelpText = "Compress file", Default = false)]
-        public bool Compress { get; set; }
+        [Option('w', "world", Required = false, HelpText = "world file path", Default = "")]
+        public string World { get; set; }
 
         [Option('r', "roompath", Required = true, HelpText = "Room output path")]
         public string RoomPath{ get; set; }
