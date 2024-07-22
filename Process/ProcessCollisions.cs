@@ -90,6 +90,11 @@ namespace Tiled2ZXNext
 
             int eventIndex = Scene.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
             int tagIndex = Scene.Instance.Tables["TagName"].Items.FindIndex(r => r.Equals(tagName, StringComparison.CurrentCultureIgnoreCase));
+            // if can't find tag, and tag value is numeric just use the tag numeric value
+            if(tagIndex == -1)
+            {
+                int.TryParse(tagName, out tagIndex);
+            }
 
             int prevBlockType = blockType;
             StringBuilder validator = Validator.ProcessValidator(_properties);
