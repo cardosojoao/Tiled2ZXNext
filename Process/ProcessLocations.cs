@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
+using Tiled2ZXNext.ProcessLayers;
+
 
 namespace Tiled2ZXNext
 {
@@ -12,10 +14,12 @@ namespace Tiled2ZXNext
     {
         private readonly Layer _rootLayer;
         private readonly Scene _scene;
-        public ProcessLocations(Layer layer, Scene scene)
+        private readonly List<Property> _properties;
+        public ProcessLocations(Layer layer, Scene scene, List<Property> properties)
         {
             _rootLayer = layer;
             _scene = scene;
+            _properties = properties;
         }
 
         public StringBuilder Execute()
@@ -28,12 +32,13 @@ namespace Tiled2ZXNext
                 if (layer.Visible)
                 {
                     Console.WriteLine("Layer " + layer.Name);
+                    locationsCode.Append('.');
                     locationsCode.Append(fileName);
                     locationsCode.Append('_');
                     locationsCode.Append(layer.Name);
                     locationsCode.Append('_');
                     locationsCode.Append(layer.Id);
-                    locationsCode.Append(":\r\n");
+                    locationsCode.AppendLine(":");
                     locationsCode.Append(WriteObjectsLayer(layer));
                 }
             }
@@ -45,7 +50,7 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="layer">layer</param>
         /// <returns>string builder collection with header and data</returns>
-        private static StringBuilder WriteObjectsLayer(Layer layer)
+        private StringBuilder WriteObjectsLayer(Layer layer)
         {
             int lengthData = 0;
             StringBuilder data = new(1024);
@@ -53,11 +58,24 @@ namespace Tiled2ZXNext
             StringBuilder header = new(200);
             List<StringBuilder> output = new() { header, data };
 
-            StringBuilder error = new();
 
             int blockType = layer.Properties.GetPropertyInt("Type");
 
-            headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
+            layer.Properties.Merge(_properties);
+
+            StringBuilder validator = Validator.ProcessValidator(layer.Properties);
+
+            if (validator.Length > 0)
+            {
+                int prevBlockType = blockType;
+                blockType += 128;
+                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with validator");
+                headerType.Append(validator);
+            }
+            else
+            {
+                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
+            }
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).Append("\t\t; Objects count\r\n");
             lengthData += 1;
 

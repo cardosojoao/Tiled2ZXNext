@@ -1,13 +1,14 @@
 ﻿using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
+//using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
-
+using Tiled2ZXNext.ProcessLayers;
 
 namespace Tiled2ZXNext
 {
@@ -18,10 +19,12 @@ namespace Tiled2ZXNext
     {
         private readonly Layer _rootLayer;
         private readonly Scene _scene;
-        public ProcessPlatform(Layer layer, Scene scene)
+        private readonly List<Entities.Property> _properties;
+        public ProcessPlatform(Layer layer, Scene scene, List<Property> properties)
         {
             _rootLayer = layer;
             _scene = scene;
+            _properties = properties;
         }
 
         public StringBuilder Execute()
@@ -33,12 +36,13 @@ namespace Tiled2ZXNext
             if (layer.Visible)
             {
                 Console.WriteLine("Layer " + layer.Name);
+                locationsCode.Append('.');
                 locationsCode.Append(fileName);
                 locationsCode.Append('_');
                 locationsCode.Append(layer.Name);
                 locationsCode.Append('_');
                 locationsCode.Append(layer.Id);
-                locationsCode.Append(":\r\n");
+                locationsCode.AppendLine(":");
                 locationsCode.Append(WriteObjectsLayer(layer));
             }
             return locationsCode;
@@ -57,11 +61,23 @@ namespace Tiled2ZXNext
             StringBuilder header = new(200);
             List<StringBuilder> output = new() { header, data };
 
-            StringBuilder error = new();
+            layer.Properties.Merge(_properties);
+            StringBuilder validator =  Validator.ProcessValidator(layer.Properties);
+
 
             int blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
 
-            headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
+            if (validator.Length > 0)
+            {
+                int prevBlockType = blockType;
+                blockType += 128;
+                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with validator.");
+                headerType.Append(validator);
+            }
+            else
+            {
+                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
+            }
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).Append("\t\t; Objects count\r\n");
             lengthData++;
 

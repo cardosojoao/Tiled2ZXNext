@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Collections.Generic;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
 
@@ -9,14 +10,16 @@ namespace Tiled2ZXNext
     /// <summary>
     /// Process Environment Element Interaction
     /// </summary>
-    public class ProcessEEI : IProcess
+    public class ProcessEei : IProcess
     {
         private readonly Layer _rootLayer;
         private readonly Scene _scene;
-        public ProcessEEI(Layer layer, Scene scene)
+        private readonly List<Entities.Property> _properties;
+        public ProcessEei(Layer layer, Scene scene, List<Property> properties)
         {
             _rootLayer = layer;
             _scene = scene;
+            _properties = properties;
         }
 
         public StringBuilder Execute()
@@ -33,12 +36,12 @@ namespace Tiled2ZXNext
                     {
                         case 5:
                             {
-                                all.Append(new ProcessPlatform(layer, _scene).Execute());
+                                all.Append(new ProcessPlatform(layer, _scene, _properties).Execute());
                             }
                             break;
                         case 6:
                             {
-                                all.Append(new ProcessWatter(layer, _scene).Execute());
+                                all.Append(new ProcessWatter(layer, _scene, _properties).Execute());
                                 break;
                             }
                     }

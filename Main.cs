@@ -91,7 +91,7 @@ namespace Tiled2ZXNext
             //BuildList(o.MapPath, "*.asm", o.MapPath + "\\list.txt");
 
             // get layers data
-            StringBuilder layerData = ProcessLayer(scene);
+            StringBuilder layerData = ProcessScene(scene);
             Console.WriteLine("output layer file " + outputFile);
             // write layers to final location
             OutputLayer(o, layerData);

@@ -1,12 +1,10 @@
-﻿using Microsoft.Extensions.Primitives;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
+using Tiled2ZXNext.ProcessLayers;
 
 
 namespace Tiled2ZXNext
@@ -15,10 +13,12 @@ namespace Tiled2ZXNext
     {
         private readonly Layer _rootLayer;
         private readonly Scene _scene;
-        public ProcessPaths(Layer layer, Scene scene)
+        private readonly List<Property> _properties;
+        public ProcessPaths(Layer layer, Scene scene, List<Property> properties)
         {
             _rootLayer = layer;
             _scene = scene;
+            _properties = properties;
         }
 
         public StringBuilder Execute()
@@ -31,6 +31,7 @@ namespace Tiled2ZXNext
                 if (layer.Visible && layer.Name.Equals("path", StringComparison.InvariantCultureIgnoreCase))
                 {
                     Console.WriteLine("Layer " + layer.Name);
+                    locationsCode.Append('.');
                     locationsCode.Append(fileName);
                     locationsCode.Append('_');
                     locationsCode.Append(layer.Name);
@@ -48,7 +49,7 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="layer">layer</param>
         /// <returns>string builder collection with header and data</returns>
-        private static StringBuilder WriteObjectsLayer(Layer layer)
+        private StringBuilder WriteObjectsLayer(Layer layer)
         {
             int lengthData = 0;
             StringBuilder data = new(1024);
@@ -56,11 +57,24 @@ namespace Tiled2ZXNext
             StringBuilder header = new(200);
             List<StringBuilder> output = new() { header, data };
 
-            StringBuilder error = new();
 
             int blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
 
-            headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
+            layer.Properties.Merge(_properties);
+            StringBuilder validator = Validator.ProcessValidator(layer.Properties);
+
+            if (validator.Length > 0)
+            {
+                int prevBlockType = blockType;
+                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with validator.");
+                headerType.Append(validator);
+            }
+            else
+            {
+                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
+            }
+
+
 
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible && c.Type.Equals("path", StringComparison.InvariantCultureIgnoreCase)).ToString("X")).Append("\t\t; Objects count\r\n");
             lengthData += 1;
@@ -73,11 +87,7 @@ namespace Tiled2ZXNext
                     int blockLength = 0;
                     Polygon polygon = obj.Polygon;
                     int id = polygon.Properties.GetPropertyInt("ID");
-
-                    //string timer = polygon.Properties.GetProperty("time");      // time in hunder
                     string speed = polygon.Properties.GetProperty("speed");
-
-                    //List<Double> timeIntervals = GetTimers(timer);
 
                     List<int> speedIntervals = GetSpeed(speed, polygon.Count);
                     if (speedIntervals.Count != polygon.Count)
@@ -86,13 +96,6 @@ namespace Tiled2ZXNext
                         break;
                     }
                     int i = 0;
-                    //int x0 = polygon[i].X + (int)obj.X; // root point x
-                    //int y0 = polygon[i].Y + (int)obj.Y; // root point y
-                    //int x1 = x0;                        // first point x = root x
-                    //int y1 = y0;                        // first point y = root y
-                    //int  speedStep = speedIntervals[i];     // time to run the distance bettween 2 points x
-                    //int x2;
-                    //int y2;
                     data.Append("\t\tdb $").Append(id.Int2Hex("X2"));
                     data.Append("\t\t; ID\r\n");
                     lengthData++;                   // only counts to data type length not block
@@ -103,30 +106,12 @@ namespace Tiled2ZXNext
                         int x = polygon[i ].X + (int)obj.X; // next point x
                         int y = polygon[i ].Y + (int)obj.Y; // next point y
                         int speedStep = speedIntervals[i];   // time to run the distance bettween 2 points x
-
-                        //var step = CalcStep(speedStep, x1, y1, x2, y2);
                         steps.Add((speedStep, x, y));
                     }
-                    //speedStep = speedIntervals[i];
-                    //x2 = x0;
-                    //y2 = y0;
-                    //var stepf = CalcStep(speedStep, x1, y1, x2, y2);
-                    //steps.Add(stepf);
-
                     StringBuilder blockData = new(1024);
-                    // set initial position
-                    //x0 += (int)Controller.Config.Offset.x;
-                    //y0 += (int)Controller.Config.Offset.y;
-
-                    //blockData.Append("\t\tdw $").Append(x0.Int2Hex("X4")).Append(", $").Append(y0.Int2Hex("X4"));
-                    //blockData.Append("\t\t; X, Y\r\n");
-                    //blockLength += 4;
                     blockData.Append("\t\tdb $").Append(steps.Count.Int2Hex("X2"));
                     blockData.Append("\t\t; Number of steps\r\n");
                     blockLength++;
-                    //blockData.Append("\t\tdb $").Append(255.Int2Hex("X2"));
-                    //blockData.Append("\t\t; No key frame\r\n");
-                    //blockLength++;
                     blockData.Append("\t\tdb $").Append( SetFlags(steps).Int2Hex("X2"));
                     blockData.Append("\t\t; flags  bit0 - 1=Loop, 0=Once\r\n");
                     blockLength++;
@@ -196,50 +181,5 @@ namespace Tiled2ZXNext
             }
             return speed;
         }
-
-
-        //private static List<double> GetTimers(string timer)
-        //{
-        //    List<double> timers = new();
-
-        //    string[] intervals = timer.Split(',');
-        //    foreach (string timeInterval in intervals)
-        //    {
-        //        timers.Add(double.Parse(timeInterval));
-        //    }
-        //    return timers;
-        //}
-
-
-
-
-
-        //private static (int frames, int stepX, int stepY) CalcStep(double time, double x1, double y1, double x2, double y2)
-        //{
-        //    double distanceX = x2 - x1; //  distance  x bettween 2 points 
-        //    double distanceY = y2 - y1; //  distance  y bettween 2 points 
-        //    int stepx = (int)((distanceX / (time * 50)) * 50);  // distance divide by time multiple by 50 (frames) and multiple by 50 (frames)
-        //    int stepy = (int)((distanceY / (time * 50)) * 50);  // distance divide by time multiple by 50 (frames) and multiple by 50 (frames)
-        //    double x = (distanceX * 50) / stepx;
-        //    x = Math.Round(x + .4999999f, MidpointRounding.AwayFromZero);
-        //    double y = (distanceY * 50) / stepy;
-        //    y = Math.Round(y + .4999999f, MidpointRounding.AwayFromZero);
-        //    if (x.Equals(double.NaN))
-        //    {
-        //        x = y;
-        //    }
-        //    if (y.Equals(double.NaN))
-        //    {
-        //        y = x;
-        //    }
-        //    if (x != y)
-        //    {
-        //        Console.Error.WriteLine("Number of frames x={0},y={1} is different.", x, y);
-        //    }
-        //    // int frames = (int)time * 50;                        // the number of frames must be the same    
-        //    int frames = (int)y;
-        //    Console.WriteLine($"Frames={frames} DistanceX={distanceX} stepX={stepx} ${stepx.Int2Hex("X2")}, DistanceY={distanceY} StepY={stepy} ${stepy.Int2Hex("X2")}");
-        //    return (frames, stepx, stepy);
-        //}
     }
 }

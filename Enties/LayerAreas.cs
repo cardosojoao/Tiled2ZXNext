@@ -12,6 +12,7 @@ namespace Tiled2ZXNext.Entities
         /// Name of Layer
         /// </summary>
         public string Name { get; set; }
+        public int Id { get; set; }
         /// <summary>
         /// Collections of areas
         /// </summary>
@@ -19,6 +20,6 @@ namespace Tiled2ZXNext.Entities
 
         public List<Tileset> TileSet { get; set; }
 
-
+        public List<Property> Properties { get; set; }
     }
 }

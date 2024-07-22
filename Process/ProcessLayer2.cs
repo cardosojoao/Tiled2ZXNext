@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
+using Tiled2ZXNext.ProcessLayers;
 
 namespace Tiled2ZXNext
 {
@@ -11,15 +12,17 @@ namespace Tiled2ZXNext
         public List<LayerAreas> LayersArea { get; private set; }
         private readonly Layer _rootLayer;
         private readonly Scene _scene;
+        private readonly List<Property> _properties;
         private List<Tileset> _tileSets;
-        private int _type;
+        private int _blockType;
         private int _size;
         private int _tileSize;
-        public ProcessLayer2(Layer layer, Scene scene)
+        public ProcessLayer2(Layer layer, Scene scene,  List<Property> properties )
         {
             _rootLayer = layer;
             LayersArea = new List<LayerAreas>();
             _scene = scene;
+            _properties = properties;
         }
 
         public StringBuilder Execute()
@@ -30,13 +33,17 @@ namespace Tiled2ZXNext
             {
                 if (layer.Visible)
                 {
+                    layer.Properties.Merge(_properties);        // add parent extended properties
+
                     _tileSets = new();
                     Console.WriteLine("Layer " + layer.Name);
-                    _type = layer.Properties.GetPropertyInt("Type");
+                    _blockType = layer.Properties.GetPropertyInt("Type");
                     _tileSize = layer.Properties.GetPropertyInt("Size");
                     LayerScan layerScan = new LayerScan(layer, _tileSize);
                     LayerAreas layerAreas = layerScan.ScanLayer();
                     layerAreas.Name = layer.Name;
+                    layerAreas.Id = layer.Id;
+                    layerAreas.Properties = layer.Properties;
                     LayerConvertCells(layerAreas);
                     layerAreas.TileSet = _tileSets;
                     // we don't include empty areas, the engine is prepared for that scenario and will crash!
@@ -44,24 +51,40 @@ namespace Tiled2ZXNext
                     {
                         LayersArea.Add(layerAreas);
                     }
-                    
+
 
                 }
-            }
-
-            TileSetUpdate();
-            foreach (LayerAreas layer in LayersArea)
-            {
-                MapLayer(layer);
             }
 
             StringBuilder layer2Code = new();
             foreach (LayerAreas layer in LayersArea)
             {
+                layer2Code.Append('.');
+                layer2Code.Append(_scene.FileName);
+                layer2Code.Append('_');
+                layer2Code.Append(layer.Name);
+                layer2Code.Append('_');
+                layer2Code.Append(layer.Id);
+                layer2Code.AppendLine(":");
+
+                StringBuilder validator = Validator.ProcessValidator(layer.Properties);
+                if(validator.Length>0)
+                {
+                    int prevBlockType = _blockType;
+                    _blockType += 128;  // block with layer validator
+
+                    layer2Code.Append("\t\tdb $").Append(_blockType.ToString("X2"));
+                    layer2Code.Append($"\t\t; data type {prevBlockType} with validator, Layer2({_tileSize}x{_tileSize}) - {layer.Name}\r\n");
+                    layer2Code.Append(validator);
+
+                }
+                else
+                {
+                    layer2Code.Append("\t\tdb $").Append(_blockType.ToString("X2"));
+                    layer2Code.Append($"\t\t; data type Layer2({_tileSize}x{_tileSize}) - {layer.Name}\r\n");
+                }
                 _size = 0;
-                layer2Code.Append("\t\tdb $");
-                layer2Code.Append(_type.ToString("X2"));
-                layer2Code.Append($"\t\t; data type Layer2({_tileSize}x{_tileSize}) - {layer.Name}\r\n");
+                
                 StringBuilder body = WriteLayer2Area(layer);
                 layer2Code.Append("\t\tdw $").Append(_size.ToString("X4")).Append($"\t\t; Size of block\r\n");
                 layer2Code.Append(body);
@@ -191,12 +214,16 @@ namespace Tiled2ZXNext
                 uint paletteIndex = (uint)gidData.tileSheet.PaletteIndex << 4;
                 //extend |= paletteIndex;                 // add pallete index
                 tileId = (uint)gidData.gid - 1;         // the gid is always +1, we need to ensure that the ranges are from 0..63 for the first block and 64..127 for the second block
-                // if we don't have the tileset just add it
-                if (_tileSets.FindIndex(t => t.TileSheetID == gidData.tileSheet.TileSheetID) == -1)
+                                                        // if we don't have the tileset just add it
+
+                int tileSheetIndex = _tileSets.FindIndex(t => t.TileSheetID == gidData.tileSheet.TileSheetID);
+                if (tileSheetIndex == -1)
                 {
                     _tileSets.Add(gidData.tileSheet);
+                    tileSheetIndex = _tileSets.Count - 1;
                 }
-                cell.TileID = tileId;
+                // convert gid to tileSheetPosition
+                cell.TileID = (uint)((tileId - _tileSets[tileSheetIndex].Parsedgid) + (tileSheetIndex * 64));
                 cell.Settings = extend;
             }
         }

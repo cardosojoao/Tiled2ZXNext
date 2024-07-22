@@ -1,10 +1,13 @@
 ﻿using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
+using Tiled2ZXNext.Models.XML;
+using Tiled2ZXNext.ProcessLayers;
 
 namespace Tiled2ZXNext
 {
@@ -12,10 +15,12 @@ namespace Tiled2ZXNext
     {
         private readonly Layer _rootLayer;
         private readonly Scene _scene;
-        public ProcessCollision(Layer layer, Scene scene)
+        private readonly List<Entities.Property> _properties;
+        public ProcessCollision(Layer layer, Scene scene, List<Entities.Property> properties)
         {
             _rootLayer = layer;
             _scene = scene;
+            _properties = properties;
         }
 
         public StringBuilder Execute()
@@ -28,6 +33,7 @@ namespace Tiled2ZXNext
                 if (layer.Visible)
                 {
                     Console.WriteLine("Layer " + layer.Name);
+                    collisionCode.Append('.');
                     collisionCode.Append(fileName);
                     collisionCode.Append('_');
                     collisionCode.Append(layer.Name);
@@ -45,7 +51,7 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="layer">layer</param>
         /// <returns>string builder collection with header and data</returns>
-        private static StringBuilder WriteObjectsLayer(Layer layer)
+        private StringBuilder WriteObjectsLayer(Layer layer)
         {
             int lengthData = 0;
             StringBuilder data = new(1024);
@@ -57,18 +63,15 @@ namespace Tiled2ZXNext
             StringBuilder error = new();
             foreach (Entities.Object obj in layer.Objects)
             {
-                if (obj.Visible)
+                if (obj.Visible && !CheckObject(obj))
                 {
-                    if (!CheckObject(obj))
-                    {
-                        string objID = obj.Id + "-" + (obj.Name.Length > 0 ? obj.Name : "<na>");
-                        error.Clear();
-                        error.Append("Object ");
-                        error.Append(objID);
-                        error.Append($" Incorrect Width {obj.Width} or Height {obj.Height}, must be an even value\r\n");
-                        Console.WriteLine(error.ToString());
-                        haveError = true;
-                    }
+                    string objID = obj.Id + "-" + (obj.Name.Length > 0 ? obj.Name : "<na>");
+                    error.Clear();
+                    error.Append("Object ");
+                    error.Append(objID);
+                    error.Append($" Incorrect Width {obj.Width} or Height {obj.Height}, must be an even value\r\n");
+                    Console.WriteLine(error.ToString());
+                    haveError = true;
                 }
             }
             if (haveError)
@@ -76,6 +79,7 @@ namespace Tiled2ZXNext
                 throw new Exception("Incorrect height or Width must be even.");
             }
 
+            layer.Properties.Merge(_properties);
 
             int layerMask = layer.Properties.GetPropertyInt("LayerMask");
             int layerId = layer.Properties.GetPropertyInt("Layer");
@@ -87,9 +91,19 @@ namespace Tiled2ZXNext
             int eventIndex = Scene.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
             int tagIndex = Scene.Instance.Tables["TagName"].Items.FindIndex(r => r.Equals(tagName, StringComparison.CurrentCultureIgnoreCase));
 
-            headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
-
-            // merge layer mask with lasyID in a single byte
+            int prevBlockType = blockType;
+            StringBuilder validator = Validator.ProcessValidator(_properties);
+            if (validator.Length > 0)
+            {
+                blockType += 128;  // block with layer validator
+                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with validator.");
+                headerType.Append(validator);
+            }
+            else
+            {
+                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type.");
+            }
+            // merge layer mask with layerID in a single byte
             layerMask *= 16;
             layerMask += layerId;
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).Append("\t\t; Objects count\r\n");
@@ -111,8 +125,8 @@ namespace Tiled2ZXNext
             {
                 if (obj.Visible)
                 {
-                    data.Append("\t\tdw $").Append((obj.X + Controller.Config.Offset.x).Double2Hex( "X4"));
-                    data.Append(",$").Append((obj.Y + Controller.Config.Offset.y).Double2Hex( "X4"));
+                    data.Append("\t\tdw $").Append((obj.X + Controller.Config.Offset.x).Double2Hex("X4"));
+                    data.Append(",$").Append((obj.Y + Controller.Config.Offset.y).Double2Hex("X4"));
                     data.Append("\r\n");
                     data.Append("\t\tdb $").Append(obj.Width.Double2Hex());
                     data.Append(",$").Append(obj.Height.Double2Hex());

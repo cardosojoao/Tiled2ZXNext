@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
+
 namespace Tiled2ZXNext
 {
     public partial class Controller
@@ -54,7 +55,7 @@ namespace Tiled2ZXNext
             startinfo.ErrorDialog = true;
             startinfo.CreateNoWindow = true;
             startinfo.UseShellExecute = true;
-            Process myProcess = Process.Start(startinfo);
+            System.Diagnostics.Process myProcess = System.Diagnostics.Process.Start(startinfo);
             myProcess.Start();
             myProcess.WaitForExit(5000);
             int result = myProcess.ExitCode;

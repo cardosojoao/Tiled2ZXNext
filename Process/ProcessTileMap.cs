@@ -17,7 +17,7 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="layer">parent layer</param>
         /// <param name="scene">scene</param>
-        public ProcessTileMap(Layer layer, Scene scene)
+        public ProcessTileMap(Layer layer, Scene scene, List<Entities.Property> properties)
         {
             _rootLayer = layer;
             _tileData = scene;
