@@ -67,7 +67,7 @@ namespace Tiled2ZXNext
                 layer2Code.Append(layer.Id);
                 layer2Code.AppendLine(":");
 
-                StringBuilder validator = Validator.ProcessValidator(layer.Properties);
+                StringBuilder validator = Validator.ProcessLayerValidator(layer.Properties);
                 if(validator.Length>0)
                 {
                     int prevBlockType = _blockType;

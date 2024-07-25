@@ -10,7 +10,7 @@ using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
 using Tiled2ZXNext.ProcessLayers;
 
-namespace Tiled2ZXNext
+namespace Tiled2ZXNext.Process.EEI
 {
     /// <summary>
     /// Process Environment Element Interaction
@@ -19,7 +19,7 @@ namespace Tiled2ZXNext
     {
         private readonly Layer _rootLayer;
         private readonly Scene _scene;
-        private readonly List<Entities.Property> _properties;
+        private readonly List<Property> _properties;
         public ProcessPlatform(Layer layer, Scene scene, List<Property> properties)
         {
             _rootLayer = layer;
@@ -62,7 +62,7 @@ namespace Tiled2ZXNext
             List<StringBuilder> output = new() { header, data };
 
             layer.Properties.Merge(_properties);
-            StringBuilder validator =  Validator.ProcessValidator(layer.Properties);
+            StringBuilder validator = Validator.ProcessLayerValidator(layer.Properties);
 
 
             int blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser

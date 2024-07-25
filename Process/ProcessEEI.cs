@@ -3,6 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
+using Tiled2ZXNext.Process.EEI;
 
 
 namespace Tiled2ZXNext
@@ -42,6 +43,11 @@ namespace Tiled2ZXNext
                         case 6:
                             {
                                 all.Append(new ProcessWatter(layer, _scene, _properties).Execute());
+                                break;
+                            }
+                        case 7:
+                            {
+                                all.Append(new ProcessScrap(layer, _scene, _properties).Execute());
                                 break;
                             }
                     }

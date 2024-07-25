@@ -63,7 +63,7 @@ namespace Tiled2ZXNext
 
             layer.Properties.Merge(_properties);
 
-            StringBuilder validator = Validator.ProcessValidator(layer.Properties);
+            StringBuilder validator = Validator.ProcessLayerValidator(layer.Properties);
 
             if (validator.Length > 0)
             {

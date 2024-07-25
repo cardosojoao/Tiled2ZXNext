@@ -7,7 +7,7 @@ using Tiled2ZXNext.Extensions;
 using Tiled2ZXNext.ProcessLayers;
 
 
-namespace Tiled2ZXNext
+namespace Tiled2ZXNext.Process.EEI
 {
     /// <summary>
     /// Process Environment Element Interaction
@@ -54,13 +54,14 @@ namespace Tiled2ZXNext
             int blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
 
             layer.Properties.Merge(_properties);
-            StringBuilder validator = Validator.ProcessValidator(layer.Properties);
+            StringBuilder validator = Validator.ProcessLayerValidator(layer.Properties);
             if (validator.Length > 0)
             {
                 int prevBlockType = blockType;
+                blockType += 128;
                 headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator.");
                 headerType.Append(validator);
-            }   
+            }
             else
             {
                 headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine("\t\t; data block type");

@@ -97,7 +97,7 @@ namespace Tiled2ZXNext
             }
 
             int prevBlockType = blockType;
-            StringBuilder validator = Validator.ProcessValidator(_properties);
+            StringBuilder validator = Validator.ProcessLayerValidator(_properties);
             if (validator.Length > 0)
             {
                 blockType += 128;  // block with layer validator

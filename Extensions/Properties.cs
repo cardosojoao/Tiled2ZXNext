@@ -99,6 +99,13 @@ namespace Tiled2ZXNext.Extensions
             return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.Value.ToString());
         }
 
+        public static bool GetPropertyBool(this List<Entities.Property> properties, string name)
+        {
+            if (properties == null) throw new ArgumentNullException(nameof(properties));
+            Entities.Property? prop = properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return prop == null ? throw new KeyNotFoundException(name) : bool.Parse(prop.Value.ToString());
+        }
+
         public static void Merge(this List<Entities.Property> properties, List<Entities.Property> mergeProperties)
         {
             if (properties == null) throw new ArgumentNullException(nameof(properties));

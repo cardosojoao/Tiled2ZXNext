@@ -61,7 +61,7 @@ namespace Tiled2ZXNext
             int blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
 
             layer.Properties.Merge(_properties);
-            StringBuilder validator = Validator.ProcessValidator(layer.Properties);
+            StringBuilder validator = Validator.ProcessLayerValidator(layer.Properties);
 
             if (validator.Length > 0)
             {
