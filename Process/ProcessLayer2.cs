@@ -62,7 +62,7 @@ namespace Tiled2ZXNext
                 layer2Code.Append('.');
                 layer2Code.Append(_scene.FileName);
                 layer2Code.Append('_');
-                layer2Code.Append(layer.Name);
+                layer2Code.Append(layer.Name.Replace(" ","_"));
                 layer2Code.Append('_');
                 layer2Code.Append(layer.Id);
                 layer2Code.AppendLine(":");

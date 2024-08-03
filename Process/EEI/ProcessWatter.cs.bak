@@ -79,11 +79,11 @@ namespace Tiled2ZXNext.Process.EEI
                     int y = (int)obj.Y - 8 + 32;      // middle of first sprite, top starts with 16
                     int length = obj.Properties.GetPropertyInt("Length");
 
-                    data.Append("\t\tdw $").Append(x.Int2Hex("X4")).Append(", $").Append(y.Int2Hex("X4"));
+                    data.Append("\t\tdb $").Append(x.Int2Hex("X4")).Append(", $").Append(y.Int2Hex("X4"));
                     data.Append("\t\t; x, y\r\n");
                     data.Append("\t\tdb $").Append(length.Int2Hex("X2"));
                     data.Append("\t\t; length ID\r\n");
-                    lengthData += 5;
+                    lengthData += 3;
                 }
             }
             // size must be 2Bytes long (map is over 256 Bytes)
