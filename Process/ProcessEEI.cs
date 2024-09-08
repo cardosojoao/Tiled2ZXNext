@@ -50,6 +50,16 @@ namespace Tiled2ZXNext
                                 all.Append(new ProcessScrap(layer, _scene, _properties).Execute());
                                 break;
                             }
+                        case 8:
+                            {
+                                all.Append(new ProcessSprite(layer, _scene, _properties).Execute());
+                                break;
+                            }
+                        case 9:
+                            {
+                                all.Append(new ProcessSprite(layer, _scene, _properties).Execute());
+                                break;
+                            }
                     }
                 }
             }
