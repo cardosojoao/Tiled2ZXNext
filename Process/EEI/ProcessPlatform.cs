@@ -15,35 +15,34 @@ namespace Tiled2ZXNext.Process.EEI
     /// <summary>
     /// Process Environment Element Interaction
     /// </summary>
-    public class ProcessPlatform : IProcess
+    public class ProcessPlatform : ProcessMaster // IProcess
     {
-        private readonly Layer _rootLayer;
-        private readonly Scene _scene;
-        private readonly List<Property> _properties;
-        public ProcessPlatform(Layer layer, Scene scene, List<Property> properties)
+        //private readonly Layer _rootLayer;
+        //private readonly Scene _scene;
+        //private readonly List<Property> _properties;
+        public ProcessPlatform(Layer layer, Scene scene, List<Property> properties): base(layer,scene,properties)
         {
-            _rootLayer = layer;
-            _scene = scene;
-            _properties = properties;
+            //_rootLayer = layer;
+            //_scene = scene;
+            //_properties = properties;
         }
 
         public StringBuilder Execute()
         {
-            Console.WriteLine("Group " + _rootLayer.Name);
-            Layer layer = _rootLayer;
+            Console.WriteLine("Group " + base._layer.Name);
             StringBuilder locationsCode = new();
             string fileName = _scene.Properties.GetProperty("FileName");
-            if (layer.Visible)
+            if (_layer.Visible)
             {
-                Console.WriteLine("Layer " + layer.Name);
+                Console.WriteLine("Layer " + _layer.Name);
                 locationsCode.Append('.');
                 locationsCode.Append(fileName);
                 locationsCode.Append('_');
-                locationsCode.Append(layer.Name);
+                locationsCode.Append(_layer.Name);
                 locationsCode.Append('_');
-                locationsCode.Append(layer.Id);
+                locationsCode.Append(_layer.Id);
                 locationsCode.AppendLine(":");
-                locationsCode.Append(WriteObjectsLayer(layer));
+                locationsCode.Append(WriteObjectsLayer(_layer));
             }
             return locationsCode;
         }
@@ -62,22 +61,23 @@ namespace Tiled2ZXNext.Process.EEI
             List<StringBuilder> output = new() { header, data };
 
             layer.Properties.Merge(_properties);
-            StringBuilder validator = Validator.ProcessLayerValidator(layer.Properties);
+            CheckValidator();
 
+            //StringBuilder validator = Validator.ProcessLayerValidator(layer.Properties);
 
-            int blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
+            //int blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
 
-            if (validator.Length > 0)
-            {
-                int prevBlockType = blockType;
-                blockType += 128;
-                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with validator.");
-                headerType.Append(validator);
-            }
-            else
-            {
-                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
-            }
+            //if (validator.Length > 0)
+            //{
+            //    int prevBlockType = blockType;
+            //    blockType += 128;
+            //    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with validator.");
+            //    headerType.Append(validator);
+            //}
+            //else
+            //{
+            //    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
+            //}
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).Append("\t\t; Objects count\r\n");
             lengthData++;
 
@@ -118,7 +118,5 @@ namespace Tiled2ZXNext.Process.EEI
             id = path.Properties.GetPropertyInt("Id");
             return id;
         }
-
-
     }
 }

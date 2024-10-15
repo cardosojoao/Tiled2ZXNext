@@ -13,16 +13,13 @@ namespace Tiled2ZXNext.Process.EEI
     /// <summary>
     /// Process Environment Element Interaction scrap
     /// </summary>
-    public class ProcessScrap : IProcess
+    public class ProcessScrap : ProcessMaster
     {
-        private readonly Layer _layer;
-        private readonly Scene _scene;
-        private readonly List<Property> _properties;
-        public ProcessScrap(Layer layer, Scene scene, List<Property> properties)
+        //private readonly Layer _layer;
+        //private readonly Scene _scene;
+        //private readonly List<Property> _properties;
+        public ProcessScrap(Layer layer, Scene scene, List<Property> properties) : base(layer,scene,properties)
         {
-            _layer = layer;
-            _scene = scene;
-            _properties = properties;
         }
 
         public StringBuilder Execute()
@@ -45,47 +42,50 @@ namespace Tiled2ZXNext.Process.EEI
         /// <returns>string builder collection with header and data</returns>
         private StringBuilder WriteObjectsLayer(Layer layer)
         {
-            bool validatorItemActive = false;
-            int lengthData = 0;
-            StringBuilder data = new(1024);
-            StringBuilder headerType = new(200);
-            StringBuilder header = new(200);
-            //List<StringBuilder> output = new() { header, data };
+            //bool validatorItemActive = false;
+            //int lengthData = 0;
+            //StringBuilder data = new(1024);
+            //StringBuilder headerType = new(200);
+            //StringBuilder header = new(200);
+            ////List<StringBuilder> output = new() { header, data };
+            layer.Properties.Merge(_properties);
 
-            int blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
+            CheckValidator();
+
+            //int blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
             int layerMask = layer.Properties.GetPropertyInt("LayerMask");
             int layerId = layer.Properties.GetPropertyInt("Layer");
             string eventName = layer.Properties.GetProperty("EventName");
 
-            int eventIndex = Scene.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
+            int eventIndex = Project.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
 
-            layer.Properties.Merge(_properties);
+            
             // validator at layer level
-            StringBuilder validatorLayer = Validator.ProcessLayerValidator(layer.Properties);
-            if (validatorLayer.Length > 0)
-            {
-                int prevBlockType = blockType;
-                blockType += 128;
-                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator layer.");
-                headerType.Append(validatorLayer);
-            }
-            else
-            {
-                // validator at item level
-                StringBuilder validatorItem = Validator.ProcessItemValidator(layer.Properties);
-                validatorItemActive = validatorItem.Length > 0;
-                if (validatorItemActive)
-                {
-                    int prevBlockType = blockType;
-                    blockType += 64;
-                    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator item.");
-                    //headerType.Append(validatorItem);
-                }
-                else
-                {
-                    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine("\t\t; data block type");
-                }
-            }
+            //StringBuilder validatorLayer = Validator.ProcessLayerValidator(layer.Properties);
+            //if (validatorLayer.Length > 0)
+            //{
+            //    int prevBlockType = blockType;
+            //    blockType += 128;
+            //    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator layer.");
+            //    headerType.Append(validatorLayer);
+            //}
+            //else
+            //{
+            //    // validator at item level
+            //    StringBuilder validatorItem = Validator.ProcessItemValidator(layer.Properties);
+            //    validatorItemActive = validatorItem.Length > 0;
+            //    if (validatorItemActive)
+            //    {
+            //        int prevBlockType = blockType;
+            //        blockType += 64;
+            //        headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator item.");
+            //        //headerType.Append(validatorItem);
+            //    }
+            //    else
+            //    {
+            //        headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine("\t\t; data block type");
+            //    }
+            //}
 
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");
             lengthData++;

@@ -13,7 +13,7 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="scene"></param>
         /// <returns></returns>
-        public StringBuilder ProcessMap(Entities.Scene scene)
+        public StringBuilder ProcessMap(Entities.Project scene)
         {
             StringBuilder result = new StringBuilder(100);
             string fileName = scene.Properties.GetProperty( "FileName");

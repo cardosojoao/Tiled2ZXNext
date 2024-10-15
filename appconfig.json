@@ -5,7 +5,7 @@
   },
   "assembler": {
     "app": "d:\\devl\\zx\\sjasmplus\\sjasmplus.exe",
-    "args": "\"%1\" --raw=\"%2\""
+    "args": "\"%1\" --raw=\"%2\" \"%3\""
   },
   "zip": {
     "app": "d:\\devl\\zx\\utils\\zx0.exe",

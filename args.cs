@@ -15,6 +15,9 @@ namespace Tiled2ZXNext
         [Option('a', "approot", Required = true, HelpText = "Application Root Path", Default = false)]
         public string AppRoot { get; set; }
 
+        [Option('p', "project", Required = false, HelpText = "project file path", Default = "")]
+        public string Project { get; set; }
+
         [Option('w', "world", Required = false, HelpText = "world file path", Default = "")]
         public string World { get; set; }
 

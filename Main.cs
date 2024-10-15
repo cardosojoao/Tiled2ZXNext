@@ -54,15 +54,27 @@ namespace Tiled2ZXNext
 
                     world.GetMatrix();
 
-                    ProcessWorld proc =  new ProcessWorld(world);
+                    ProcessWorld proc = new ProcessWorld(world);
 
-                    var worldProc =  proc.Execute();
+                    var worldProc = proc.Execute();
 
                     File.WriteAllText(Path.Combine(o.MapPath, "worldMap.asm"), worldProc.ToString());
 
-                    
+
                 }
             }
+
+            if (o.Project.Length > 0)
+            {
+                if (File.Exists(o.Project))
+                {
+                    string projectRaw = File.ReadAllText(o.Project);
+                    Models.Project projectData = JsonSerializer.Deserialize<Models.Project>(projectRaw);
+                    ProjectMapper.Map(projectData, Entities.Project.Instance, o);
+                }
+            }
+
+
 
             //inputPath = Path.GetDirectoryName(inputFile);
             string data = File.ReadAllText(inputFile);
@@ -92,6 +104,29 @@ namespace Tiled2ZXNext
 
             // get layers data
             StringBuilder layerData = ProcessScene(scene);
+
+            StringBuilder includes = new();
+
+            //foreach (Table table in Entities.Project.Instance.Tables.Values)
+            //{
+            //    string tablePath = table.FilePath.Replace("~", o.AppRoot);
+            //    string path = Path.GetRelativePath(o.RoomPath, tablePath);
+
+            //    includes.Append('\t').Append("include\t\"").Append(path.Replace('\\','/')).AppendLine("\"");
+            //}
+
+            foreach (Table table in Entities.Project.Instance.Includes.Values)
+            {
+                string tablePath = table.FilePath.Replace("~", o.AppRoot);
+                string path = Path.GetRelativePath(o.RoomPath, tablePath);
+
+                includes.Append('\t').Append("include\t\"").Append(tablePath.Replace('\\', '/')).AppendLine("\"");
+            }
+
+
+
+            layerData.Insert(0, includes);
+
             Console.WriteLine("output layer file " + outputFile);
             // write layers to final location
             OutputLayer(o, layerData);

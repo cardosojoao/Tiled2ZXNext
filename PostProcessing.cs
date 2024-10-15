@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using Tiled2ZXNext.Entities;
 
 
 namespace Tiled2ZXNext
@@ -22,7 +23,13 @@ namespace Tiled2ZXNext
                 string param = Controller.Config.Assembler.Args; // assemblerConfig.GetSection("args").Value;
 
                 param = param.Replace("%1", inputFile).Replace("%2", outputfileAssembler);
+                string tables = "";
+                if ("" == string.Empty)
+                {
 
+                }
+
+                param.Replace("%3", tables);
                 execResult = ExecuteCommand(pathExe, param);
                 Console.WriteLine($"Result={execResult}");
             }
@@ -50,7 +57,7 @@ namespace Tiled2ZXNext
 
         static int ExecuteCommand(string exec, string parameters)
         {
-            Console.WriteLine("execute  {0} {1}" , exec, parameters);
+            Console.WriteLine("execute  {0} {1}", exec, parameters);
             ProcessStartInfo startinfo = new ProcessStartInfo(exec, parameters);
             startinfo.ErrorDialog = true;
             startinfo.CreateNoWindow = true;

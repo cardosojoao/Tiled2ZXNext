@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
-
+//using Tiled2ZXNext.Models;
+using Tiled2ZXNext.ProcessLayers;
 
 namespace Tiled2ZXNext.Process.EEI
 {
@@ -49,6 +50,38 @@ namespace Tiled2ZXNext.Process.EEI
         protected virtual StringBuilder WriteObjectsLayer(Layer layer)
         {
             return new StringBuilder();
+        }
+
+        protected void CheckValidator()
+        {
+            blockType = _layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
+
+            StringBuilder validator = Validator.ProcessLayerValidator(_layer.Properties);
+
+            if (validator.Length > 0)
+            {
+                int prevBlockType = blockType;
+                blockType += 128;
+                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with validator.");
+                headerType.Append(validator);
+            }
+            else
+            {
+                // validator at item level
+                StringBuilder validatorItem = Validator.ProcessItemValidator(_layer.Properties);
+                validatorItemActive = validatorItem.Length > 0;
+                if (validatorItemActive)
+                {
+                    int prevBlockType = blockType;
+                    blockType += 64;
+                    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator item.");
+                    //headerType.Append(validatorItem);
+                }
+                else
+                {
+                    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine("\t\t; data block type");
+                }
+            }
         }
     }
 }

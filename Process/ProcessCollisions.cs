@@ -88,8 +88,8 @@ namespace Tiled2ZXNext
             string bodyType = layer.Properties.GetProperty("BodyType").ToLower();
             string eventName = layer.Properties.GetProperty("EventName");
 
-            int eventIndex = Scene.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
-            int tagIndex = Scene.Instance.Tables["TagName"].Items.FindIndex(r => r.Equals(tagName, StringComparison.CurrentCultureIgnoreCase));
+            int eventIndex = Project.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
+            int tagIndex = Project.Instance.Tables["TagName"].Items.FindIndex(r => r.Equals(tagName, StringComparison.CurrentCultureIgnoreCase));
             // if can't find tag, and tag value is numeric just use the tag numeric value
             if(tagIndex == -1)
             {
@@ -179,7 +179,7 @@ namespace Tiled2ZXNext
         /// </summary>
         /// <param name="bodyType">name of body</param>
         /// <returns>int type of body</returns>
-        private static int BodyTypeInt(string bodyType)
+        public static int BodyTypeInt(string bodyType)
         {
             return bodyType switch
             {

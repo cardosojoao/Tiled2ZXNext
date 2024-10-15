@@ -34,10 +34,10 @@ namespace Tiled2ZXNext.Mapper
             scene.RootFolder = inputPath;
             scene.Tilesets = ResolveTileSets(sceneRaw.Tilesets, inputPath);
 
-            if (sceneRaw.Properties.ExistProperty("Tables"))
-            {
-                scene.Tables.Append<string, Table>(ResolveTables(sceneRaw.Properties, options.AppRoot));
-            }
+            //if (sceneRaw.Properties.ExistProperty("Tables"))
+            //{
+            //    scene.Tables.Append<string, Table>(ResolveTables(sceneRaw.Properties, options.AppRoot));
+            //}
             return scene;
         }
 
@@ -45,78 +45,39 @@ namespace Tiled2ZXNext.Mapper
         /// check if tables are available and load definition
         /// </summary>
         /// <param name="props"></param>
-        private static Dictionary<string, Table> ResolveTables(List<Model.Property> props, string appRoot)
-        {
-
-            string[] tablesRaw = props.GetProperty("Tables").Split('\n');           //PropertyExtensions.GetProperty(props, "Tables").Split('\n');
-            Dictionary<string, Table> tables = new();
-            foreach (string table in tablesRaw)
-            {
-                string[] tableParts = table.Split(':');
-                Table tableSettings = new Table() { Name = tableParts[0], FilePath = tableParts[1] };
-                tables.Add(tableSettings.Name, tableSettings);
-                Console.WriteLine($"Table={tableSettings.Name} Path={tableSettings.FilePath}");
-                // read the file content    
-                List<string> tableData = new(File.ReadAllLines(tableSettings.FilePath.Replace("~", appRoot)));
-                // find table begin
-                int tableIndex = tableData.FindIndex(r => r.Contains("Table:" + tableSettings.Name, StringComparison.InvariantCultureIgnoreCase));
-                // if table exists
-                if (tableIndex > 0)
-                {   // loop through content until find and empty line
-                    for (int line = tableIndex + 1; line < tableData.Count; line++)
-                    {
-                        string item = tableData[line];
-                        if (item == string.Empty)
-                        {
-                            break;
-                        }
-                        // get just the name
-                        string[] itemData = item.Split(new char[] { ' ', '\t' });
-                        tableSettings.Items.Add(itemData[0]);
-                    }
-                }
-            }
-            return tables;
-        }
-
-        //private static void ResolveTileSetsold(List<Model.Tileset> tileSetsRaw, string inputPath)
+        //private static Dictionary<string, Table> ResolveTables(List<Model.Property> props, string appRoot)
         //{
-        //    //Dictionary<string, List<Tileset>> resolved = new();
 
-        //    Dictionary<string, TileSetXMl> tilesSetData = new();
-
-        //    int order = 0;       // order of load 
-        //    foreach (Model.Tileset tileSetRaw in tileSetsRaw)
+        //    string[] tablesRaw = props.GetProperty("Tables").Split('\n');           //PropertyExtensions.GetProperty(props, "Tables").Split('\n');
+        //    Dictionary<string, Table> tables = new();
+        //    foreach (string table in tablesRaw)
         //    {
-        //        Entity.Tileset tileset = new();
-        //        tileset.Order = order;                  // judt to keep in mind the physical order of tilesheet that is align with gid's
-        //        //tileSetRaw.Order = order;      
-        //        string file = Path.Combine(inputPath, tileSetRaw.Source);
-        //        TileSetXMl tileSetData = ReadTileSet(file);
-        //        tileset.Lastgid = tileSetData.tilecount + tileSetRaw.Firstgid - 1;
-        //        //tileSetRaw.Lastgid = tileSetData.tilecount + tileSetRaw.Firstgid - 1;
-        //        if (!Entity.Scene.Instance.Tilesets.ContainsKey(tileSetData.image.source))
-        //        {
-        //            Entity.Scene.Instance.Tilesets.Add(tileSetData.image.source, new List<Entity.Tileset>());
-        //            tilesSetData.Add(tileSetData.image.source, tileSetData);
-        //        }
-        //        Entity.Scene.Instance.Tilesets[tileSetData.image.source].Add(tileset);
-        //        order++;
-        //    }
-
-        //    foreach (KeyValuePair<string, List<Entity.Tileset>> sets in Entity.Scene.Instance.Tilesets)
-        //    {
-        //        foreach (Entity.Tileset set in sets.Value)
-        //        {
-        //            TileSetXMl tileSetData = tilesSetData[sets.Key];
-        //            set.Parsedgid = set.Firstgid - 1;
-        //            set.TileSheetID = tileSetData.GetPropertyInt("TileSheetId");        //  unique id of tilesheet
-        //            set.PaletteIndex = tileSetData.GetPropertyInt("PaletteIndex");      //  palette id or -1 if no palette 
+        //        string[] tableParts = table.Split(':');
+        //        Table tableSettings = new Table() { Name = tableParts[0], FilePath = tableParts[1] };
+        //        tables.Add(tableSettings.Name, tableSettings);
+        //        Console.WriteLine($"Table={tableSettings.Name} Path={tableSettings.FilePath}");
+        //        // read the file content    
+        //        List<string> tableData = new(File.ReadAllLines(tableSettings.FilePath.Replace("~", appRoot)));
+        //        // find table begin
+        //        int tableIndex = tableData.FindIndex(r => r.Contains("Table:" + tableSettings.Name, StringComparison.InvariantCultureIgnoreCase));
+        //        // if table exists
+        //        if (tableIndex > 0)
+        //        {   // loop through content until find and empty line
+        //            for (int line = tableIndex + 1; line < tableData.Count; line++)
+        //            {
+        //                string item = tableData[line];
+        //                if (item == string.Empty)
+        //                {
+        //                    break;
+        //                }
+        //                // get just the name
+        //                string[] itemData = item.Split(new char[] { ' ', '\t' });
+        //                tableSettings.Items.Add(itemData[0]);
+        //            }
         //        }
         //    }
+        //    return tables;
         //}
-
-
 
         private static List<Entity.Tileset> ResolveTileSets(List<Model.TileSet> tileSetsRaw, string inputPath)
         {
