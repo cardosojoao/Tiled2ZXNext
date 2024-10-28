@@ -11,7 +11,7 @@ namespace Tiled2ZXNext
 
             try
             {
-                Console.WriteLine("Tiled 2 ZX Next converter " + Assembly.GetEntryAssembly().GetName().Version);
+                Console.WriteLine("Tiled 2 Dot8 " + Assembly.GetEntryAssembly().GetName().Version);
 
                 Parser.Default.ParseArguments<Options>(args)
                     .WithParsed<Options>(o =>

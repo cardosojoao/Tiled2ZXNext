@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
@@ -23,7 +25,9 @@ namespace Tiled2ZXNext
             StringBuilder layerCode = new(2048);
             string fileName = scene.Properties.GetProperty("FileName");
 
+
             layerCode.Append(fileName).AppendLine(":");
+
 
             List<IProcess> blocks = CreateProcesses(scene.Layers, scene, null);
 
@@ -103,7 +107,7 @@ namespace Tiled2ZXNext
             return layerCode;
         }
 
-        private List<IProcess>  CreateProcesses(List<Entities.Layer> layers, Entities.Scene scene, List<Entities.Property> properties)
+        private List<IProcess> CreateProcesses(List<Entities.Layer> layers, Entities.Scene scene, List<Entities.Property> properties)
         {
             List<IProcess> blocks = new();
 
@@ -202,21 +206,25 @@ namespace Tiled2ZXNext
         //}
 
 
-        public void OutputLayer(Options o, StringBuilder mapData)
+        public void OutputLayer(Options o, string worldName, StringBuilder mapData)
         {
-            string pathOutput = Path.Combine(o.RoomPath, outputFile);
+
+            string FolderOutput = Path.Combine(o.RoomPath, worldName);
+            if(!Directory.Exists(FolderOutput))
+            {
+                Directory.CreateDirectory(FolderOutput);
+            }
+            string pathOutput = Path.Combine(FolderOutput, outputFile);
             File.WriteAllText(pathOutput, mapData.ToString());
         }
 
         private List<Entities.Layer> GetGenericGroups(List<Entities.Layer> layers)
         {
-
             List<Entities.Layer> groupsGeneric = layers.FindAll(l => GROUPS.FindIndex(g => g == l.Name) > -1);
-
             return groupsGeneric;
         }
 
-        private bool IsGenericGroup(string name)
+        private static bool IsGenericGroup(string name)
         {
             return GROUPS.FindIndex(g => g.Equals(name, System.StringComparison.InvariantCultureIgnoreCase)) == -1;
         }

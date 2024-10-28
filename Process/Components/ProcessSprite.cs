@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
-//using Tiled2ZXNext.Models;
-using Tiled2ZXNext.ProcessLayers;
 
 
 namespace Tiled2ZXNext.Process.EEI
@@ -88,79 +84,101 @@ namespace Tiled2ZXNext.Process.EEI
         {
             CheckValidator();
             header.Append("\t\tdb $").Append(layer.Layers.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");
-            lengthData ++;
+            lengthData++;
             foreach (Entities.Layer layerComponents in layer.Layers)
             {
-                int components = layerComponents.Properties.GetPropertyInt("Components");
-                GameObject gameObject = new();
-                StringBuilder componentsData = new StringBuilder();
-
-                if ((components & ((int)ComponentFlags.Sprite)) == ((int)ComponentFlags.Sprite))
+                if (layerComponents.Visible)
                 {
-                    Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("sprite", StringComparison.InvariantCultureIgnoreCase));
-                    componentsData.AppendLine("\t\t;\tSprite Component");
-                    componentsData.Append("\t\tdb ").Append(obj.Properties.GetProperty("SpriteName").ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
-                    componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("SpriteIndex").Int2Hex("X2")).AppendLine("\t\t; Pattern Index");
-                    lengthData += 2;
-                    if (!gameObject.Set)
+                    //int components = layerComponents.Properties.GetPropertyInt("Components");
+                    int components = 0;
+                    GameObject gameObject = new();
+                    StringBuilder componentsData = new StringBuilder();
+
+                    //if ((components & ((int)ComponentFlags.Sprite)) == ((int)ComponentFlags.Sprite) )
                     {
-                        gameObject.Setup(obj.X, obj.Y);
+                        Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("sprite", StringComparison.InvariantCultureIgnoreCase));
+                        if (obj != null && obj.Visible)
+                        {
+                            components |= ((int)ComponentFlags.Sprite);
+                            componentsData.AppendLine("\t\t;\tSprite Component");
+                            componentsData.Append("\t\tdb ").Append(obj.Properties.GetProperty("SpriteName").ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
+                            componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("SpriteIndex").Int2Hex("X2")).AppendLine("\t\t; Pattern Index");
+                            componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("Attributes").Int2Hex("X2")).AppendLine("\t\t; Sprite Attributes");
+                            lengthData += 3;
+                            if (!gameObject.Set)
+                            {
+                                gameObject.Setup(obj.X, obj.Y);
+                            }
+                        }
                     }
+                    //if ((components & ((int)ComponentFlags.SpriteFlag)) == ((int)ComponentFlags.SpriteFlag))
+                    {
+                        Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("spriteflag", StringComparison.InvariantCultureIgnoreCase));
+                        if (obj != null && obj.Visible)
+                        {
+                            components |= ((int)ComponentFlags.SpriteFlag);
+                            componentsData.AppendLine("\t\t;\tSprite Flag Component");
+                            componentsData.Append("\t\tdb ").Append(obj.Properties.GetProperty("SpriteName").ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
+                            componentsData.Append("\t\tdb ").Append(obj.Properties.GetProperty("FlagName")).AppendLine("\t\t; Flag (Patterm Index)");
+                            componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("Attributes").Int2Hex("X2")).AppendLine("\t\t; Sprite Attributes");
+                            lengthData += 3;
+                            if (!gameObject.Set)
+                            {
+                                gameObject.Setup(obj.X, obj.Y);
+                            }
+                        }
+                    }
+                    //if ((components & ((int)ComponentFlags.Body)) == ((int)ComponentFlags.Body))
+                    {
+                        Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("body", StringComparison.InvariantCultureIgnoreCase));
+                        if (obj != null && obj.Visible)
+                        {
+                            components |= ((int)ComponentFlags.Body);
+                            int layerMask = obj.Properties.GetPropertyInt("LayerMask");
+                            int layerId = obj.Properties.GetPropertyInt("Layer");
+                            string bodyType = obj.Properties.GetProperty("BodyType").ToLower();
+                            string eventName = obj.Properties.GetProperty("EventName");
+
+                            int eventIndex = Project.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
+                            // merge layer mask with layerID in a single byte
+                            layerMask *= 16;
+                            layerMask += layerId;
+
+                            byte offsetX = 0;
+                            byte offsetY = 0;
+                            int x = (int)obj.X + (int)(obj.Width / 2);
+                            int y = (int)obj.Y + (int)(obj.Height / 2);
+
+                            if (gameObject.Set)
+                            {
+                                offsetX = (byte)(x - gameObject.X);
+                                offsetY = (byte)(y - gameObject.Y);
+                            }
+                            componentsData.AppendLine("\t\t;\tBody Component");
+                            componentsData.Append("\t\tdb $").Append(offsetX.ToString("X2")).Append(", $").Append(offsetY.ToString("X2")).AppendLine("\t\t; offset X,Y");
+                            componentsData.Append("\t\tdb $").Append(((int)obj.Width).ToString("X2")).Append(", $").Append(((int)obj.Height).ToString("X2")).AppendLine("\t\t; width, height");
+                            componentsData.Append("\t\tdb $").Append(layerMask.ToString("X2")).Append("\t\t; Layer\r\n");
+                            componentsData.Append("\t\tdb $").Append(ProcessCollision.BodyTypeInt(bodyType) > 0 ? 128 : 0.ToString("X2")).Append(" + $").Append(eventIndex.ToString("X2")).Append("\t\t; Body Type 0=trigger , 128=rigid + EventName = ").AppendLine(eventName);   // to be removed
+                            lengthData += 6;
+                            if (!gameObject.Set)
+                            {
+                                gameObject.Setup(x, y);
+                            }
+                        }
+                    }
+
+                    // GameObject 
+                    StringBuilder gameObjectHeader = new StringBuilder();
+                    gameObjectHeader.Append("\t\t; GameObject: ").AppendLine(layerComponents.Name);
+                    gameObjectHeader.Append("\t\tdb $").Append(layerComponents.Properties.GetPropertyInt("Components").Int2Hex("X2")).AppendLine("\t\t; GameObject Components Flags");
+                    int GameObjectX = gameObject.X + ((int)Controller.Config.Offset.x);
+                    int GameObjectY = gameObject.Y + ((int)Controller.Config.Offset.y);
+                    gameObjectHeader.Append("\t\tdw $").Append(GameObjectX.Int2Hex("X4")).Append(", $").Append(GameObjectY.Int2Hex("X4")).AppendLine("\t\t; x, y.");
+                    lengthData += 5;
+
+                    data.Append(gameObjectHeader);
+                    data.Append(componentsData);
                 }
-                if ((components & ((int)ComponentFlags.SpriteFlag)) == ((int)ComponentFlags.SpriteFlag))
-                {
-                    Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("spriteflag", StringComparison.InvariantCultureIgnoreCase));
-                    componentsData.AppendLine("\t\t;\tSprite Flag Component");
-                    componentsData.Append("\t\tdb ").Append(obj.Properties.GetProperty("SpriteName").ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
-                    componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("FlagId").Int2Hex("X2")).AppendLine("\t\t; Flag Patterm Index");
-                    lengthData += 2;
-                    if (!gameObject.Set)
-                    {
-                        gameObject.Setup(obj.X, obj.Y);
-                    }
-                }
-                if ((components & ((int)ComponentFlags.Body)) == ((int)ComponentFlags.Body))
-                {
-                    Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("body", StringComparison.InvariantCultureIgnoreCase));
-
-                    int layerMask = obj.Properties.GetPropertyInt("LayerMask");
-                    int layerId = obj.Properties.GetPropertyInt("Layer");
-                    string bodyType = obj.Properties.GetProperty("BodyType").ToLower();
-                    string eventName = obj.Properties.GetProperty("EventName");
-
-                    int eventIndex = Project.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
-                    // merge layer mask with layerID in a single byte
-                    layerMask *= 16;
-                    layerMask += layerId;
-
-                    byte offsetX = 0;
-                    byte offsetY = 0;
-                    if (gameObject.Set)
-                    {
-                        int x = (int)obj.X + (int)(obj.Width / 2);
-                        int y = (int)obj.Y + (int)(obj.Height/ 2);
-                        offsetX = (byte)(x - gameObject.X);
-                        offsetY = (byte)(y - gameObject.Y);
-                    }
-                    componentsData.AppendLine("\t\t;\tBody Component");
-                    componentsData.Append("\t\tdb $").Append(offsetX.ToString("X2")).Append(", $").Append(offsetY.ToString("X2")).AppendLine("\t\t; offset X,Y");
-                    componentsData.Append("\t\tdb $").Append(((int)obj.Width).ToString("X2")).Append(", $").Append(((int)obj.Height).ToString("X2")).AppendLine("\t\t; width, height");
-                    componentsData.Append("\t\tdb $").Append(layerMask.ToString("X2")).Append("\t\t; Layer\r\n");
-                    componentsData.Append("\t\tdb $").Append(ProcessCollision.BodyTypeInt(bodyType) > 0 ? 128 : 0.ToString("X2")).Append(" + $").Append(eventIndex.ToString("X2")).Append("\t\t; Body Type 0=trigger , 128=rigid + EventName = ").AppendLine(eventName);   // to be removed
-                    lengthData += 6;
-                    if (!gameObject.Set)
-                    {
-                        gameObject.Setup(obj.X, obj.Y);
-                    }
-                }
-                StringBuilder gameObjectHeader = new StringBuilder();
-                gameObjectHeader.AppendLine("\t\t; GameObject Components Flags");
-                gameObjectHeader.Append("\t\tdb $").AppendLine(layerComponents.Properties.GetPropertyInt("Components").Int2Hex("X2"));
-                gameObjectHeader.Append("\t\tdw $").Append(gameObject.X.Int2Hex("X4")).Append(", $").Append(gameObject.Y.Int2Hex("X4")).AppendLine("\t\t; x, y.");
-                lengthData += 5;
-
-                data.Append(gameObjectHeader);
-                data.Append(componentsData);
             }
 
         }

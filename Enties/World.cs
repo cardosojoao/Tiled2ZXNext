@@ -30,6 +30,7 @@ namespace Tiled2ZXNext.Entities
 
     public class World
     {
+        public string Name { get; set; }
         public List<Map> Maps { get; set; }
         public bool OnlyShowAdjacentMaps { get; set; }
         public string Type { get; set; }

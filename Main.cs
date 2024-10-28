@@ -10,6 +10,7 @@ using System.Xml.Serialization;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Models;
 using Tiled2ZXNext.Mapper;
+using System.Reflection;
 
 namespace Tiled2ZXNext
 {
@@ -32,9 +33,6 @@ namespace Tiled2ZXNext
         {
             _options = o;
             inputFile = o.Input;
-
-
-
             IConfiguration config = new ConfigurationBuilder()
                 .AddJsonFile("appconfig.json", optional: true, reloadOnChange: false)
                 .Build();
@@ -43,26 +41,38 @@ namespace Tiled2ZXNext
             Config.Assembler = config.GetRequiredSection("assembler").Get<Command>();
 
 
+            //
+            //  create the world map based on the matrix of rooms
+            //
+            //if (o.World.Length > 0)
+            //{
+            //    if (File.Exists(o.World))
+            //    {
+            //        string worldraw = File.ReadAllText(o.World);
+            //        Models.World worldData = JsonSerializer.Deserialize<Models.World>(worldraw);
+            //        Entities.World world = WorldMapper.Map(worldData, o);
+            //        world.GetMatrix();
+            //        ProcessWorld proc = new ProcessWorld(world);
+            //        var worldProc = proc.Execute();
+            //        File.WriteAllText(Path.Combine(o.MapPath, "worldMap.asm"), worldProc.ToString());
+            //    }
+            //}
 
-            if (o.World.Length > 0)
+            string[] worlds = Directory.GetFiles(Path.GetDirectoryName(o.World), "*.world");
+            foreach (string worldFile in worlds)
             {
-                if (File.Exists(o.World))
-                {
-                    string worldraw = File.ReadAllText(o.World);
-                    Models.World worldData = JsonSerializer.Deserialize<Models.World>(worldraw);
-                    Entities.World world = WorldMapper.Map(worldData, o);
-
-                    world.GetMatrix();
-
-                    ProcessWorld proc = new ProcessWorld(world);
-
-                    var worldProc = proc.Execute();
-
-                    File.WriteAllText(Path.Combine(o.MapPath, "worldMap.asm"), worldProc.ToString());
-
-
-                }
+                string worldRaw = File.ReadAllText(worldFile);
+                Models.World worldData = JsonSerializer.Deserialize<Models.World>(worldRaw);
+                Entities.World world = WorldMapper.Map(worldData, o);
+                world.Name = Path.GetFileNameWithoutExtension(worldFile);
+                world.GetMatrix();
+                ProcessWorld proc = new ProcessWorld(world);
+                var worldProc = proc.Execute();
+                string worldName = Path.GetFileName(worldFile);
+                File.WriteAllText(Path.Combine(o.MapPath, Path.GetFileNameWithoutExtension(worldName)+"_worldMap.asm"), worldProc.ToString());
             }
+
+
 
             if (o.Project.Length > 0)
             {
@@ -104,34 +114,36 @@ namespace Tiled2ZXNext
 
             // get layers data
             StringBuilder layerData = ProcessScene(scene);
+            StringBuilder header = new();
 
-            StringBuilder includes = new();
+            var assembly = Assembly.GetExecutingAssembly();
+            var assemblyName = assembly.GetName().Name;
+            var assemblyVersion = assembly.GetName().Version;
 
-            //foreach (Table table in Entities.Project.Instance.Tables.Values)
-            //{
-            //    string tablePath = table.FilePath.Replace("~", o.AppRoot);
-            //    string path = Path.GetRelativePath(o.RoomPath, tablePath);
-
-            //    includes.Append('\t').Append("include\t\"").Append(path.Replace('\\','/')).AppendLine("\"");
-            //}
+            header.AppendLine(";");
+            header.Append(";\t").AppendLine($"Assembly Name: {assemblyName}");
+            header.Append(";\t").AppendLine($"Assembly Version: {assemblyVersion}");
+            header.AppendLine(";");
 
             foreach (Table table in Entities.Project.Instance.Includes.Values)
             {
                 string tablePath = table.FilePath.Replace("~", o.AppRoot);
                 string path = Path.GetRelativePath(o.RoomPath, tablePath);
 
-                includes.Append('\t').Append("include\t\"").Append(tablePath.Replace('\\', '/')).AppendLine("\"");
+                header.Append('\t').Append("include\t\"").Append(tablePath.Replace('\\', '/')).AppendLine("\"");
             }
 
 
 
-            layerData.Insert(0, includes);
+            layerData.Insert(0, header);
 
+            string sceneWorldName = scene.Properties.GetProperty("WorldName");
+            
             Console.WriteLine("output layer file " + outputFile);
             // write layers to final location
-            OutputLayer(o, layerData);
+            OutputLayer(o, sceneWorldName, layerData);
 
-            PostProcessing(o);
+            PostProcessing(o, sceneWorldName);
         }
     }
 

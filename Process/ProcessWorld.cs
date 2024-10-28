@@ -26,7 +26,7 @@ namespace Tiled2ZXNext
         {
             Console.WriteLine("Group World");
             StringBuilder all = new();
-            all.AppendLine("map_rooms:");
+            all.Append(_world.Name).AppendLine("_scenes:");
 
             _world.Maps.Sort((m1,m2) =>   m1.Id.CompareTo(m2.Id));  
             

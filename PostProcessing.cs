@@ -11,11 +11,12 @@ namespace Tiled2ZXNext
 {
     public partial class Controller
     {
-        public void PostProcessing(Options o)
+        public void PostProcessing(Options o, string worldName)
         {
             int execResult = -1;
-            string outputfileAssembler = Path.Combine(o.RoomPath, fileName + ".bin");
-            string inputFile = Path.Combine(o.RoomPath, outputFile);
+            string outputPath = Path.Combine(o.RoomPath, worldName);
+            string outputfileAssembler = Path.Combine(outputPath, fileName + ".bin");
+            string inputFile = Path.Combine(outputPath, outputFile);
 
             if (Controller.Config.Assembler != null)
             {
@@ -51,7 +52,7 @@ namespace Tiled2ZXNext
                 Console.WriteLine("ERROR: Skip compress step");
             }
 
-            BuildList(o.RoomPath, "*.zx0", o.RoomPath + "\\list.txt");
+            BuildList(outputPath, "*.zx0", outputPath + "\\list.txt");
 
         }
 
