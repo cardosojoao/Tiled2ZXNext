@@ -1,11 +1,11 @@
 {
   "offset": {
-    "x": 32,
-    "y" : 32 
+    "x": 0,
+    "y" : 0 
   },
   "assembler": {
     "app": "d:\\devl\\zx\\sjasmplus\\sjasmplus.exe",
-    "args": "\"%1\" --raw=\"%2\" \"%3\""
+    "args": "\"%1\" --raw=\"%2\""
   },
   "zip": {
     "app": "d:\\devl\\zx\\utils\\zx0.exe",

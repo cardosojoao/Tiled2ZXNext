@@ -31,7 +31,7 @@ namespace Tiled2ZXNext
             LayersArea.Clear();
             foreach (Layer layer in _rootLayer.Layers)
             {
-                if (layer.Visible)
+                if (layer.Visible && !IsLayerEmpty(layer.Data));
                 {
                     layer.Properties.Merge(_properties);        // add parent extended properties
 
@@ -285,6 +285,18 @@ namespace Tiled2ZXNext
                 }
             }
             return gidMap;
+        }
+
+
+        private bool IsLayerEmpty(List<uint>  data)
+        {
+            long result = 0;
+
+            for(int i = 0; i < data.Count; i++)
+            {
+                result += data[i];
+            }
+            return result == 0;
         }
     }
 }

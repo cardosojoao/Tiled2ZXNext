@@ -24,10 +24,7 @@ namespace Tiled2ZXNext
         {
             StringBuilder layerCode = new(2048);
             string fileName = scene.Properties.GetProperty("FileName");
-
-
             layerCode.Append(fileName).AppendLine(":");
-
 
             List<IProcess> blocks = CreateProcesses(scene.Layers, scene, null);
 
@@ -35,66 +32,6 @@ namespace Tiled2ZXNext
             {
                 layerCode.Append(process.Execute());
             }
-
-
-            //layerCode.Append(ProcessLayers(scene.Layers, scene,null));
-
-            //List<IProcess> blocks = new();
-            //StringBuilder layerCode = new(2048);
-
-            //// get root folders group
-            //List<Entities.Layer> groups = layers.FindAll(l => l.Type == "group" && l.Visible);
-
-            //// select Layer 2 group layers
-            //Entities.Layer groupLayer = groups.Find(g => g.Name.Equals("layer2", System.StringComparison.InvariantCultureIgnoreCase));
-            //if (groupLayer != null)
-            //{
-            //    blocks.Add(new ProcessLayer2(groupLayer, scene));
-            //}
-
-            //// select Collision group layers
-            //groupLayer = groups.Find(g => g.Name.Equals("collision", System.StringComparison.InvariantCultureIgnoreCase));
-            //if (groupLayer != null)
-            //{
-            //    blocks.Add(new ProcessCollision(groupLayer, scene));
-            //}
-
-            //// select Tilemap group layers
-            //groupLayer = groups.Find(g => g.Name.Equals("tilemap", System.StringComparison.InvariantCultureIgnoreCase));
-            //if (groupLayer != null)
-            //{
-            //    blocks.Add(new ProcessTileMap(groupLayer, scene));
-            //}
-
-            //// select Tilemap group layers
-            //groupLayer = groups.Find(g => g.Name.Equals("locations", System.StringComparison.InvariantCultureIgnoreCase) || g.Name.Equals("location", System.StringComparison.InvariantCultureIgnoreCase));
-            //if (groupLayer != null)
-            //{
-            //    blocks.Add(new ProcessLocations(groupLayer, scene));
-            //}
-
-
-            //// select Tilemap group layers
-            //groupLayer = groups.Find(g => g.Name.Equals("path", System.StringComparison.InvariantCultureIgnoreCase));
-            //if (groupLayer != null)
-            //{
-            //    blocks.Add(new ProcessPaths(groupLayer, scene));
-            //}
-
-            //// select Tilemap group layers
-            //groupLayer = groups.Find(g => g.Name.Equals("EEI", System.StringComparison.InvariantCultureIgnoreCase));
-            //if (groupLayer != null)
-            //{
-            //    blocks.Add(new ProcessEEI(groupLayer, scene));
-            //}
-
-            //foreach (IProcess process in blocks)
-            //{
-            //    layerCode.Append(process.Execute());
-            //}
-
-
-
 
 
             // add terminator to scene
@@ -110,6 +47,9 @@ namespace Tiled2ZXNext
         private List<IProcess> CreateProcesses(List<Entities.Layer> layers, Entities.Scene scene, List<Entities.Property> properties)
         {
             List<IProcess> blocks = new();
+
+            blocks.Add(new ProcessSceneSize(null, scene, properties));
+
 
             // get root folders group
             List<Entities.Layer> groups = layers.FindAll(l => l.Type == "group" && l.Visible);

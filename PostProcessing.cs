@@ -24,13 +24,13 @@ namespace Tiled2ZXNext
                 string param = Controller.Config.Assembler.Args; // assemblerConfig.GetSection("args").Value;
 
                 param = param.Replace("%1", inputFile).Replace("%2", outputfileAssembler);
-                string tables = "";
-                if ("" == string.Empty)
-                {
+                //string tables = "";
+                //if ("" == string.Empty)
+                //{
 
-                }
+                //}
 
-                param.Replace("%3", tables);
+                //param.Replace("%3", tables);
                 execResult = ExecuteCommand(pathExe, param);
                 Console.WriteLine($"Result={execResult}");
             }

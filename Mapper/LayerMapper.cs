@@ -14,7 +14,10 @@ namespace Tiled2ZXNext.Mapper
             List<Entity.Layer> layers = new();
             foreach (var layerRaw in LayersRaw)
             {
-                layers.Add(ParseLayer(layerRaw));
+                if (layerRaw.Visible)
+                { 
+                layers.Add(ParseLayer(layerRaw)); 
+                }
             }
             return layers;
         }
@@ -49,7 +52,10 @@ namespace Tiled2ZXNext.Mapper
             {
                 foreach (Model.Layer layerRawChild in layerRaw.Layers)
                 {
-                    layer.Layers.Add(ParseLayer(layerRawChild));
+                    if (layerRawChild.Visible)
+                    {
+                        layer.Layers.Add(ParseLayer(layerRawChild));
+                    }
                 }
             }
 

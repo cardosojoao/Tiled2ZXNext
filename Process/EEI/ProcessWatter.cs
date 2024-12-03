@@ -77,8 +77,8 @@ namespace Tiled2ZXNext.Process.EEI
             {
                 if (obj.Visible)
                 {
-                    int x = (int)obj.X + 8 + 32;     // middle of first sprite, left start with 0
-                    int y = (int)obj.Y - 8 + 32;      // middle of first sprite, top starts with 16
+                    int x = (int)obj.X + 8;     // middle of first sprite, left start with 0
+                    int y = (int)obj.Y - 8;      // middle of first sprite, top starts with 16
                     int length = obj.Properties.GetPropertyInt("Length");
 
                     data.Append("\t\tdw $").Append(x.Int2Hex("X4")).Append(", $").Append(y.Int2Hex("X4"));

@@ -84,10 +84,16 @@ namespace Tiled2ZXNext
             {
                 if (obj.Visible)
                 {
+                    double sceneSource = 0;
+                    if (obj.Properties != null &&  obj.Properties.ExistProperty("teleport"))
+                    {
+                        sceneSource = obj.Properties.GetPropertyInt("teleport");
+                    }
+
+                    data.Append("\t\tdb $").AppendLine(((int)sceneSource).ToString("X2"));
                     data.Append("\t\tdw $").Append((obj.X + Controller.Config.Offset.x).Double2Hex("X4"));
-                    data.Append(",$").Append((obj.Y + Controller.Config.Offset.y).Double2Hex("X4"));
-                    data.Append("\r\n");
-                    lengthData += 4;
+                    data.Append(",$").AppendLine((obj.Y + Controller.Config.Offset.y).Double2Hex("X4"));
+                    lengthData += 5;
                 }
             }
 

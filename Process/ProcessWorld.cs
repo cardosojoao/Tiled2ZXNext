@@ -34,10 +34,18 @@ namespace Tiled2ZXNext
             {
                 Console.WriteLine("Map " + map.FileName);
                 all.Append("\t\t;").AppendLine(map.FileName);
-                all.Append("\t\tdb $").Append(map.NeighBours.Left.ToString("X2")).AppendLine("\t; Left");
-                all.Append("\t\tdb $").Append(map.NeighBours.Right.ToString("X2")).AppendLine("\t; Right");
-                all.Append("\t\tdb $").Append(map.NeighBours.Top.ToString("X2")).AppendLine("\t; Top");
-                all.Append("\t\tdb $").Append(map.NeighBours.Bottom.ToString("X2")).AppendLine("\t; Bottom\n");
+                all.Append("\t\tdb $").Append(map.NeighBours.Left.Id.ToString("X2")).AppendLine("\t; (Left) id");
+                all.Append("\t\tdw $").Append(map.NeighBours.Left.Xoffset.Int2Hex("X4")).Append(", $").Append(map.NeighBours.Left.Yoffset.Int2Hex("X4")).AppendLine("\t; (Left) Xoffset, Yoffset");
+                all.Append("\t\tdb $").Append(map.NeighBours.Right.Id.ToString("X2")).AppendLine("\t; (Right) id");
+                all.Append("\t\tdw $").Append(map.NeighBours.Right.Xoffset.Int2Hex("X4")).Append(", $").Append(map.NeighBours.Right.Yoffset.Int2Hex("X4")).AppendLine("\t; (Right) Xoffset, Yoffset");
+                all.Append("\t\tdb $").Append(map.NeighBours.Top.Id.ToString("X2")).AppendLine("\t; (Top) id");
+                all.Append("\t\tdw $").Append(map.NeighBours.Top.Xoffset.Int2Hex("X4")).Append(", $").Append(map.NeighBours.Top.Yoffset.Int2Hex("X4")).AppendLine("\t; (Top) Xoffset, Yoffset");
+                all.Append("\t\tdb $").Append(map.NeighBours.Bottom.Id.ToString("X2")).AppendLine("\t; (Bottom) id");
+                all.Append("\t\tdw $").Append(map.NeighBours.Bottom.Xoffset.Int2Hex("X4")).Append(", $").Append(map.NeighBours.Bottom.Yoffset.Int2Hex("X4")).AppendLine("\t; (Bottom) Xoffset, Yoffset ");
+
+                //all.Append("\t\tdb $").Append(map.NeighBours.Right.Id.ToString("X2")).AppendLine("\t; Right");
+                //all.Append("\t\tdb $").Append(map.NeighBours.Top.Id.ToString("X2")).AppendLine("\t; Top");
+                //all.Append("\t\tdb $").Append(map.NeighBours.Bottom.Id.ToString("X2")).AppendLine("\t; Bottom\n");
             }
 
             return all;
