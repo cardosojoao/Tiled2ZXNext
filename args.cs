@@ -26,6 +26,9 @@ namespace Tiled2ZXNext
 
         [Option('m', "mappath", Required = true, HelpText = "map output path")]
         public string MapPath{ get; set; }
+        
+        [Option('c', "palette", Required = true, HelpText = "Default palette")]
+        public string PalettePath { get; set; }
 
         [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages.")]
         public bool Verbose { get; set; }

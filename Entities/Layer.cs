@@ -24,6 +24,7 @@ namespace Tiled2ZXNext.Entities
         public int X { get; set; }
 
         public int Y { get; set; }
+        public string Colour { get;set; }
 
         public List<Object> Objects { get; set; }
 

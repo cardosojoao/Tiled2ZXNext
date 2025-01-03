@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
-//using Tiled2ZXNext.Models;
-using Tiled2ZXNext.ProcessLayers;
 
 
 namespace Tiled2ZXNext.Process.EEI
@@ -63,32 +59,6 @@ namespace Tiled2ZXNext.Process.EEI
         private void SpriteDynamicComponent(Layer layer)
         {
             CheckValidator();
-            // validator at layer level
-            //StringBuilder validatorLayer = Validator.ProcessLayerValidator(layer.Properties);
-            //if (validatorLayer.Length > 0)
-            //{
-            //    int prevBlockType = blockType;
-            //    blockType += 128;
-            //    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator layer.");
-            //    headerType.Append(validatorLayer);
-            //}
-            //else
-            //{
-            //    // validator at item level
-            //    StringBuilder validatorItem = Validator.ProcessItemValidator(layer.Properties);
-            //    validatorItemActive = validatorItem.Length > 0;
-            //    if (validatorItemActive)
-            //    {
-            //        int prevBlockType = blockType;
-            //        blockType += 64;
-            //        headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator item.");
-            //        //headerType.Append(validatorItem);
-            //    }
-            //    else
-            //    {
-            //        headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine("\t\t; data block type");
-            //    }
-            //}
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");
             lengthData++;
 
@@ -107,10 +77,8 @@ namespace Tiled2ZXNext.Process.EEI
                         lengthData += 2;
                     }
                     int spriteIndex = obj.Properties.GetPropertyInt("SpriteIndex");
-                    //int spritePatternId = obj.Properties.GetPropertyInt("SpriteName");
                     string spritePatternName = obj.Properties.GetProperty("SpriteName");
                     data.Append("\t\tdw $").Append(x.Int2Hex("X4")).Append(", $").Append(y.Int2Hex("X4")).AppendLine("\t\t; x, y.");
-                    //data.Append("\t\tdb $").Append(spritePatternId.Int2Hex("X2")).Append(", $").Append(spriteIndex.Int2Hex("X2")).AppendLine("\t\t; spritePattern, spriteIndex.");
                     data.Append("\t\tdb ").Append(spritePatternName).Append(", $").Append(spriteIndex.Int2Hex("X2")).AppendLine("\t\t; spritePatternName, spriteIndex.");
                     lengthData += 6;
                 }
@@ -147,7 +115,6 @@ namespace Tiled2ZXNext.Process.EEI
         private void SpriteDynamic(Layer layer)
         {
             headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine("\t\t; data block type");
-            //header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");
             lengthData++;
             foreach (Entities.Object obj in layer.Objects)
             {

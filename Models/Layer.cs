@@ -46,5 +46,8 @@ namespace Tiled2ZXNext.Models
 
         [JsonPropertyName("properties")]
         public List<Property> Properties { get; set; }
+
+        [JsonPropertyName("tintcolor")]
+        public string TintColour { get; set; }
     }
 }

@@ -46,7 +46,7 @@ namespace Tiled2ZXNext
                     layerAreas.Properties = layer.Properties;
                     LayerConvertCells(layerAreas);
                     layerAreas.TileSet = _tileSets;
-                    // we don't include empty areas, the engine is prepared for that scenario and will crash!
+                    // we don't include empty areas, the engine isnt prepared for that scenario and will crash!
                     if (layerAreas.Areas.Count > 0)
                     {
                         LayersArea.Add(layerAreas);

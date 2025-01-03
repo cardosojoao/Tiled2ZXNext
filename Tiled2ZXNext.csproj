@@ -3,17 +3,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <Version>1.5.3.0</Version>
+    <Version>1.6.0.0</Version>
     <Authors>João Cardoso</Authors>
     <Company>Bapa Dreams</Company>
     <Description>Parser to Tiled convert tile map into asm file</Description>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="TileSet\**" />
-    <EmbeddedResource Remove="TileSet\**" />
-    <None Remove="TileSet\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
@@ -22,20 +16,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
 
   <ItemGroup>
     <None Update="appconfig.json">

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Tiled2ZXNext.Entities;
-using Tiled2ZXNext.Extensions;
-using Tiled2ZXNext.ProcessLayers;
 
 namespace Tiled2ZXNext
 {

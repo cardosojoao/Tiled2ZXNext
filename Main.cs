@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -7,6 +8,8 @@ using System.Text.Json;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
 using Tiled2ZXNext.Mapper;
+using Tiled2ZXNext.Palette;
+
 
 namespace Tiled2ZXNext
 {
@@ -20,8 +23,14 @@ namespace Tiled2ZXNext
         public string OutputMapFile { get; set; }
         private Options _options;
         public static Config Config { get; set; } = new();
+        public static GPL Palette { get; set; }
         public void Run(Options o)
         {
+
+            //DebugTest();
+
+
+
             _options = o;
             inputFile = o.Input;
             IConfiguration config = new ConfigurationBuilder()
@@ -40,8 +49,6 @@ namespace Tiled2ZXNext
                 world.Name = Path.GetFileNameWithoutExtension(worldFile);
 
                 world.GetMatrix();
-
-                // world.GetMatrix();
                 ProcessWorld proc = new ProcessWorld(world);
                 var worldProc = proc.Execute();
                 string worldName = Path.GetFileName(worldFile);
@@ -67,6 +74,9 @@ namespace Tiled2ZXNext
 
             Entities.Scene scene = SceneMapper.Map(sceneRaw, Entities.Scene.Instance, _options);      // migrated
             scene.Layers = LayerMapper.Map(sceneRaw.Layers);
+
+            Palette = LoadGplPalette.Load(o.PalettePath);
+
             // get layers data
             StringBuilder layerData = ProcessScene(scene);
             StringBuilder header = new();
@@ -94,6 +104,32 @@ namespace Tiled2ZXNext
             // write layers to final location
             OutputLayer(o, sceneWorldName, layerData);
             PostProcessing(o, sceneWorldName);
+        }
+
+
+        private void DebugTest()
+        {
+            Layer layer = new();
+            layer.Width = 10;
+            layer.Height = 10;
+            layer.Data = new List<uint>(100){ 
+                0,0,0,0,0,0,0,0,0,0,
+                0,1,1,1,0,0,0,0,0,0,
+                0,1,1,1,0,0,0,0,0,0,
+                0,1,1,1,0,0,0,0,0,0,
+                0,1,1,0,0,0,0,0,0,0,
+                0,1,1,0,0,0,0,0,0,0,
+                0,1,1,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,1,1,1,0,0,0,0,0,0,
+                0,1,1,1,0,0,0,0,0,0
+            };
+
+            LayerScanFill scan = new(layer);
+            scan.Scan();
+             
+
+
         }
     }
 

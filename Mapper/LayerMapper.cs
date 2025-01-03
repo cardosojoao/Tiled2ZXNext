@@ -36,7 +36,8 @@ namespace Tiled2ZXNext.Mapper
                 Y = layerRaw.Y,
                 Id = layerRaw.Id,
                 Visible = layerRaw.Visible,
-                Data = layerRaw.Data
+                Data = layerRaw.Data,
+                Colour = layerRaw.TintColour
             };
 
             if (layerRaw.Objects != null)
