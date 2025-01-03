@@ -24,7 +24,7 @@ namespace Tiled2ZXNext
             _size = 0;
             StringBuilder backgroundCode = new();
             Console.WriteLine("Background Colour");
-            Layer layer = Utils.Find(_scene.Layers, "BackgroundColor");
+            Layer layer = Utils.Find(_scene.Layers, "BackgroundColour");
 
             RGBA backColour;
             if (layer == null)

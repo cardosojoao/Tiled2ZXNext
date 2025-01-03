@@ -10,7 +10,7 @@ namespace Tiled2ZXNext
 {
     public class ProcessFillArea : IProcess
     {
-        public Dictionary<Layer, List<Rectangle>> LayerAreas { get; private set; }
+        public Dictionary<Layer, Dictionary<int, List<Rectangle>>> LayerAreas { get; private set; }
         private readonly Layer _rootLayer;
         private readonly Scene _scene;
         private readonly List<Property> _properties;
@@ -35,7 +35,7 @@ namespace Tiled2ZXNext
             Console.WriteLine("Group " + _rootLayer.Name);
             foreach (Layer layer in _rootLayer.Layers)
             {
-                if (layer.Visible && !IsLayerEmpty(layer.Data) ) ;
+                if (layer.Visible && !IsLayerEmpty(layer.Data)) ;
                 {
                     layer.Properties.Merge(_properties);        // add parent extended properties
 
@@ -43,14 +43,14 @@ namespace Tiled2ZXNext
                     if (_blockType == 15)
                     {
                         Console.WriteLine("Layer " + layer.Name);
-                        List<Rectangle> areas = new LayerScanFill(layer).Scan();
+                        Dictionary<int, List<Rectangle>> areas = new LayerScanFill(layer).Scan();
                         LayerAreas.Add(layer, areas);
                     }
                 }
             }
 
             StringBuilder backgroundFill = new();
-            foreach (KeyValuePair<Layer, List<Rectangle>> data in LayerAreas)
+            foreach (KeyValuePair<Layer, Dictionary<int, List<Rectangle>>> data in LayerAreas)
             {
                 Layer layer = data.Key;
                 RGBA backColour = new RGBA(layer.Colour);
@@ -84,33 +84,37 @@ namespace Tiled2ZXNext
 
                 int colourIndex = Controller.Palette.Colours.FindIndex(c => c.R == backColour.R && c.G == backColour.G && c.B == backColour.B && c.A == backColour.A);
                 _size++;
-                backgroundFill.Append("\t\tdb $").Append(_blockType.ToString("X2")).Append("\t\t; data block type\r\n");
+                StringBuilder body = WriteAreas(data.Value);
+
+                //backgroundFill.Append("\t\tdb $").Append(_blockType.ToString("X2")).Append("\t\t; data block type\r\n");
                 backgroundFill.Append("\t\tdw $").Append(_size.ToString("X4")).Append("\t\t; Block size\r\n");
+                
                 backgroundFill.Append("\t\tdb $").Append(colourIndex.ToString("X2")).Append("\t\t;\t").Append("RGBA ").Append(backColour.R).Append(',').Append(backColour.G).Append(',').Append(backColour.B).Append(',').Append(backColour.A).AppendLine();
-
-
-
-                StringBuilder body = WriteAreas(data);
-                backgroundFill.Append("\t\tdw $").Append(_size.ToString("X4")).Append($"\t\t; Size of block\r\n");
                 backgroundFill.Append(body);
             }
             return backgroundFill;
         }
 
 
-        private StringBuilder WriteAreas(KeyValuePair<Layer, List<Rectangle>> layer)
+        private StringBuilder WriteAreas(Dictionary<int, List<Rectangle>> layer)
         {
             StringBuilder data = new(1024);
-            //data.Append(WriteLayer2TileSets(layer.TileSet));
-            data.Append("\t\tdb $").Append(layer.Value.Count.ToString("X2")).Append("\t\t; areas count\r\n");
+            data.Append("\t\tdb $").Append(layer.Count.ToString("X2")).Append("\t\t; blocks count\r\n");
             _size++;
-
-            int areaIndex = 0;
-            foreach (Rectangle area in layer.Value)
+            foreach (KeyValuePair<int, List<Rectangle>> kvp in layer)
             {
-                data.Append($"\t\t; area {areaIndex}\r\n");
-                data.Append(AreaCode(area));
-                areaIndex++;
+                data.Append("\t\tdb $").Append((kvp.Key*2).ToString("X2")).AppendLine("\t\t; block id");
+                data.Append("\t\tdb $").Append(kvp.Value.Count.ToString("X2")).AppendLine("\t\t; areas count");
+                _size+=2;
+                foreach (Rectangle rectangle in kvp.Value)
+                {
+                    int x= rectangle.X - (kvp.Key * 8);
+
+                    byte pos = (byte)((x<<5) + rectangle.Y);
+                    byte dim = (byte)(((rectangle.Width-1) << 5) + rectangle.Height-1);
+                    data.Append("\t\tdb $").Append(pos.ToString("X2")).Append(" ,$").Append(dim.ToString("X2")).Append("\t\t; area pos, dimemsion X=").Append(rectangle.X).Append(" Y=").Append(rectangle.Y).Append(" Width=").Append(rectangle.Width).Append(" Height=").Append(rectangle.Height).AppendLine();
+                    _size += 2;
+                }
             }
             return data;
         }
