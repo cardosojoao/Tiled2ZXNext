@@ -44,11 +44,14 @@ namespace Tiled2ZXNext
 
         private Area GetArea(int y, int x)
         {
+            int maxRow = int.Min(4, _layer.Height - y);
+            int maxCol = int.Min(4, _layer.Width - x);
+            
             List<Cell> cells = new();
-            for (int row = 0; row < 4; row++)
+            for (int row = 0; row < maxRow; row++)
             {
                 int index = (y + row) * _layer.Width + x;
-                for (int col = 0; col < 4; col++)
+                for (int col = 0; maxCol < 4; col++)
                 {
                     uint tileId = (uint)_layer.Data[index + col];
                     if (tileId > 0)

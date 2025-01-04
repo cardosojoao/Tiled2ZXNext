@@ -31,7 +31,7 @@ namespace Tiled2ZXNext
             LayersArea.Clear();
             foreach (Layer layer in _rootLayer.Layers)
             {
-                if (layer.Visible && !IsLayerEmpty(layer.Data));
+                if (layer.Visible && !IsLayerEmpty(layer.Data))
                 {
                     layer.Properties.Merge(_properties);        // add parent extended properties
 

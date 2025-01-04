@@ -12,7 +12,7 @@ namespace Tiled2ZXNext
 
         public static Layer Find(List<Layer> layers, string name)
         {
-            Layer found = layers.Find(l => l.Name.Equals("BackgroundColor", StringComparison.InvariantCultureIgnoreCase));
+            Layer found = layers.Find(l => l.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             if (found == null)
             {
                 foreach(Layer  layer in layers)
