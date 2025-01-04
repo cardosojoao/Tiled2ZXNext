@@ -51,7 +51,7 @@ namespace Tiled2ZXNext
             for (int row = 0; row < maxRow; row++)
             {
                 int index = (y + row) * _layer.Width + x;
-                for (int col = 0; maxCol < 4; col++)
+                for (int col = 0; col < maxCol; col++)
                 {
                     uint tileId = (uint)_layer.Data[index + col];
                     if (tileId > 0)
