@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
@@ -27,7 +28,10 @@ namespace Tiled2ZXNext
             StringBuilder sceneCode = new(2048);
 
             string fileName = scene.Properties.GetProperty("FileName");
-            sceneCode.Append(fileName).AppendLine(":");
+
+
+
+            TechHeader.Reset();
 
             List<IProcess> blocks = CreateProcesses(scene.Layers, scene, null);
 
@@ -36,6 +40,8 @@ namespace Tiled2ZXNext
                 processesCode.Append(process.Execute());
             }
 
+            sceneCode.Append(TechHeader.Get());
+            sceneCode.Append(fileName).AppendLine(":");
             sceneCode.Append(processesCode);
 
             // add terminator to scene

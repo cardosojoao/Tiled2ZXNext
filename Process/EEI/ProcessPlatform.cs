@@ -63,21 +63,6 @@ namespace Tiled2ZXNext.Process.EEI
             layer.Properties.Merge(_properties);
             CheckValidator();
 
-            //StringBuilder validator = Validator.ProcessLayerValidator(layer.Properties);
-
-            //int blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
-
-            //if (validator.Length > 0)
-            //{
-            //    int prevBlockType = blockType;
-            //    blockType += 128;
-            //    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with validator.");
-            //    headerType.Append(validator);
-            //}
-            //else
-            //{
-            //    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
-            //}
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).Append("\t\t; Objects count\r\n");
             lengthData++;
 
@@ -85,6 +70,7 @@ namespace Tiled2ZXNext.Process.EEI
             {
                 if (obj.Visible)
                 {
+
                     int pathObjectId = obj.Properties.GetPropertyInt("Path");
                     int pathId = GetPathId(pathObjectId);
                     int TemplateType = obj.Properties.GetPropertyInt("TemplateId");

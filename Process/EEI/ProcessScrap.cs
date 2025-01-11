@@ -56,39 +56,14 @@ namespace Tiled2ZXNext.Process.EEI
             int layerMask = layer.Properties.GetPropertyInt("LayerMask");
             int layerId = layer.Properties.GetPropertyInt("Layer");
             string eventName = layer.Properties.GetProperty("EventName");
-
             int eventIndex = Project.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
-
-            
-            // validator at layer level
-            //StringBuilder validatorLayer = Validator.ProcessLayerValidator(layer.Properties);
-            //if (validatorLayer.Length > 0)
-            //{
-            //    int prevBlockType = blockType;
-            //    blockType += 128;
-            //    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator layer.");
-            //    headerType.Append(validatorLayer);
-            //}
-            //else
-            //{
-            //    // validator at item level
-            //    StringBuilder validatorItem = Validator.ProcessItemValidator(layer.Properties);
-            //    validatorItemActive = validatorItem.Length > 0;
-            //    if (validatorItemActive)
-            //    {
-            //        int prevBlockType = blockType;
-            //        blockType += 64;
-            //        headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator item.");
-            //        //headerType.Append(validatorItem);
-            //    }
-            //    else
-            //    {
-            //        headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine("\t\t; data block type");
-            //    }
-            //}
 
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");
             lengthData++;
+
+            TechHeader.Add("object", layer.Objects.Count);
+            TechHeader.Add("sprite", layer.Objects.Count);
+            TechHeader.Add("body", layer.Objects.Count);
 
             // merge layer mask with layerID in a single byte
             layerMask *= 16;

@@ -102,6 +102,7 @@ namespace Tiled2ZXNext.Process.EEI
                         Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("parameter", StringComparison.InvariantCultureIgnoreCase));
                         if (obj != null && obj.Visible)
                         {
+                            
                             gameObject.Components |= ((int)ComponentFlags.Parameter);
                             componentsData.AppendLine("\t\t;\tParameter Component");
                             if (obj.Properties.ExistProperty("parametertype") && obj.Properties.ExistProperty("parametervalue"))
@@ -119,6 +120,7 @@ namespace Tiled2ZXNext.Process.EEI
                         Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("sprite", StringComparison.InvariantCultureIgnoreCase));
                         if (obj != null && obj.Visible)
                         {
+                            TechHeader.Add("sprite", 1);
                             gameObject.Components |= ((int)ComponentFlags.Sprite);
                             componentsData.AppendLine("\t\t;\tSprite Component");
                             componentsData.Append("\t\tdb ").Append(obj.Properties.GetProperty("SpriteName").ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
@@ -135,6 +137,7 @@ namespace Tiled2ZXNext.Process.EEI
                         Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("spriteflag", StringComparison.InvariantCultureIgnoreCase));
                         if (obj != null && obj.Visible)
                         {
+                            TechHeader.Add("sprite", 1);
                             gameObject.Components |= ((int)ComponentFlags.SpriteFlag);
                             componentsData.AppendLine("\t\t;\tSprite Flag Component");
                             componentsData.Append("\t\tdb ").Append(obj.Properties.GetProperty("SpriteName").ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
@@ -151,6 +154,7 @@ namespace Tiled2ZXNext.Process.EEI
                         Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("body", StringComparison.InvariantCultureIgnoreCase));
                         if (obj != null && obj.Visible)
                         {
+                            TechHeader.Add("body", 1);
                             gameObject.Components |= ((int)ComponentFlags.Body);
                             int layerMask = obj.Properties.GetPropertyInt("LayerMask");
                             int layerId = obj.Properties.GetPropertyInt("Layer");
@@ -185,9 +189,9 @@ namespace Tiled2ZXNext.Process.EEI
                         }
                     }
                     // GameObject 
+                    TechHeader.Add("object", 1);
                     StringBuilder gameObjectHeader = new StringBuilder();
                     gameObjectHeader.Append("\t\t; GameObject: ").AppendLine(layerComponents.Name);
-                    //gameObjectHeader.Append("\t\tdb $").Append(layerComponents.Properties.GetPropertyInt("Components").Int2Hex("X2")).AppendLine("\t\t; GameObject Components Flags");
                     gameObjectHeader.Append("\t\tdb $").Append(gameObject.Components.Int2Hex("X2")).AppendLine("\t\t; GameObject Components Flags");
                     int GameObjectX = gameObject.X + ((int)Controller.Config.Offset.x);
                     int GameObjectY = gameObject.Y + ((int)Controller.Config.Offset.y);
@@ -210,9 +214,6 @@ namespace Tiled2ZXNext.Process.EEI
             {
                 if (obj.Visible)
                 {
-                    //int x = (int)obj.X + (int)(obj.Width / 2) + (int)Controller.Config.Offset.x;    // middle of first sprite, left start with 0 
-                    //int y = (int)obj.Y - (int)(obj.Height / 2) + (int)Controller.Config.Offset.y;    // middle of first sprite, top starts with 16
-
                     int x = (int)obj.X + (int)Controller.Config.Offset.x;    // middle of first sprite, left start with 0 
                     int y = (int)obj.Y + (int)Controller.Config.Offset.y;
 

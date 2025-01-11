@@ -43,7 +43,7 @@ namespace Tiled2ZXNext
 
             int colourIndex = Controller.Palette.Colours.FindIndex(c => c.R == backColour.R && c.G == backColour.G && c.B == backColour.B && c.A == backColour.A);
             _size++;
-            backgroundCode.Append("\t\tdb $").Append(_blockType.ToString("X2")).Append("\t\t; data block type\r\n");
+            backgroundCode.Append("\t\tdb $").Append(_blockType.ToString("X2")).Append("\t\t; data block type Background Colour\r\n");
             backgroundCode.Append("\t\tdw $").Append(_size.ToString("X4")).Append("\t\t; Block size\r\n");
             backgroundCode.Append("\t\tdb $").Append(colourIndex.ToString("X2")).Append("\t\t;\t").Append("RGBA ").Append(backColour.R).Append(',').Append(backColour.G).Append(',').Append(backColour.B).Append(',').Append(backColour.A).AppendLine();
             return backgroundCode;

@@ -65,6 +65,13 @@ namespace Tiled2ZXNext
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).Append("\t\t; Objects count\r\n");
             lengthData++;
 
+
+            TechHeader.Add("object", layer.Objects.Count);
+            TechHeader.Add("sprite", layer.Objects.Count);
+            TechHeader.Add("body", layer.Objects.Count);
+            TechHeader.Add("path", layer.Objects.Count);
+            TechHeader.Add("physic", layer.Objects.Count);
+
             foreach (Entities.Object obj in layer.Objects)
             {
                 if (obj.Visible)

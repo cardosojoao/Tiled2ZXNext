@@ -77,8 +77,7 @@ namespace Tiled2ZXNext
                 }
                 else
                 {
-                    backgroundFill.Append("\t\tdb $").Append(_blockType.ToString("X2"));
-                    backgroundFill.AppendLine($"\t\t; data type - {layer.Name}");
+                    backgroundFill.Append("\t\tdb $").Append(_blockType.ToString("X2")).AppendLine($"\t\t; data type - Fill Area");
                 }
                 _size = 0;
 

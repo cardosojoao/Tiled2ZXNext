@@ -52,7 +52,7 @@ namespace Tiled2ZXNext.Models
 
     public class PolygonPoint
     {
-        public int x { get; set; }
-        public int y { get; set; }
+        public float x { get; set; }
+        public float y { get; set; }
     }
 }

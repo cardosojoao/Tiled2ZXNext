@@ -74,7 +74,8 @@ namespace Tiled2ZXNext
                 headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).Append("\t\t; data block type\r\n");
             }
 
-
+            TechHeader.Add("object", 1);
+            TechHeader.Add("path", 1);
 
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible && c.Type.Equals("path", StringComparison.InvariantCultureIgnoreCase)).ToString("X")).Append("\t\t; Objects count\r\n");
             lengthData += 1;
@@ -103,8 +104,8 @@ namespace Tiled2ZXNext
 
                     for (; i < polygon.Count; i++)
                     {
-                        int x = polygon[i ].X + (int)obj.X; // next point x
-                        int y = polygon[i ].Y + (int)obj.Y; // next point y
+                        int x = ((int)polygon[i ].X) + (int)obj.X; // next point x
+                        int y = ((int)polygon[i ].Y) + (int)obj.Y; // next point y
                         int speedStep = speedIntervals[i];   // time to run the distance bettween 2 points x
                         steps.Add((speedStep, x, y));
                     }

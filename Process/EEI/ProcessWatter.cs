@@ -72,6 +72,9 @@ namespace Tiled2ZXNext.Process.EEI
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).Append("\t\t; Objects count\r\n");
             lengthData++;
 
+            TechHeader.Add("object", layer.Objects.Count);
+            TechHeader.Add("sprite", layer.Objects.Count);
+            TechHeader.Add("animation", layer.Objects.Count);
 
             foreach (Entities.Object obj in layer.Objects)
             {

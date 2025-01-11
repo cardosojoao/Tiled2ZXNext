@@ -2,7 +2,7 @@
   "profiles": {
     "Tiled2ZXNext": {
       "commandName": "Project",
-      "commandLineArgs": " -i\"D:/devl/zx/proj/ZXGame/3.resources/Tiled/island_008.json\"   \r\n -aD:\\devl\\zx\\proj\\ZXGame\\2.source\\\r\n -mD:\\devl\\zx\\proj\\ZXGame\\2.source\\ -rD:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\worlds -wD:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\test1.world -p\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\mapa01.tiled-project\" -c\"D:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\Palette\\layer2_01.gpl\" "
+      "commandLineArgs": " -i\"D:/devl/zx/proj/ZXGame/3.resources/Tiled/island_014.json\"   \r\n -aD:\\devl\\zx\\proj\\ZXGame\\2.source\\\r\n -mD:\\devl\\zx\\proj\\ZXGame\\2.source\\ -rD:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\worlds -wD:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\test1.world -p\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\mapa01.tiled-project\" -c\"D:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\Palette\\layer2_01.gpl\" "
     }
   }
 }

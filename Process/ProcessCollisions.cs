@@ -79,6 +79,9 @@ namespace Tiled2ZXNext
                 throw new Exception("Incorrect height or Width must be even.");
             }
 
+            TechHeader.Add("object", layer.Objects.Count);
+            TechHeader.Add("body", layer.Objects.Count);
+
             layer.Properties.Merge(_properties);
 
             int layerMask = layer.Properties.GetPropertyInt("LayerMask");
