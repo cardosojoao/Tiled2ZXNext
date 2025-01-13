@@ -97,8 +97,7 @@ namespace Tiled2ZXNext
                         break;
                     }
                     int i = 0;
-                    data.Append("\t\tdb $").Append(id.Int2Hex("X2"));
-                    data.Append("\t\t; ID\r\n");
+                    data.Append("\t\tdb $").Append(id.Int2Hex("X2")).AppendLine("\t\t; ID");
                     lengthData++;                   // only counts to data type length not block
                     List<(int speed, int X, int Y)> steps = new();
 
@@ -119,9 +118,10 @@ namespace Tiled2ZXNext
 
                     foreach (var step in steps)
                     {
-                        blockData.Append("\t\tdb $").Append(step.X.Int2Hex("X2")).Append(", $").Append(step.Y.Int2Hex("X2")).Append(", $").Append(step.speed.Int2Hex("X2"));
+                        blockData.Append("\t\tdw $").Append(step.X.Int2Hex("X4")).Append(", $").AppendLine(step.Y.Int2Hex("X4"));
+                        blockData.Append("\t\tdb $").AppendLine(step.speed.Int2Hex("X2"));
                         blockData.Append("\t\t; StepX, StepY, frames\r\n");
-                        blockLength += 3;
+                        blockLength += 5;
                     }
                     data.Append("\t\tdb $").Append(blockLength.Int2Hex("X2"));
                     data.Append("\t\t; Block size\r\n");
