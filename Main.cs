@@ -39,6 +39,9 @@ namespace Tiled2ZXNext
             Config.Offset = config.GetRequiredSection("offset").Get<Offset>();
             Config.Zip = config.GetRequiredSection("zip").Get<Command>();
             Config.Assembler = config.GetRequiredSection("assembler").Get<Command>();
+            Config.SpriteSoftwareSuffix = config.GetValue<string>("SpriteSoftwareSuffix");
+            
+
 
             string[] worlds = Directory.GetFiles(Path.GetDirectoryName(o.World), "*.world");
             foreach (string worldFile in worlds)
@@ -136,6 +139,7 @@ namespace Tiled2ZXNext
 
     public class Config
     {
+        public string? SpriteSoftwareSuffix { get; set; }
         public Offset Offset { get; set; }
         public Command? Zip { get; set; }
         public Command? Assembler { get; set; }

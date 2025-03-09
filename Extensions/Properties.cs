@@ -92,6 +92,13 @@ namespace Tiled2ZXNext.Extensions
             return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.Value);
         }
 
+        public static int GetPropertyInt(this List<Entities.Property> properties, string name, int value)
+        {
+            if (properties == null) throw new ArgumentNullException(nameof(properties));
+            Entities.Property? prop = properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return prop == null ? value : int.Parse(prop.Value);
+        }
+
         public static int GetPropertyInt(this List<Models.Property> properties, string name)
         {
             if (properties == null) throw new ArgumentNullException(nameof(properties));

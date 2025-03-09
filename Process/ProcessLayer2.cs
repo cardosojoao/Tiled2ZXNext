@@ -9,85 +9,74 @@ namespace Tiled2ZXNext
 {
     public class ProcessLayer2 : IProcess
     {
-        public List<LayerAreas> LayersArea { get; private set; }
-        private readonly Layer _rootLayer;
+        //public List<LayerAreas> LayersArea { get; private set; }
+        private readonly Layer _layer;
         private readonly Scene _scene;
         private readonly List<Property> _properties;
         private List<Tileset> _tileSets;
         private int _blockType;
         private int _size;
         private int _tileSize;
-        public ProcessLayer2(Layer layer, Scene scene,  List<Property> properties )
+        public ProcessLayer2(Layer layer, Scene scene, List<Property> properties)
         {
-            _rootLayer = layer;
-            LayersArea = new List<LayerAreas>();
+            _layer = layer;
             _scene = scene;
             _properties = properties;
         }
 
         public StringBuilder Execute()
         {
-            Console.WriteLine("Group " + _rootLayer.Name);
-            LayersArea.Clear();
-            foreach (Layer layer in _rootLayer.Layers)
-            {
-                if (layer.Visible && !IsLayerEmpty(layer.Data))
-                {
-                    layer.Properties.Merge(_properties);        // add parent extended properties
-
-                    _tileSets = new();
-                    Console.WriteLine("Layer " + layer.Name);
-                    _blockType = layer.Properties.GetPropertyInt("Type");
-                    _tileSize = layer.Properties.GetPropertyInt("Size");
-                    LayerScan layerScan = new LayerScan(layer, _tileSize);
-                    LayerAreas layerAreas = layerScan.ScanLayer();
-                    layerAreas.Name = layer.Name;
-                    layerAreas.Id = layer.Id;
-                    layerAreas.Properties = layer.Properties;
-                    LayerConvertCells(layerAreas);
-                    layerAreas.TileSet = _tileSets;
-                    // we don't include empty areas, the engine isnt prepared for that scenario and will crash!
-                    if (layerAreas.Areas.Count > 0)
-                    {
-                        LayersArea.Add(layerAreas);
-                    }
-
-
-                }
-            }
-
+            //Console.WriteLine("Group " + _rootLayer.Name);
+            //LayersArea.Clear();
             StringBuilder layer2Code = new();
-            foreach (LayerAreas layer in LayersArea)
+            //foreach (Layer layer in _rootLayer.Layers)
+            if (IsLayerEmpty(_layer.Data))
             {
-                layer2Code.Append('.');
-                layer2Code.Append(_scene.FileName);
-                layer2Code.Append('_');
-                layer2Code.Append(layer.Name.Replace(" ","_"));
-                layer2Code.Append('_');
-                layer2Code.Append(layer.Id);
-                layer2Code.AppendLine(":");
-
-                StringBuilder validator = Validator.ProcessLayerValidator(layer.Properties);
-                if(validator.Length>0)
+                _layer.Properties.Merge(_properties);        // add parent extended properties
+                _tileSets = new();
+                Console.WriteLine("Layer " + _layer.Name);
+                _blockType = _layer.Properties.GetPropertyInt("Type");
+                _tileSize = _layer.Properties.GetPropertyInt("Size");
+                LayerScan layerScan = new LayerScan(_layer, _tileSize);
+                LayerAreas layerAreas = layerScan.ScanLayer();
+                layerAreas.Name = _layer.Name;
+                layerAreas.Id = _layer.Id;
+                layerAreas.Properties = _layer.Properties;
+                LayerConvertCells(layerAreas);
+                layerAreas.TileSet = _tileSets;
+                // we don't include empty areas, the engine isnt prepared for that scenario and will crash!
+                if (layerAreas.Areas.Count > 0)
                 {
-                    int prevBlockType = _blockType;
-                    _blockType += 128;  // block with layer validator
+                    layer2Code.Append('.');
+                    layer2Code.Append(_scene.FileName);
+                    layer2Code.Append('_');
+                    layer2Code.Append(_layer.Name.Replace(" ", "_"));
+                    layer2Code.Append('_');
+                    layer2Code.Append(_layer.Id);
+                    layer2Code.AppendLine(":");
 
-                    layer2Code.Append("\t\tdb $").Append(_blockType.ToString("X2"));
-                    layer2Code.Append($"\t\t; data type {prevBlockType} with validator, Layer2({_tileSize}x{_tileSize}) - {layer.Name}\r\n");
-                    layer2Code.Append(validator);
+                    StringBuilder validator = Validator.ProcessLayerValidator(layerAreas.Properties);
+                    if (validator.Length > 0)
+                    {
+                        int prevBlockType = _blockType;
+                        _blockType += 128;  // block with layer validator
 
+                        layer2Code.Append("\t\tdb $").Append(_blockType.ToString("X2"));
+                        layer2Code.Append($"\t\t; data type {prevBlockType} with validator, Layer2({_tileSize}x{_tileSize}) - {layerAreas.Name}\r\n");
+                        layer2Code.Append(validator);
+
+                    }
+                    else
+                    {
+                        layer2Code.Append("\t\tdb $").Append(_blockType.ToString("X2"));
+                        layer2Code.Append($"\t\t; data type Layer2({_tileSize}x{_tileSize}) - {layerAreas.Name}\r\n");
+                    }
+                    _size = 0;
+
+                    StringBuilder body = WriteLayer2Area(layerAreas);
+                    layer2Code.Append("\t\tdw $").Append(_size.ToString("X4")).Append($"\t\t; Size of block\r\n");
+                    layer2Code.Append(body);
                 }
-                else
-                {
-                    layer2Code.Append("\t\tdb $").Append(_blockType.ToString("X2"));
-                    layer2Code.Append($"\t\t; data type Layer2({_tileSize}x{_tileSize}) - {layer.Name}\r\n");
-                }
-                _size = 0;
-                
-                StringBuilder body = WriteLayer2Area(layer);
-                layer2Code.Append("\t\tdw $").Append(_size.ToString("X4")).Append($"\t\t; Size of block\r\n");
-                layer2Code.Append(body);
             }
             return layer2Code;
         }
@@ -288,11 +277,11 @@ namespace Tiled2ZXNext
         }
 
 
-        private bool IsLayerEmpty(List<uint>  data)
+        private bool IsLayerEmpty(List<uint> data)
         {
             long result = 0;
 
-            for(int i = 0; i < data.Count; i++)
+            for (int i = 0; i < data.Count; i++)
             {
                 result += data[i];
             }
