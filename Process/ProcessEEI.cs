@@ -5,7 +5,6 @@ using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
 using Tiled2ZXNext.Process.EEI;
 
-
 namespace Tiled2ZXNext
 {
     /// <summary>
@@ -50,19 +49,15 @@ namespace Tiled2ZXNext
                                 all.Append(new ProcessScrap(layer, _scene, _properties).Execute());
                                 break;
                             }
-                        case 8:
+                        //case 8:
+                        //case 9:
+                        //    {
+                        //        all.Append(new ProcessSprite(layer, _scene, _properties).Execute());
+                        //        break;
+                        //    }
+                        case 17:        //  12
                             {
-                                all.Append(new ProcessSprite(layer, _scene, _properties).Execute());
-                                break;
-                            }
-                        case 9:
-                            {
-                                all.Append(new ProcessSprite(layer, _scene, _properties).Execute());
-                                break;
-                            }
-                        case 12:
-                            {
-                                all.Append(new ProcessSpriteComponents(layer, _scene, _properties).Execute());
+                                all.Append(new ProcessObjectComponents(layer, _scene, _properties).Execute());
                                 break;
                             }
                     }

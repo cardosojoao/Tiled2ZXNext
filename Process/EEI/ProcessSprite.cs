@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
+using Tiled2ZXNext.Process.Components;
 
 
 namespace Tiled2ZXNext.Process.EEI
@@ -44,6 +45,12 @@ namespace Tiled2ZXNext.Process.EEI
                         SpriteDynamicComponent(layer);
                         break;
                     }
+                case 16:
+                    {
+                        // sprite static
+                        SpriteDynamicComponent(layer);
+                        break;
+                    }
                 default:
                     break;
             }
@@ -62,28 +69,38 @@ namespace Tiled2ZXNext.Process.EEI
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");
             lengthData++;
 
+            StringBuilder spriteBlock = new(1024);
             foreach (Entities.Object obj in layer.Objects)
             {
                 if (obj.Visible)
                 {
+                    spriteBlock.Clear();
+                    int blockLength = 0;
+
                     int x = (int)obj.X + (int)(obj.Width / 2) + (int)Controller.Config.Offset.x;    // middle of first sprite, left start with 0 
                     int y = (int)obj.Y - (int)(obj.Height / 2) + (int)Controller.Config.Offset.y;    // middle of first sprite, top starts with 16
                     if (validatorItemActive)
                     {
                         int flagId = obj.Properties.GetPropertyInt("FlagId");
                         int enableValue = obj.Properties.GetPropertyInt("EnableValue");
-                        data.Append("\t\tdb $").Append(flagId.Int2Hex("X2")).AppendLine("\t\t; Flag Id.");
-                        data.Append("\t\tdb $").Append(enableValue.Int2Hex("X2")).AppendLine("\t\t; enable value.");
-                        lengthData += 2;
+                        spriteBlock.Append("\t\tdb $").Append(flagId.Int2Hex("X2")).AppendLine("\t\t; Flag Id.");
+                        spriteBlock.Append("\t\tdb $").Append(enableValue.Int2Hex("X2")).AppendLine("\t\t; enable value.");
+                        blockLength += 2;
                     }
-                    int spriteIndex = obj.Properties.GetPropertyInt("SpriteIndex");
                     string spritePatternName = obj.Properties.GetProperty("SpriteName");
-                    data.Append("\t\tdw $").Append(x.Int2Hex("X4")).Append(", $").Append(y.Int2Hex("X4")).AppendLine("\t\t; x, y.");
-                    data.Append("\t\tdb ").Append(spritePatternName).Append(", $").Append(spriteIndex.Int2Hex("X2")).AppendLine("\t\t; spritePatternName, spriteIndex.");
-                    lengthData += 6;
+                    spriteBlock.Append("\t\tdw $").Append(x.Int2Hex("X4")).Append(", $").Append(y.Int2Hex("X4")).AppendLine("\t\t; x, y.");
+                    spriteBlock.Append("\t\tdb ").Append(spritePatternName).Append(Controller.Config.SpriteSoftwareSuffix).AppendLine("\t\t; spritePatternName.");
+                    blockLength += 5;
+                    spriteBlock.Append(SpriteModules.WriteObjectsLayer(obj, ref blockLength));
+                    lengthData += blockLength;
+
+                    StringBuilder blockSize = new StringBuilder(256);
+                    blockSize.Append("\t\tdb $").Append(blockLength.Int2Hex("X2")).AppendLine("\t\t; sprite block size");
+                    lengthData++;
+                    spriteBlock.Insert(0, blockSize);
+                    data.Append(spriteBlock);
                 }
             }
-
         }
 
         private void Machine(Layer layer)
@@ -95,9 +112,6 @@ namespace Tiled2ZXNext.Process.EEI
             {
                 if (obj.Visible)
                 {
-                    //int x = (int)obj.X + (int)(obj.Width / 2) + (int)Controller.Config.Offset.x;    // middle of first sprite, left start with 0 
-                    //int y = (int)obj.Y - (int)(obj.Height / 2) + (int)Controller.Config.Offset.y;    // middle of first sprite, top starts with 16
-
                     int x = (int)obj.X + (int)Controller.Config.Offset.x;    // middle of first sprite, left start with 0 
                     int y = (int)obj.Y + (int)Controller.Config.Offset.y;
 

@@ -16,37 +16,24 @@ namespace Tiled2ZXNext.Extensions
         /// <returns>hexadecimal value</returns>
         public static string Double2Hex(this double value, string format = "X2")
         {
-
             short shortNumber = (short)value;
             string result = shortNumber.ToString(format);
-
-            //if (value >= 0)
-            //{
-            //    result = ((int)Math.Round(value, 0)).ToString(format);
-            //}
-            //else
-            //{
-            //    result = ((int)Math.Round(value, 0)).ToString(format).Substring(6, 2);
-            //}
             return result;
         }
 
         public static string Int2Hex(this Int32 value, string format = "X2")
         {
-
             // Ensure the number fits within 2 bytes (16 bits)
             short shortNumber = (short)value;
             string result =  shortNumber.ToString(format);
+            return result;
+        }
 
 
-            //if (value >= 0)
-            //{
-            //    result = value.ToString(format);
-            //}
-            //else
-            //{
-            //    result = value.ToString(format).Substring(6, 2);
-            //}
+        public static string Byte2Hex(this Int32 value, string format = "X2")
+        {
+            short shortNumber = (short)value;
+            string result = shortNumber.ToString(format)[^2..];
             return result;
         }
     }

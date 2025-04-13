@@ -7,7 +7,7 @@ using System.Text;
 using Tiled2ZXNext.Entities;
 using Tiled2ZXNext.Extensions;
 using Tiled2ZXNext.Models;
-
+using Tiled2ZXNext.Process.EEI;
 namespace Tiled2ZXNext
 {
     public partial class Controller
@@ -20,7 +20,7 @@ namespace Tiled2ZXNext
         public static string G_EEI = "eei";
         public static string G_BACKGROUND = "background";
 
-        public static List<string> GROUPS = new List<string> { G_LAYER2, G_COLLISION, G_EEI, G_LOCATION, G_LOCATIONS, G_PATH , G_BACKGROUND};
+        public static List<string> GROUPS = new List<string> { G_LAYER2, G_COLLISION, G_EEI, G_LOCATION, G_LOCATIONS, G_PATH, G_BACKGROUND };
 
         public StringBuilder ProcessScene(Entities.Scene scene)
         {
@@ -57,11 +57,8 @@ namespace Tiled2ZXNext
         private List<IProcess> CreateProcesses(List<Entities.Layer> layers, Entities.Scene scene, List<Entities.Property> properties)
         {
             List<IProcess> blocks = new();
-            blocks.Add(new ProcessBackgroundColour(null, scene, properties));
-            blocks.Add(new ProcessSceneSize(null, scene, properties));
-
-
-
+            blocks.Add(new ProcessBackgroundColour(null, scene, properties));   // add default process for set background colour
+            blocks.Add(new ProcessSceneSize(null, scene, properties));          // add default process to defined scene size    
 
             // get root folders group
             List<Entities.Layer> groups = layers.FindAll(l => l.Type == "group" && l.Visible);
@@ -79,8 +76,25 @@ namespace Tiled2ZXNext
                     }
                     else if (group.Name.Equals("layer2", System.StringComparison.InvariantCultureIgnoreCase))
                     {
-                        blocks.Add(new ProcessLayer2(group, scene, properties));
-                        // select Layer 2 group layers
+                        foreach (Entities.Layer layer in group.Layers)
+                        {
+                            if (layer.Visible)
+                            {
+                                switch (layer.Type)
+                                {
+                                    // default tiled layer
+                                    case "tilelayer":
+                                        blocks.Add(new ProcessLayer2(layer, scene, properties));
+                                        break;
+                                    // static sprite layer
+                                    case "objectgroup":
+                                        blocks.Add(new ProcessSprite(layer, scene, properties));
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
                     }
                     else if (group.Name.Equals("collision", System.StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -110,7 +124,7 @@ namespace Tiled2ZXNext
         public void OutputLayer(Options o, string worldName, StringBuilder mapData)
         {
             string FolderOutput = Path.Combine(o.RoomPath, worldName);
-            if(!Directory.Exists(FolderOutput))
+            if (!Directory.Exists(FolderOutput))
             {
                 Directory.CreateDirectory(FolderOutput);
             }
@@ -118,20 +132,19 @@ namespace Tiled2ZXNext
             File.WriteAllText(pathOutput, mapData.ToString());
         }
 
-        private List<Entities.Layer> GetGenericGroups(List<Entities.Layer> layers)
-        {
-            List<Entities.Layer> groupsGeneric = layers.FindAll(l => GROUPS.FindIndex(g => g == l.Name) > -1);
-            return groupsGeneric;
-        }
+        //private List<Entities.Layer> GetGenericGroups(List<Entities.Layer> layers)
+        //{
+        //    List<Entities.Layer> groupsGeneric = layers.FindAll(l => GROUPS.FindIndex(g => g == l.Name) > -1);
+        //    return groupsGeneric;
+        //}
 
         private static bool IsGenericGroup(string name)
         {
             return GROUPS.FindIndex(g => g.Equals(name, System.StringComparison.InvariantCultureIgnoreCase)) == -1;
         }
 
-        public static void AddSceneHeaderCode(StringBuilder code, int bytes)
-        {
-
-        }
+        //public static void AddSceneHeaderCode(StringBuilder code, int bytes)
+        //{
+        //}
     }
 }

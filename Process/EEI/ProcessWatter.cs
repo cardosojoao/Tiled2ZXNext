@@ -12,16 +12,10 @@ namespace Tiled2ZXNext.Process.EEI
     /// <summary>
     /// Process Environment Element Interaction
     /// </summary>
-    public class ProcessWatter : ProcessMaster // IProcess
+    public class ProcessWatter : ProcessMaster
     {
-        //private readonly Layer _layer;
-        //private readonly Scene _scene;
-        //private readonly List<Property> _properties;
         public ProcessWatter(Layer layer, Scene scene, List<Property> properties) : base(layer, scene, properties)
         {
-            //_layer = layer;
-            //_scene = scene;
-            //_properties = properties;
         }
 
         public StringBuilder Execute()
@@ -30,7 +24,6 @@ namespace Tiled2ZXNext.Process.EEI
             StringBuilder all = new();
             if (_layer.Visible)
             {
-                //Console.WriteLine("Layer " + _layer.Name);
                 string fileName = _scene.Properties.GetProperty("FileName");
                 all.Append('.').Append(fileName).Append('_').Append(_layer.Name).Append('_').Append(_layer.Id).AppendLine(":");
                 all.Append(WriteObjectsLayer(_layer));
@@ -45,30 +38,8 @@ namespace Tiled2ZXNext.Process.EEI
         /// <returns>string builder collection with header and data</returns>
         private StringBuilder WriteObjectsLayer(Layer layer)
         {
-            //int lengthData = 0;
-            //StringBuilder data = new(1024);
-            //StringBuilder headerType = new(200);
-            //StringBuilder header = new(200);
-            //List<StringBuilder> output = new() { header, data };
-
             layer.Properties.Merge(_properties);
             CheckValidator();
-
-            //int blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
-
-            //StringBuilder validator = Validator.ProcessLayerValidator(layer.Properties);
-            //if (validator.Length > 0)
-            //{
-            //    int prevBlockType = blockType;
-            //    blockType += 128;
-            //    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator.");
-            //    headerType.Append(validator);
-            //}
-            //else
-            //{
-            //    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine("\t\t; data block type");
-            //}
-
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).Append("\t\t; Objects count\r\n");
             lengthData++;
 
