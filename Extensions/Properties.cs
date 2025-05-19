@@ -39,6 +39,13 @@ namespace Tiled2ZXNext.Extensions
             return prop?.Value ?? "";
         }
 
+        public static string GetProperty(this List<Entities.Property> properties, string name, string value)
+        {
+            if (properties == null) throw new ArgumentNullException(nameof(properties));
+            Entities.Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return prop?.Value ?? value;
+        }
+
         /// <summary>
         /// get the sprite sheet id from tileset
         /// </summary>

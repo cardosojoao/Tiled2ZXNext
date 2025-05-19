@@ -30,7 +30,7 @@ namespace Tiled2ZXNext
             //LayersArea.Clear();
             StringBuilder layer2Code = new();
             //foreach (Layer layer in _rootLayer.Layers)
-            if (IsLayerEmpty(_layer.Data))
+            if (!IsLayerEmpty(_layer.Data))
             {
                 _layer.Properties.Merge(_properties);        // add parent extended properties
                 _tileSets = new();

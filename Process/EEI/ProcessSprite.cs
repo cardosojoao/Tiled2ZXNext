@@ -77,8 +77,10 @@ namespace Tiled2ZXNext.Process.EEI
                     spriteBlock.Clear();
                     int blockLength = 0;
 
-                    int x = (int)obj.X + (int)(obj.Width / 2) + (int)Controller.Config.Offset.x;    // middle of first sprite, left start with 0 
-                    int y = (int)obj.Y - (int)(obj.Height / 2) + (int)Controller.Config.Offset.y;    // middle of first sprite, top starts with 16
+                    //int x = (int)obj.X + (int)(obj.Width / 2) + (int)Controller.Config.Offset.x;    // middle of first sprite, left start with 0 
+                    //int y = (int)obj.Y - (int)(obj.Height / 2) + (int)Controller.Config.Offset.y;    // middle of first sprite, top starts with 16
+                    int x = (int)obj.X + (int)Controller.Config.Offset.x;    // middle of first sprite, left start with 0 
+                    int y = (int)obj.Y + (int)Controller.Config.Offset.y;    // middle of first sprite, top starts with 16
                     if (validatorItemActive)
                     {
                         int flagId = obj.Properties.GetPropertyInt("FlagId");

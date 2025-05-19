@@ -90,9 +90,9 @@ namespace Tiled2ZXNext
                         sceneSource = obj.Properties.GetPropertyInt("teleport");
                     }
 
-                    data.Append("\t\tdb $").AppendLine(((int)sceneSource).ToString("X2"));
+                    data.Append("\t\tdb $").Append(((int)sceneSource).ToString("X2")).AppendLine("\t;Scene Source");
                     data.Append("\t\tdw $").Append((obj.X + Controller.Config.Offset.x).Double2Hex("X4"));
-                    data.Append(",$").AppendLine((obj.Y + Controller.Config.Offset.y).Double2Hex("X4"));
+                    data.Append(",$").Append((obj.Y + Controller.Config.Offset.y).Double2Hex("X4")).AppendLine("\t; X,Y");
                     lengthData += 5;
                 }
             }

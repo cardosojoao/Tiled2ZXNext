@@ -19,11 +19,16 @@ namespace Tiled2ZXNext.Process.Components
 
             byte bitFlags = 0;
             StringBuilder bitFlagsComment = new(256);
+
+            //            string AnimationName = obj.Properties.GetProperty("AnimationName");
             int offSetX = obj.Properties.GetPropertyInt("OffSetX", 0);
             int offSetY = obj.Properties.GetPropertyInt("OffSetY", 0);
 
             int shiftVertical = obj.Properties.GetPropertyInt("ShiftVertical", 0);
             int shiftHorizontal = obj.Properties.GetPropertyInt("ShiftHorizontal", 0);
+
+            int shiftVerticalDirection = obj.Properties.GetPropertyInt("ShiftVerticalDirection", 0);
+            int shiftHorizontalDirection = obj.Properties.GetPropertyInt("ShiftHorizontalDirection", 0);
 
             string flagName = obj.Properties.GetProperty("FlagName");
             int spriteIndex = obj.Properties.GetPropertyInt("SpriteIndex", -1);
@@ -32,15 +37,16 @@ namespace Tiled2ZXNext.Process.Components
             // sprite index or flag name
             if (spriteIndex == -1 && flagName.Length == 0)
             {
-                throw new Exception("SpriteIndex or flag name not found");
+                throw new Exception("SpriteIndex or flag name or Animation not found");
             }
             else
             {
                 lengdata++;
+
                 if (flagName.Length > 0)
                 {
                     bitFlags |= 0x80;
-                    
+
                     if (int.TryParse(flagName, out int flagNumber))
                     {
                         data.Append("\t\tdb $").Append(flagNumber.Int2Hex("X2")).AppendLine("\t\t; Flag Number.");
@@ -52,7 +58,7 @@ namespace Tiled2ZXNext.Process.Components
                         bitFlagsComment.Append("\t\t; flag bits - $80 Flag Name");
                     }
                 }
-                else
+                else if ((bitFlags & 0x01) == 0)
                 {
                     bitFlags |= 0x40;
                     data.Append("\t\tdb $").Append(spriteIndex.Int2Hex("X2")).AppendLine("\t\t; sprite index.");
@@ -70,19 +76,28 @@ namespace Tiled2ZXNext.Process.Components
                 data.Append("\t\tdb $").Append(offSetY.Byte2Hex("X2")).AppendLine("\t\t; offset Y.");
             }
 
-            if (shiftVertical != 0 )
+            // shiftHorizontal vertical
+            if (shiftVertical != 0 || shiftVerticalDirection != 0)
             {
                 lengdata += 1;
                 bitFlags |= 0x10;
                 bitFlagsComment.Append(", $10 shift vertical");
+                if(shiftVerticalDirection > 0)
+                {
+                    shiftVertical |= (shiftVerticalDirection == 1 ? 0 : 128);       // 0= up, 128 = down  // just set 7 bit 
+                }
                 data.Append("\t\tdb $").Append(shiftVertical.Byte2Hex("X2")).AppendLine("\t\t; shiftVertical");
             }
-
-            if ( shiftHorizontal != 0)
+            // shiftHorizontal horizontal
+            if (shiftHorizontal != 0 || shiftHorizontalDirection != 0)
             {
                 lengdata += 1;
                 bitFlags |= 0x08;
                 bitFlagsComment.Append(", shift horizontal");
+                if (shiftHorizontalDirection > 0)
+                {
+                    shiftHorizontal |= (shiftHorizontalDirection == 1 ? 0 : 128);   // just set 7 bit 
+                }
                 data.Append("\t\tdb $").Append(shiftHorizontal.Byte2Hex("X2")).AppendLine("\t\t; shiftHorizontal");
             }
 

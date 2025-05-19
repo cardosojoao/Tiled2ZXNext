@@ -19,14 +19,23 @@ namespace Tiled2ZXNext.Process.EEI
             Parameter = 1,  // Generic value (literal of from flag) to be used by other components
             Sprite = 2,     // sprite component
             SpriteFlag = 4, // replace by sprite modular
-            Body = 8        // body component
+            Body = 8,       // body component
+            Animation = 16  // animation component
+        }
+
+        public class ComponentsType
+        {
+            public const string Animation = "AnimationComponent";
+            public const string Sprite = "SpriteComponent";
+            public const string Parameter = "ParameterComponent";
+            public const string Body = "BodyComponent";
         }
 
         public class GameObject
         {
             public int X { get; set; }
             public int Y { get; set; }
-            public int Components {  get; set; }
+            public int Components { get; set; }
             public bool Set { get; private set; }
             public int ParameterType { get; set; }
             public int ParameterValue { get; set; }
@@ -41,7 +50,7 @@ namespace Tiled2ZXNext.Process.EEI
                 X = (int)x;
                 Y = (int)y;
                 Set = true;
-                
+
             }
         }
         public ProcessObjectComponents(Layer layer, Scene scene, List<Property> properties) : base(layer, scene, properties)
@@ -73,7 +82,7 @@ namespace Tiled2ZXNext.Process.EEI
                     }
                 case 17:
                     {
-                        GameObjectDynamic(layer);
+                        GameObjectCompnents(layer);
                         break;
                     }
                 default:
@@ -88,15 +97,15 @@ namespace Tiled2ZXNext.Process.EEI
             return header;
         }
 
-        private void GameObjectDynamic(Layer layer)
+        private void GameObjectCompnents(Layer layer)
         {
             CheckValidator();
             header.Append("\t\tdb $").Append(layer.Layers.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");
             lengthData++;
-            
-            foreach (Entities.Layer layerComponents in layer.Layers)
+
+            foreach (Entities.Layer entityGameObject in layer.Layers)
             {
-                if (layerComponents.Visible)
+                if (entityGameObject.Visible)
                 {
                     GameObject gameObject = new();
                     StringBuilder componentsData = new StringBuilder();
@@ -104,15 +113,15 @@ namespace Tiled2ZXNext.Process.EEI
                         //
                         // parameter component - set a literal value of flag value to be consumed by other components
                         //
-                        Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("parameter", StringComparison.InvariantCultureIgnoreCase));
+                        Entities.Object obj = entityGameObject.Objects.Find(c => c.Type.Equals(ComponentsType.Parameter, StringComparison.InvariantCultureIgnoreCase));
                         if (obj != null && obj.Visible)
                         {
                             gameObject.Components |= ((int)ComponentFlags.Parameter);
-                            componentsData.AppendLine("\t\t;\tParameter Component");
-                            if (obj.Properties.ExistProperty("parametertype") && obj.Properties.ExistProperty("parametervalue"))
+                            componentsData.AppendLine($"\t\t;\tParameter Component - {obj.Id}");
+                            if (obj.Properties.ExistProperty("type") && obj.Properties.ExistProperty("value"))
                             {
-                                componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("parametertype").Int2Hex("X2")).AppendLine("\t\t; Parameter Type");
-                                componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("parametervalue").Int2Hex("X2")).AppendLine("\t\t; Parameter Value");
+                                componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("type").Int2Hex("X2")).AppendLine("\t\t; Parameter Type");
+                                componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("value").Int2Hex("X2")).AppendLine("\t\t; Parameter Value");
                             }
                             lengthData += 2;
                         }
@@ -122,17 +131,17 @@ namespace Tiled2ZXNext.Process.EEI
                         //
                         //  Sprite Modular Component - setup a sprite with modular configuration
                         //
-                        Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("sprite", StringComparison.InvariantCultureIgnoreCase));
+                        Entities.Object obj = entityGameObject.Objects.Find(c => c.Type.Equals(ComponentsType.Sprite, StringComparison.InvariantCultureIgnoreCase));
                         if (obj != null && obj.Visible)
                         {
                             TechHeader.Add("sprite", 1);
                             gameObject.Components |= ((int)ComponentFlags.Sprite);
-                            componentsData.AppendLine("\t\t;\tSprite Modular Component");
+                            componentsData.AppendLine($"\t\t;\tSprite Modular Component - {obj.Id}");
                             componentsData.Append("\t\tdb ").Append(obj.Properties.GetProperty("SpriteName").ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
-                            componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("Attributes",0).Int2Hex("X2")).AppendLine("\t\t; Sprite Attributes");
+                            // componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("Attributes",0).Int2Hex("X2")).AppendLine("\t\t; Sprite Attributes");
                             componentsData.Append(SpriteModules.WriteObjectsLayer(obj, ref lengthData));
 
-                            lengthData += 2;
+                            lengthData += 1;
                             if (!gameObject.Set)
                             {
                                 gameObject.Setup(obj.X, obj.Y);
@@ -159,15 +168,18 @@ namespace Tiled2ZXNext.Process.EEI
                     //        }
                     //    }
                     //}
+
+
+
                     {
-                        
-                        Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("spriteflag", StringComparison.InvariantCultureIgnoreCase));
+
+                        Entities.Object obj = entityGameObject.Objects.Find(c => c.Name.Equals("spriteflag", StringComparison.InvariantCultureIgnoreCase));
                         if (obj != null && obj.Visible)
                         {
                             throw new Exception("[SpriteFlag] is not supported, it should use [spritemodular]");
                             TechHeader.Add("sprite", 1);
                             gameObject.Components |= ((int)ComponentFlags.SpriteFlag);
-                            componentsData.AppendLine("\t\t;\tSprite Flag Component");
+                            componentsData.AppendLine("\t\t;\tSprite Flag Component - {obj.Id}");
                             componentsData.Append("\t\tdb ").Append(obj.Properties.GetProperty("SpriteName").ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
                             componentsData.Append("\t\tdb ").Append(obj.Properties.GetProperty("FlagName")).AppendLine("\t\t; Flag (Patterm Index)");
                             componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("Attributes").Int2Hex("X2")).AppendLine("\t\t; Sprite Attributes");
@@ -179,9 +191,10 @@ namespace Tiled2ZXNext.Process.EEI
                         }
                     }
                     {
-                        Entities.Object obj = layerComponents.Objects.Find(c => c.Name.Equals("body", StringComparison.InvariantCultureIgnoreCase));
+                        Entities.Object obj = entityGameObject.Objects.Find(c => c.Type.Equals(ComponentsType.Body, StringComparison.InvariantCultureIgnoreCase));
                         if (obj != null && obj.Visible)
                         {
+                            
                             TechHeader.Add("body", 1);
                             gameObject.Components |= ((int)ComponentFlags.Body);
                             int layerMask = obj.Properties.GetPropertyInt("LayerMask");
@@ -190,7 +203,7 @@ namespace Tiled2ZXNext.Process.EEI
                             string eventName = obj.Properties.GetProperty("EventName");
 
                             int eventIndex = Project.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
-                            if (bodyType.Equals("rigid",  StringComparison.InvariantCultureIgnoreCase) && eventIndex == -1)
+                            if (bodyType.Equals("rigid", StringComparison.InvariantCultureIgnoreCase) && eventIndex == -1)
                             {
                                 eventIndex = 0;
                             }
@@ -220,12 +233,33 @@ namespace Tiled2ZXNext.Process.EEI
                             }
                         }
                     }
+
+                    {
+                        Entities.Object obj = entityGameObject.Objects.Find(c => c.Type.Equals(ComponentsType.Animation, StringComparison.InvariantCultureIgnoreCase));
+                        if (obj != null && obj.Visible)
+                        {
+                            TechHeader.Add("animation", 1);
+                            gameObject.Components |= ((int)ComponentFlags.Animation);
+                            componentsData.AppendLine($"\t\t;\tSprite Animation Component - {obj.Id}");
+                            string animationName = obj.Properties.GetProperty("AnimationName");
+                            int animationStyle = obj.Properties.GetPropertyInt("Style", 0);
+                            int animationIndex = Project.Instance.Tables["Animation"].Items.FindIndex(r => r.Equals(animationName + "_CODE", StringComparison.CurrentCultureIgnoreCase));
+                            componentsData.Append("\t\tdb $").Append(animationStyle.Int2Hex("X2")).AppendLine("\t\t; Animation style 0=Loop. 1=Once");
+                            componentsData.Append("\t\tdb $").Append(animationIndex.Int2Hex("X2")).Append("\t\t; Animation ").AppendLine(animationName);
+                            lengthData += 2;
+                            if (!gameObject.Set)
+                            {
+                                gameObject.Setup(obj.X, obj.Y);
+                            }
+                        }
+                    }
+
                     //
                     // GameObject 
                     //
                     TechHeader.Add("object", 1);
                     StringBuilder gameObjectHeader = new StringBuilder();
-                    gameObjectHeader.Append("\t\t; GameObject: ").AppendLine(layerComponents.Name);
+                    gameObjectHeader.Append("\t\t; GameObject: ").AppendLine(entityGameObject.Name);
                     gameObjectHeader.Append("\t\tdb $").Append(gameObject.Components.Int2Hex("X2")).AppendLine("\t\t; GameObject Components Flags");
                     int GameObjectX = gameObject.X + ((int)Controller.Config.Offset.x);
                     int GameObjectY = gameObject.Y + ((int)Controller.Config.Offset.y);
