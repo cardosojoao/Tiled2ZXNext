@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Tiled2ZXNext.Entities
+namespace Tiled2dot8.Entities
 {
     public partial class Layer
     {

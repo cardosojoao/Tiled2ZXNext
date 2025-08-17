@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using Tiled2ZXNext.Extensions;
+using Tiled2dot8.Extensions;
 
-namespace Tiled2ZXNext.ProcessLayers
+namespace Tiled2dot8.ProcessLayers
 {
     internal static class Validator
     {

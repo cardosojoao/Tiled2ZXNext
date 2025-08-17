@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Tiled2ZXNext.Extensions;
-using Tiled2ZXNext.Entities;
+using Tiled2dot8.Extensions;
+using Tiled2dot8.Entities;
 using System.IO;
-using Model = Tiled2ZXNext.Models;
-using Entity = Tiled2ZXNext.Entities;
+using Model = Tiled2dot8.Models;
+using Entity = Tiled2dot8.Entities;
 using System.Xml.Serialization;
-using Tiled2ZXNext.Models;
+using Tiled2dot8.Models;
 using System.Reflection.Metadata;
 
 
-namespace Tiled2ZXNext.Mapper
+namespace Tiled2dot8.Mapper
 {
     public class WorldMapper
     {

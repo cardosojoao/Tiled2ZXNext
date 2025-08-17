@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
-using Tiled2ZXNext.Entities;
-using Tiled2ZXNext.Extensions;
-using Tiled2ZXNext.Process.EEI;
+using Tiled2dot8.Entities;
+using Tiled2dot8.Extensions;
+using Tiled2dot8.Process.EEI;
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     /// <summary>
     /// Process Environment Element Interaction

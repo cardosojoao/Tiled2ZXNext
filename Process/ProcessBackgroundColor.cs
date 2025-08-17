@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Tiled2ZXNext.Entities;
-using Tiled2ZXNext.Palette;
-using Tiled2ZXNext.Extensions;
+using Tiled2dot8.Entities;
+using Tiled2dot8.Palette;
+using Tiled2dot8.Extensions;
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     public class ProcessBackgroundColour : IProcess
     {

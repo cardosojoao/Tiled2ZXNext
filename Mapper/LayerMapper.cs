@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Tiled2ZXNext.Entities;
-using Tiled2ZXNext.Models;
-using Entity = Tiled2ZXNext.Entities;
-using Model = Tiled2ZXNext.Models;
+using Tiled2dot8.Entities;
+using Tiled2dot8.Models;
+using Entity = Tiled2dot8.Entities;
+using Model = Tiled2dot8.Models;
 
-namespace Tiled2ZXNext.Mapper
+namespace Tiled2dot8.Mapper
 {
     public class LayerMapper
     {

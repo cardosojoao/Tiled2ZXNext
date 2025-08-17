@@ -1,4 +1,4 @@
-﻿namespace Tiled2ZXNext.Entities
+﻿namespace Tiled2dot8.Entities
 {
     public class Property
     {

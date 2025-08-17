@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tiled2ZXNext.Entities
+namespace Tiled2dot8.Entities
 {
     /// <summary>
     /// single tile

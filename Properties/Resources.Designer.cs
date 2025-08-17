@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Tiled2ZXNext.Properties {
+namespace Tiled2dot8.Properties {
     using System;
     
     

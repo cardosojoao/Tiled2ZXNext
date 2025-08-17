@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using Tiled2ZXNext.Entities;
-using Tiled2ZXNext.Extensions;
-using Tiled2ZXNext.Models.XML;
-using Tiled2ZXNext.ProcessLayers;
+using Tiled2dot8.Entities;
+using Tiled2dot8.Extensions;
+using Tiled2dot8.Models.XML;
+using Tiled2dot8.ProcessLayers;
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     public class ProcessCollision : IProcess
     {
@@ -88,16 +88,16 @@ namespace Tiled2ZXNext
             int layerId = layer.Properties.GetPropertyInt("Layer");
             string tagName = layer.Properties.GetProperty("Tag");
             int blockType = layer.Properties.GetPropertyInt("Type");
-            string bodyType = layer.Properties.GetProperty("BodyType").ToLower();
+            string bodyType = layer.Properties.GetProperty("ColliderType");
             string eventName = layer.Properties.GetProperty("EventName");
 
-            int eventIndex = Project.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
-            int tagIndex = Project.Instance.Tables["TagName"].Items.FindIndex(r => r.Equals(tagName, StringComparison.CurrentCultureIgnoreCase));
+            //int eventIndex = Project.Instance.Tables["EventName"].Items.FindIndex(r => r.Equals(eventName, StringComparison.CurrentCultureIgnoreCase));
+            //int tagIndex = Project.Instance.Tables["TagName"].Items.FindIndex(r => r.Equals(tagName, StringComparison.CurrentCultureIgnoreCase));
             // if can't find tag, and tag value is numeric just use the tag numeric value
-            if(tagIndex == -1)
-            {
-                int.TryParse(tagName, out tagIndex);
-            }
+            //if(tagIndex == -1)
+            //{
+            //    int.TryParse(tagName, out tagIndex);
+            //}
 
             int prevBlockType = blockType;
             StringBuilder validator = Validator.ProcessLayerValidator(_properties);
@@ -115,10 +115,10 @@ namespace Tiled2ZXNext
             layerMask *= 16;
             layerMask += layerId;
             header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).Append("\t\t; Objects count\r\n");
-            header.Append("\t\tdb $").Append(tagIndex.ToString("X2")).Append("\t\t; Tag [").Append(tagName).Append("]\r\n");
+            header.Append("\t\tdb ").AppendLine(tagName);
             header.Append("\t\tdb $").Append(layerMask.ToString("X2")).Append("\t\t; Layer\r\n");
-            header.Append("\t\tdb $").Append(BodyTypeInt(bodyType).ToString("X2")).Append("\t\t; Body Type 0=trigger , 4=rigid\r\n");   // to be removed
-            header.Append("\t\tdb $").Append(eventIndex.ToString("X2")).Append("\t\t; Event ID [").Append(eventName).Append("]\r\n");
+            header.Append("\t\tdb ").AppendLine(bodyType);   // to be removed
+            header.Append("\t\tdb ").AppendLine(eventName);
             lengthData += 5;
 
             if (layer.Name.Equals("collision", StringComparison.InvariantCultureIgnoreCase))
@@ -184,7 +184,7 @@ namespace Tiled2ZXNext
         /// <returns>int type of body</returns>
         public static int BodyTypeInt(string bodyType)
         {
-            return bodyType switch
+            return bodyType.ToLower() switch
             {
                 "trigger" => 0,
                 "rigid" => 4,

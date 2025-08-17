@@ -5,10 +5,10 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-using Tiled2ZXNext.Entities;
-using Tiled2ZXNext.Models;
+using Tiled2dot8.Entities;
+using Tiled2dot8.Models;
 
-namespace Tiled2ZXNext.Entities
+namespace Tiled2dot8.Entities
 {
     public class Scene
     {

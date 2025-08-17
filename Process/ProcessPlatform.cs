@@ -5,11 +5,11 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
-using Tiled2ZXNext.Entities;
-using Tiled2ZXNext.Extensions;
+using Tiled2dot8.Entities;
+using Tiled2dot8.Extensions;
 
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     /// <summary>
     /// Process Environment Element Interaction

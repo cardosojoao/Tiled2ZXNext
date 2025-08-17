@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Tiled2ZXNext.Palette
+namespace Tiled2dot8.Palette
 {
     public static class LoadGplPalette 
     {

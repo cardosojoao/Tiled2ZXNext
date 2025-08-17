@@ -4,11 +4,11 @@ using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
-using Tiled2ZXNext.Entities;
-using Tiled2ZXNext.Extensions;
-using Tiled2ZXNext.Models;
-using Tiled2ZXNext.Process.EEI;
-namespace Tiled2ZXNext
+using Tiled2dot8.Entities;
+using Tiled2dot8.Extensions;
+using Tiled2dot8.Models;
+using Tiled2dot8.Process.EEI;
+namespace Tiled2dot8
 {
     public partial class Controller
     {

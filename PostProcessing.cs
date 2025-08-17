@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using Tiled2ZXNext.Entities;
+using Tiled2dot8.Entities;
 
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     public partial class Controller
     {
@@ -55,14 +55,47 @@ namespace Tiled2ZXNext
             ProcessStartInfo startinfo = new ProcessStartInfo(exec, parameters);
             startinfo.ErrorDialog = true;
             startinfo.CreateNoWindow = true;
-            startinfo.UseShellExecute = true;
+            startinfo.UseShellExecute = false;
+            startinfo.RedirectStandardOutput = true;
+            startinfo.RedirectStandardError = true;
+
+
+
+
             System.Diagnostics.Process myProcess = System.Diagnostics.Process.Start(startinfo);
+
+            StringBuilder output = new StringBuilder();
+            StringBuilder error = new StringBuilder();
+
+            // Event handlers for async output/error reading
+            myProcess.OutputDataReceived += (sender, args) =>
+            {
+                if (args.Data != null)
+                    output.AppendLine( args.Data);
+            };
+
+            myProcess.ErrorDataReceived += (sender, args) =>
+            {
+                if (args.Data != null)
+                    error.AppendLine( args.Data);
+            };
+
+
+
             myProcess.Start();
+
+            myProcess.BeginOutputReadLine();
+            myProcess.BeginErrorReadLine();
+
+
             myProcess.WaitForExit(5000);
             int result = myProcess.ExitCode;
 
             myProcess.Close();
             myProcess.Dispose();
+
+            Console.WriteLine(output.ToString());
+            Console.WriteLine(error.ToString());
 
             return result;
         }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Tiled2ZXNext.Entities
+namespace Tiled2dot8.Entities
 {
     /// <summary>
     /// Layer of areas, instead of a matrix of cells, stores a collections of areas that contains cells

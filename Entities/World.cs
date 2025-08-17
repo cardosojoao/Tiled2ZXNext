@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks.Dataflow;
 
-namespace Tiled2ZXNext.Entities
+namespace Tiled2dot8.Entities
 {
 
     public class Map

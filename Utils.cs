@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Tiled2ZXNext.Entities;
+using Tiled2dot8.Entities;
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     public class Utils
     {

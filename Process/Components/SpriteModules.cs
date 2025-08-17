@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Tiled2ZXNext.Entities;
-using Tiled2ZXNext.Extensions;
+using Tiled2dot8.Entities;
+using Tiled2dot8.Extensions;
 
-namespace Tiled2ZXNext.Process.Components
+namespace Tiled2dot8.Process.Components
 {
     /// <summary>
     /// Process the dynamic parameters of sprites
@@ -32,6 +32,8 @@ namespace Tiled2ZXNext.Process.Components
 
             string flagName = obj.Properties.GetProperty("FlagName");
             int spriteIndex = obj.Properties.GetPropertyInt("SpriteIndex", -1);
+
+            bool DynamicShift = obj.Properties.GetPropertyBool("DynamicShift", false);
 
 
             // sprite index or flag name
@@ -93,7 +95,7 @@ namespace Tiled2ZXNext.Process.Components
             {
                 lengdata += 1;
                 bitFlags |= 0x08;
-                bitFlagsComment.Append(", shift horizontal");
+                bitFlagsComment.Append(", $08 shift horizontal");
                 if (shiftHorizontalDirection > 0)
                 {
                     shiftHorizontal |= (shiftHorizontalDirection == 1 ? 0 : 128);   // just set 7 bit 
@@ -101,6 +103,11 @@ namespace Tiled2ZXNext.Process.Components
                 data.Append("\t\tdb $").Append(shiftHorizontal.Byte2Hex("X2")).AppendLine("\t\t; shiftHorizontal");
             }
 
+            if (DynamicShift)
+            {
+                bitFlags |= 0x04;
+                bitFlagsComment.Append(", $04 shift dynamic");
+            }
 
             lengdata++;    // bit flags
             bitFlagsComment.Insert(0, $"\t\tdb ${((int)bitFlags).Int2Hex("X2")}").AppendLine();

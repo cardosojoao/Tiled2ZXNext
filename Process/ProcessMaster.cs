@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Tiled2ZXNext.Entities;
-using Tiled2ZXNext.Extensions;
+using Tiled2dot8.Entities;
+using Tiled2dot8.Extensions;
 //using Tiled2ZXNext.Models;
-using Tiled2ZXNext.ProcessLayers;
+using Tiled2dot8.ProcessLayers;
 
-namespace Tiled2ZXNext.Process.EEI
+namespace Tiled2dot8.Process.EEI
 {
     /// <summary>
     /// Process Environment Element Interaction scrap

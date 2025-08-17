@@ -4,11 +4,11 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
-using Tiled2ZXNext.Extensions;
-using Tiled2ZXNext.Entities;
+using Tiled2dot8.Extensions;
+using Tiled2dot8.Entities;
 using System.Reflection;
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     public class LayerScan
     {

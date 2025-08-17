@@ -1,23 +1,26 @@
 ﻿using System.Collections.Generic;
-using Entity = Tiled2ZXNext.Entities;
-using Model = Tiled2ZXNext.Models;
+using Entity = Tiled2dot8.Entities;
+using Model = Tiled2dot8.Models;
 
-namespace Tiled2ZXNext.Mapper
+namespace Tiled2dot8.Mapper
 {
     public static class PropertyMapper
     {
         public static List<Entity.Property> Map(List<Model.Property> propertiesRaw)
         {
             List<Entity.Property> properties = new();
-            foreach (Model.Property propertyRaw in propertiesRaw)
+            if (propertiesRaw != null)
             {
-                Entity.Property property = new()
+                foreach (Model.Property propertyRaw in propertiesRaw)
                 {
-                    Name = propertyRaw.Name,
-                    Type = propertyRaw.Type.ToString(),
-                    Value = propertyRaw.Value.ToString()
-                };
-                properties.Add(property);
+                    Entity.Property property = new()
+                    {
+                        Name = propertyRaw.Name,
+                        Type = propertyRaw.Type.ToString(),
+                        Value = propertyRaw.Value.ToString()
+                    };
+                    properties.Add(property);
+                }
             }
             return properties;
         }

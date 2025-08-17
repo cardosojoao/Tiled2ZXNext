@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     class Program
     {

@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31424.327
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36408.4 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tiled2ZXNext", "Tiled2ZXNext.csproj", "{EEA51499-C8D4-4F74-83CA-0DC7A2F08351}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tiled2dot8", "Tiled2dot8.csproj", "{EEA51499-C8D4-4F74-83CA-0DC7A2F08351}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

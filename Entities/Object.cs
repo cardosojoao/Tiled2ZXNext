@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Tiled2ZXNext.Entities
+namespace Tiled2dot8.Entities
 {
     public class Object
     {

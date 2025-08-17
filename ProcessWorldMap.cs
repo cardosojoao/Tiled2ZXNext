@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Primitives;
 using System.IO;
 using System.Text;
-using Tiled2ZXNext.Extensions;
+using Tiled2dot8.Extensions;
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     public partial class Controller
     {

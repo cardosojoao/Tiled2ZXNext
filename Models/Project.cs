@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Tiled2ZXNext.Entities;
+using Tiled2dot8.Entities;
 
-namespace Tiled2ZXNext.Models
+namespace Tiled2dot8.Models
 {
 
     public class Project

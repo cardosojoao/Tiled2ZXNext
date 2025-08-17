@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Tiled2ZXNext.Entities;
+using Tiled2dot8.Entities;
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     public class ProcessSceneSize : IProcess
     {

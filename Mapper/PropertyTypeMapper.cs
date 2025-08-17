@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Entity = Tiled2ZXNext.Entities;
-using Model = Tiled2ZXNext.Models;
+using Entity = Tiled2dot8.Entities;
+using Model = Tiled2dot8.Models;
 
-namespace Tiled2ZXNext.Mapper
+namespace Tiled2dot8.Mapper
 {
     public static class PropertyTypeMapper
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Tiled2ZXNext.Entities;
+using Tiled2dot8.Entities;
 
-namespace Tiled2ZXNext.Entities
+namespace Tiled2dot8.Entities
 {
     public class Template
     {

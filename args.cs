@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     public class Options
     {

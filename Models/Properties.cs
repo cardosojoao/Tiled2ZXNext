@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Tiled2ZXNext.Models
+namespace Tiled2dot8.Models
 {
     public class Property
     {

@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Tiled2ZXNext.Models;
+using Tiled2dot8.Models;
+using Tiled2dot8.Models.XML;
 
-namespace Tiled2ZXNext.Extensions
+namespace Tiled2dot8.Extensions
 {
     public static class PropertyExtensions
     {
@@ -72,17 +73,32 @@ namespace Tiled2ZXNext.Extensions
             catch (Exception ex)
             {
                 throw new Exception("missing property " + name, ex);
-                
             }
         }
 
-                    
-
-
-        public static bool ExistProperty(this tileset tileSet, string name)
+        public static bool GetPropertyBool(this TilesetTileProperty[] properties, string name, bool value = false)
         {
-            if (tileSet.properties == null) throw new ArgumentNullException($"tileSet: missing [properties] of {tileSet.name}");
-            TilesetTileProperty prop = tileSet.properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            try
+            {
+                if (properties == null) throw new ArgumentNullException(nameof(properties));
+                TilesetTileProperty? prop = properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+                //return prop?.value ?? "";
+                return prop == null ? value : bool.Parse(prop.value.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("missing property " + name, ex);
+            }
+        }
+
+        
+            
+
+
+        public static bool ExistProperty(this TilesetTileProperty[] properties, string name)
+        {
+            if (properties == null) throw new ArgumentNullException($"tileSet: missing [properties]");
+            TilesetTileProperty prop = properties.FirstOrDefault(p => p.name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             return prop == null ? false : true;
         }
 
@@ -113,11 +129,11 @@ namespace Tiled2ZXNext.Extensions
             return prop == null ? throw new KeyNotFoundException(name) : int.Parse(prop.Value.ToString());
         }
 
-        public static bool GetPropertyBool(this List<Entities.Property> properties, string name)
+        public static bool GetPropertyBool(this List<Entities.Property> properties, string name, bool value = false)
         {
             if (properties == null) throw new ArgumentNullException(nameof(properties));
             Entities.Property? prop = properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-            return prop == null ? throw new KeyNotFoundException(name) : bool.Parse(prop.Value.ToString());
+            return prop == null ? value : bool.Parse(prop.Value.ToString());
         }
 
         public static void Merge(this List<Entities.Property> properties, List<Entities.Property> mergeProperties)

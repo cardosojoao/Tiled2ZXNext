@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Tiled2ZXNext.Models
+namespace Tiled2dot8.Models
 {
 
     public class Scene

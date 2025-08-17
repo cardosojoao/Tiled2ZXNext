@@ -5,13 +5,13 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using Tiled2ZXNext.Entities;
-using Tiled2ZXNext.Extensions;
-using Tiled2ZXNext.Mapper;
-using Tiled2ZXNext.Palette;
+using Tiled2dot8.Entities;
+using Tiled2dot8.Extensions;
+using Tiled2dot8.Mapper;
+using Tiled2dot8.Palette;
 
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     public partial class Controller
     {
