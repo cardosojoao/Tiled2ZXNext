@@ -4,41 +4,34 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using Tiled2dot8.Entities;
 
-namespace Tiled2ZXNext
+
+namespace Tiled2dot8
 {
     public partial class Controller
     {
-
-        public void PostProcessing(Options o)
+        public void PostProcessing(Options o, string worldName)
         {
             int execResult = -1;
+            string outputPath = Path.Combine(o.RoomPath, worldName);
+            string outputfileAssembler = Path.Combine(outputPath, fileName + ".bin");
+            string inputFile = Path.Combine(outputPath, outputFile);
 
-            IConfiguration config = new ConfigurationBuilder()
-                .AddJsonFile("appconfig.json", optional: true, reloadOnChange: false)
-                .Build();
-
-            var zipConfig = config.GetSection("zip");
-            var assemblerConfig = config.GetSection("assembler");
-
-            string outputfileAssembler = Path.Combine(o.RoomPath, fileName + ".bin");
-            string inputFile = Path.Combine(o.RoomPath, outputFile);
-
-            if (assemblerConfig != null)
+            if (Controller.Config.Assembler != null)
             {
-                string pathExe = assemblerConfig.GetSection("app").Value;
-                string param = assemblerConfig.GetSection("args").Value;
+                string pathExe = Controller.Config.Assembler.App; // assemblerConfig.GetSection("app").Value;
+                string param = Controller.Config.Assembler.Args; // assemblerConfig.GetSection("args").Value;
 
                 param = param.Replace("%1", inputFile).Replace("%2", outputfileAssembler);
-
                 execResult = ExecuteCommand(pathExe, param);
                 Console.WriteLine($"Result={execResult}");
             }
 
-            if (zipConfig != null && execResult == 0)
+            if (Controller.Config.Zip != null && execResult == 0)
             {
-                string pathExe = zipConfig.GetSection("app").Value;
-                string param = zipConfig.GetSection("args").Value;
+                string pathExe = Controller.Config.Zip.App;     // zipConfig.GetSection("app").Value;
+                string param = Controller.Config.Zip.Args;      // zipConfig.GetSection("args").Value;
 
                 string outputfileCompress = Path.Combine(Path.GetDirectoryName(outputfileAssembler), Path.GetFileNameWithoutExtension(outputfileAssembler) + ".zx0");
 
@@ -52,24 +45,57 @@ namespace Tiled2ZXNext
                 Console.WriteLine("ERROR: Skip compress step");
             }
 
-            BuildList(o.RoomPath, "*.zx0", o.RoomPath + "\\list.txt");
+            BuildList(outputPath, "*.zx0", outputPath + "\\list.txt");
 
         }
 
         static int ExecuteCommand(string exec, string parameters)
         {
-            Console.WriteLine("execute  " + exec, parameters);
+            Console.WriteLine("execute  {0} {1}", exec, parameters);
             ProcessStartInfo startinfo = new ProcessStartInfo(exec, parameters);
             startinfo.ErrorDialog = true;
             startinfo.CreateNoWindow = true;
-            startinfo.UseShellExecute = true;
-            Process myProcess = Process.Start(startinfo);
+            startinfo.UseShellExecute = false;
+            startinfo.RedirectStandardOutput = true;
+            startinfo.RedirectStandardError = true;
+
+
+
+
+            System.Diagnostics.Process myProcess = System.Diagnostics.Process.Start(startinfo);
+
+            StringBuilder output = new StringBuilder();
+            StringBuilder error = new StringBuilder();
+
+            // Event handlers for async output/error reading
+            myProcess.OutputDataReceived += (sender, args) =>
+            {
+                if (args.Data != null)
+                    output.AppendLine( args.Data);
+            };
+
+            myProcess.ErrorDataReceived += (sender, args) =>
+            {
+                if (args.Data != null)
+                    error.AppendLine( args.Data);
+            };
+
+
+
             myProcess.Start();
+
+            myProcess.BeginOutputReadLine();
+            myProcess.BeginErrorReadLine();
+
+
             myProcess.WaitForExit(5000);
             int result = myProcess.ExitCode;
 
             myProcess.Close();
             myProcess.Dispose();
+
+            Console.WriteLine(output.ToString());
+            Console.WriteLine(error.ToString());
 
             return result;
         }

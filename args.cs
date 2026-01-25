@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 
-namespace Tiled2ZXNext
+namespace Tiled2dot8
 {
     public class Options
     {
@@ -15,14 +15,20 @@ namespace Tiled2ZXNext
         [Option('a', "approot", Required = true, HelpText = "Application Root Path", Default = false)]
         public string AppRoot { get; set; }
 
-        [Option('z', "compress", Required = false, HelpText = "Compress file", Default = false)]
-        public bool Compress { get; set; }
+        [Option('p', "project", Required = false, HelpText = "project file path", Default = "")]
+        public string Project { get; set; }
+
+        [Option('w', "world", Required = false, HelpText = "world file path", Default = "")]
+        public string World { get; set; }
 
         [Option('r', "roompath", Required = true, HelpText = "Room output path")]
         public string RoomPath{ get; set; }
 
         [Option('m', "mappath", Required = true, HelpText = "map output path")]
         public string MapPath{ get; set; }
+        
+        [Option('c', "palette", Required = true, HelpText = "Default palette")]
+        public string PalettePath { get; set; }
 
         [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages.")]
         public bool Verbose { get; set; }

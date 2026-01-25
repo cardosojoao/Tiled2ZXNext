@@ -1,0 +1,73 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Tiled2dot8.Entities;
+using Tiled2dot8.Extensions;
+using Tiled2dot8.ProcessLayers;
+
+
+namespace Tiled2dot8.Process.EEI
+{
+    /// <summary>
+    /// Process Environment Element Interaction
+    /// </summary>
+    public class ProcessWatter : ProcessMaster
+    {
+        public ProcessWatter(Layer layer, Scene scene, List<Property> properties) : base(layer, scene, properties)
+        {
+        }
+
+        public StringBuilder Execute()
+        {
+            Console.WriteLine("Group " + _layer.Name);
+            StringBuilder all = new();
+            if (_layer.Visible)
+            {
+                string fileName = _scene.Properties.GetProperty("FileName");
+                all.Append('.').Append(fileName).Append('_').Append(_layer.Name).Append('_').Append(_layer.Id).AppendLine(":");
+                all.Append(WriteObjectsLayer(_layer));
+            }
+            return all;
+        }
+
+        /// <summary>
+        /// write objects layer compressed, there is an header with the shared properties and then each line contain the object property
+        /// </summary>
+        /// <param name="layer">layer</param>
+        /// <returns>string builder collection with header and data</returns>
+        private StringBuilder WriteObjectsLayer(Layer layer)
+        {
+            layer.Properties.Merge(_properties);
+            CheckValidator();
+            header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).Append("\t\t; Objects count\r\n");
+            lengthData++;
+
+            TechHeader.Add("object", layer.Objects.Count);
+            TechHeader.Add("sprite", layer.Objects.Count);
+            TechHeader.Add("animation", layer.Objects.Count);
+
+            foreach (Entities.Object obj in layer.Objects)
+            {
+                if (obj.Visible)
+                {
+                    int x = (int)obj.X + 8;     // middle of first sprite, left start with 0
+                    int y = (int)obj.Y - 8;      // middle of first sprite, top starts with 16
+                    int length = obj.Properties.GetPropertyInt("Length");
+
+                    data.Append("\t\tdw $").Append(x.Int2Hex("X4")).Append(", $").Append(y.Int2Hex("X4"));
+                    data.Append("\t\t; x, y\r\n");
+                    data.Append("\t\tdb $").Append(length.Int2Hex("X2"));
+                    data.Append("\t\t; length ID\r\n");
+                    lengthData += 5;
+                }
+            }
+            // size must be 2Bytes long (map is over 256 Bytes)
+            headerType.Append("\t\tdw $").Append(lengthData.ToString("X4")).Append("\t\t; Block size\r\n");
+            // insert header at begin
+            header.Insert(0, headerType);
+            header.Append(data);
+            return header;
+        }
+    }
+}

@@ -1,246 +1,158 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using System.Xml.Serialization;
+using Tiled2dot8.Entities;
+using Tiled2dot8.Extensions;
+using Tiled2dot8.Mapper;
+using Tiled2dot8.Palette;
 
-namespace Tiled2ZXNext
+
+namespace Tiled2dot8
 {
     public partial class Controller
     {
         private string inputFile;
         private string fileName;
         private string outputFile;
-        private string inputPath;
 
         public string OutputRoomFile { get; set; }
         public string OutputMapFile { get; set; }
-
-        public static readonly Dictionary<string, Table> Tables  =  new();
-
         private Options _options;
-
-
+        public static Config Config { get; set; } = new();
+        public static GPL Palette { get; set; }
         public void Run(Options o)
         {
+
+            //DebugTest();
+
+
+
             _options = o;
             inputFile = o.Input;
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("appconfig.json", optional: true, reloadOnChange: false)
+                .Build();
+            Config.Offset = config.GetRequiredSection("offset").Get<Offset>();
+            Config.Zip = config.GetRequiredSection("zip").Get<Command>();
+            Config.Assembler = config.GetRequiredSection("assembler").Get<Command>();
+            Config.SpriteSoftwareSuffix = config.GetValue<string>("SpriteSoftwareSuffix");
+            
 
-            inputPath = Path.GetDirectoryName(inputFile);
 
+            string[] worlds = Directory.GetFiles(Path.GetFullPath(o.World), "*.world");
+            foreach (string worldFile in worlds)
+            {
+                string worldRaw = File.ReadAllText(worldFile);
+                Models.World worldData = JsonSerializer.Deserialize<Models.World>(worldRaw);
+                Entities.World world = WorldMapper.Map(worldData, o);
+                world.Name = Path.GetFileNameWithoutExtension(worldFile);
+
+                world.GetMatrix();
+                ProcessWorld proc = new ProcessWorld(world);
+                var worldProc = proc.Execute();
+                string worldName = Path.GetFileName(worldFile);
+                File.WriteAllText(Path.Combine(o.MapPath, Path.GetFileNameWithoutExtension(worldName)+"_worldMap.asm"), worldProc.ToString());
+            }
+            if (o.Project.Length > 0)
+            {
+                if (File.Exists(o.Project))
+                {
+                    string projectRaw = File.ReadAllText(o.Project);
+                    Models.Project projectData = JsonSerializer.Deserialize<Models.Project>(projectRaw);
+                    ProjectMapper.Map(projectData, Entities.Project.Instance, o);
+                }
+            }
             string data = File.ReadAllText(inputFile);
-
-
-            TiledParser tiledData = JsonSerializer.Deserialize<TiledParser>(data);
-
-            ResolveTileSets(tiledData.Tilesets);
-            ResolveTables(tiledData.Properties);
-
-            fileName = TiledParser.GetProperty(tiledData.Properties, "FileName");
+            Models.Scene sceneRaw = JsonSerializer.Deserialize<Models.Scene>(data);
+            fileName = sceneRaw.Properties.GetProperty("FileName");
             string extension = "asm";
             outputFile = fileName + "." + extension;
 
-            // get map settings
-            StringBuilder mapData = ProcessMap(tiledData);
-            Console.WriteLine("output map file " + outputFile);
-            // write map to final location
-            OutputMap(o, mapData);
+            Entities.Scene scene = SceneMapper.Map(sceneRaw, Entities.Scene.Instance, _options);      // migrated
+            scene.Layers = LayerMapper.Map(sceneRaw.Layers);
 
-
-            BuildList(o.MapPath, "*.asm", o.MapPath + "\\list.txt");
+            Palette = LoadGplPalette.Load(o.PalettePath);
 
             // get layers data
-            StringBuilder layerData = ProcessLayer(tiledData);
+            StringBuilder layerData = ProcessScene(scene);
+            StringBuilder header = new();
+
+            var assembly = Assembly.GetExecutingAssembly();
+            var assemblyName = assembly.GetName().Name;
+            var assemblyVersion = assembly.GetName().Version;
+
+            header.AppendLine(";");
+            header.Append(";\t").AppendLine($"Assembly Name: {assemblyName}");
+            header.Append(";\t").AppendLine($"Assembly Version: {assemblyVersion}");
+            header.AppendLine(";");
+
+            foreach (Table table in Entities.Project.Instance.Includes.Values)
+            {
+                string tablePath = table.FilePath.Replace("~", o.AppRoot);
+                string path = Path.GetRelativePath(o.RoomPath, tablePath);
+                header.Append('\t').Append("include\t\"").Append(tablePath.Replace('\\', '/')).AppendLine("\"");
+            }
+
+            layerData.Insert(0, header);
+            string sceneWorldName = scene.Properties.GetProperty("WorldName");
+            
             Console.WriteLine("output layer file " + outputFile);
             // write layers to final location
-            OutputLayer(o, layerData);
-
-            PostProcessing(o);
+            OutputLayer(o, sceneWorldName, layerData);
+            PostProcessing(o, sceneWorldName);
         }
 
-        /// <summary>
-        /// check if tables are available and load definition
-        /// </summary>
-        /// <param name="props"></param>
-        private void ResolveTables(List<Property> props)
+
+        private void DebugTest()
         {
-            if (ExistMapProperty(props, "Tables"))
-            {
-                string[] tables = GetMapProperty(props, "Tables").Split('\n');
-                foreach (string table in tables)
-                {
-                    string[] tableParts = table.Split(':');
-                    Table tableSettings = new Table() { Name = tableParts[0], FilePath = tableParts[1] };
-                    Tables.Add(tableSettings.Name, tableSettings );
-                    Console.WriteLine($"Table={tableSettings.Name} Path={tableSettings.FilePath}");
-                    // read the file content    
-                    List<string> tableData = new (File.ReadAllLines(tableSettings.FilePath.Replace("~", _options.AppRoot)));
-                    // find table begin
-                    int tableIndex = tableData.FindIndex(r=> r.Contains( "Table:"+tableSettings.Name, StringComparison.InvariantCultureIgnoreCase));
-                    // if table exists
-                    if(tableIndex>0)
-                    {   // loop through content until find and empty line
-                        for(int line=tableIndex+1; line<tableData.Count; line++)
-                        {
-                            string item = tableData[line];
-                            if (item == string.Empty)
-                            {
-                                break;
-                            }
-                            // get just the name
-                            string[] itemData = item.Split(new char[] { ' ', '\t' });
-                            tableSettings.Items.Add(itemData[0]);
-                        }
-                    }
-                }
-            }
+            Layer layer = new();
+            layer.Width = 10;
+            layer.Height = 10;
+            layer.Data = new List<uint>(100){ 
+                0,0,0,0,0,0,0,0,0,0,
+                0,1,1,1,0,0,0,0,0,0,
+                0,1,1,1,0,0,0,0,0,0,
+                0,1,1,1,0,0,0,0,0,0,
+                0,1,1,0,0,0,0,0,0,0,
+                0,1,1,0,0,0,0,0,0,0,
+                0,1,1,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,
+                0,1,1,1,0,0,0,0,0,0,
+                0,1,1,1,0,0,0,0,0,0
+            };
+
+            LayerScanFill scan = new(layer);
+            scan.Scan();
+             
+
+
         }
-
-
-        private void ResolveTileSets(List<Tileset> tileSets)
-        {
-            Dictionary<string, List<Tileset>> resolved = new();
-            Dictionary<string, tileset> tilesSetData = new();
-
-            int order = 0;       // order of load 
-            foreach (Tileset tileSet in tileSets)
-            {
-                tileSet.Order = order;      // judt to keep in mind the physical order of tilesheet that is align with gid's
-                string file = Path.Combine(inputPath, tileSet.Source);
-                tileset tileSetData = ReadTileSet(file);
-
-                tileSet.Lastgid = tileSetData.tilecount + tileSet.Firstgid - 1;
-                if (!resolved.ContainsKey(tileSetData.image.source))
-                {
-                    resolved.Add(tileSetData.image.source, new List<Tileset>());
-                    tilesSetData.Add(tileSetData.image.source, tileSetData);
-                }
-                resolved[tileSetData.image.source].Add(tileSet);
-                order++;
-            }
-
-            foreach (KeyValuePair<string, List<Tileset>> sets in resolved)
-            {
-                foreach (Tileset set in sets.Value)
-                {
-                    tileset tileSetData = tilesSetData[sets.Key];
-                    set.Parsedgid = set.Firstgid - 1;
-
-
-                    set.TileSheetID = int.Parse(GetTileSetProperty(tileSetData.properties, "TileSheetId"));
-                    set.PaletteIndex = int.Parse(GetTileSetProperty(tileSetData.properties, "PaletteIndex"));
-
-                    // if tile properties are setup, get the palette index and TileSheetID (checking if they are defined)
-                    //if (tileSetData.tile.properties != null)
-                    //{
-                    //    if (ExistProperty(tileSetData.tile.properties, "TileSheetId"))
-                    //    {
-                    //        set.TileSheetID = int.Parse(GetTileSetProperty(tileSetData.tile.properties, "TileSheetId"));
-                    //    }
-                    //    if (ExistProperty(tileSetData.tile.properties, "PaletteIndex"))
-                    //    {
-                    //        set.PaletteIndex = int.Parse(GetTileSetProperty(tileSetData.tile.properties, "PaletteIndex"));
-                    //    }
-
-                    //}
-                }
-            }
-        }
-
-        /// <summary>
-        /// load tile set and deserialize into collection of objects
-        /// </summary>
-        /// <param name="pathFile"></param>
-        /// <returns></returns>
-        private static tileset ReadTileSet(string pathFile)
-        {
-            XmlSerializer serializer = new(typeof(tileset));
-            tileset tileSet;
-            using (Stream reader = new FileStream(pathFile, FileMode.Open))
-            {
-                // Call the Deserialize method to restore the object's state.
-                tileSet = (tileset)serializer.Deserialize(reader);
-            }
-            return tileSet;
-        }
-
-        /// <summary>
-        /// get the sprite sheet id from tileset
-        /// </summary>
-        /// <param name="properties">collection of properties</param>
-        /// <param name="name">property name</param>
-        /// <returns>property value or empty if not found</returns>
-        private static string GetTileSetProperty(TilesetTileProperty[] properties, string name)
-        {
-            string value = string.Empty;
-            foreach (TilesetTileProperty prop in properties)
-            {
-                if (prop.name.ToLower() == name.ToLower())
-                {
-                    value = prop.value;
-                    break;
-                }
-            }
-            return value;
-        }
-
-
-        private static string GetMapProperty(List<Property> properties, string name)
-        {
-            string value = string.Empty;
-            foreach (Property prop in properties)
-            {
-                if (prop.Name.ToLower() == name.ToLower())
-                {
-                    value = prop.Value;
-                    break;
-                }
-            }
-            return value;
-        }
-
-        /// <summary>
-        /// check if property exists
-        /// </summary>
-        /// <param name="properties">list of properties</param>
-        /// <param name="name">property name</param>
-        /// <returns></returns>
-        private static bool ExistProperty(TilesetTileProperty[] properties, string name)
-        {
-            bool found = false;
-            foreach (TilesetTileProperty prop in properties)
-            {
-                if (prop.name.ToLower() == name.ToLower())
-                {
-                    found = true;
-                    break;
-                }
-            }
-            return found;
-        }
-
-        private static bool ExistMapProperty(List<Property> properties, string name)
-        {
-            bool found = false;
-            foreach (Property prop in properties)
-            {
-                if (prop.Name.ToLower() == name.ToLower())
-                {
-                    found = true;
-                    break;
-                }
-            }
-            return found;
-        }
-
     }
 
 
-    public class Table
+    public class Config
     {
-        public string Name { get; set; }
-        public string FilePath { get; set; }
-        public List<string> Items { get; set; } = new();
+        public string? SpriteSoftwareSuffix { get; set; }
+        public Offset Offset { get; set; }
+        public Command? Zip { get; set; }
+        public Command? Assembler { get; set; }
     }
+
+
+    public class Command
+    {
+        public string? App { get; set; }
+        public string? Args { get; set; }
+    }
+    public class Offset
+    {
+        public double x { get; set; }
+        public double y { get; set; }
+    }
+
+
 }
