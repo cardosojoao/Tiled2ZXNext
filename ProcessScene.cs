@@ -132,19 +132,10 @@ namespace Tiled2dot8
             File.WriteAllText(pathOutput, mapData.ToString());
         }
 
-        //private List<Entities.Layer> GetGenericGroups(List<Entities.Layer> layers)
-        //{
-        //    List<Entities.Layer> groupsGeneric = layers.FindAll(l => GROUPS.FindIndex(g => g == l.Name) > -1);
-        //    return groupsGeneric;
-        //}
-
         private static bool IsGenericGroup(string name)
         {
             return GROUPS.FindIndex(g => g.Equals(name, System.StringComparison.InvariantCultureIgnoreCase)) == -1;
         }
 
-        //public static void AddSceneHeaderCode(StringBuilder code, int bytes)
-        //{
-        //}
     }
 }

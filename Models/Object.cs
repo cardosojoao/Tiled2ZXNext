@@ -41,6 +41,9 @@ namespace Tiled2dot8.Models
         [JsonPropertyName("polygon")]
         public Polygon Polygon { get; set; }
 
+        [JsonPropertyName("polyline")]
+        public Polygon PolyLine { get; set; }
+
         [JsonPropertyName("template")]
         public string Template { get; set; }
     }

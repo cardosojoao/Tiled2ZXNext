@@ -134,17 +134,15 @@ namespace Tiled2dot8
                 if (obj.Visible)
                 {
                     data.Append("\t\tdw $").Append((obj.X + Controller.Config.Offset.x).Double2Hex("X4"));
-                    data.Append(",$").Append((obj.Y + Controller.Config.Offset.y).Double2Hex("X4"));
-                    data.Append("\r\n");
+                    data.Append(",$").AppendLine((obj.Y + Controller.Config.Offset.y).Double2Hex("X4"));
                     data.Append("\t\tdb $").Append(obj.Width.Double2Hex());
-                    data.Append(",$").Append(obj.Height.Double2Hex());
-                    data.Append("\r\n");
+                    data.Append(",$").AppendLine(obj.Height.Double2Hex());
                     lengthData += 6;
                 }
             }
 
             // size must be 2B long (map is over 256 Bytes)
-            headerType.Append("\t\tdw $").Append(lengthData.ToString("X4")).Append("\t\t; Block size\r\n");
+            headerType.Append("\t\tdw $").Append(lengthData.ToString("X4")).AppendLine("\t\t; Block size");
             // insert header at begin
             header.Insert(0, headerType);
             header.Append(data);
@@ -153,6 +151,7 @@ namespace Tiled2dot8
 
         /// <summary>
         /// collision objects must be even in width and height
+        /// x and y will become the center of object
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>

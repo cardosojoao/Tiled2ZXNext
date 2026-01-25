@@ -28,7 +28,7 @@ namespace Tiled2dot8
             string fileName = _scene.Properties.GetProperty("FileName");
             foreach (Layer layer in _rootLayer.Layers)
             {
-                if (layer.Visible && layer.Name.Equals("path", StringComparison.InvariantCultureIgnoreCase))
+                if (layer.Visible ) // && layer.Name.Equals("path", StringComparison.InvariantCultureIgnoreCase))
                 {
                     Console.WriteLine("Layer " + layer.Name);
                     locationsCode.Append('.');
@@ -77,7 +77,7 @@ namespace Tiled2dot8
             TechHeader.Add("object", 1);
             TechHeader.Add("path", 1);
 
-            header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible && c.Type.Equals("path", StringComparison.InvariantCultureIgnoreCase)).ToString("X")).Append("\t\t; Objects count\r\n");
+            header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible && c.Type.Equals("path", StringComparison.InvariantCultureIgnoreCase)).Int2Hex("X2")).Append("\t\t; Objects count\r\n");
             lengthData += 1;
 
 
@@ -88,7 +88,7 @@ namespace Tiled2dot8
                     int blockLength = 0;
                     Polygon polygon = obj.Polygon;
                     int id = polygon.Properties.GetPropertyInt("ID");
-                    string speed = polygon.Properties.GetProperty("speed");
+                    string speed = polygon.Properties.GetProperty("Speed");
 
                     List<int> speedIntervals = GetSpeed(speed, polygon.Count);
                     if (speedIntervals.Count != polygon.Count)
@@ -119,7 +119,7 @@ namespace Tiled2dot8
                     foreach (var step in steps)
                     {
                         blockData.Append("\t\tdw $").Append(step.X.Int2Hex("X4")).Append(", $").AppendLine(step.Y.Int2Hex("X4"));
-                        blockData.Append("\t\tdb $").AppendLine(step.speed.Int2Hex("X2"));
+                        blockData.Append("\t\tdb $").Append((step.speed/4).Int2Hex("X2")).AppendLine("\t\t; speed divide by 4");
                         blockData.Append("\t\t; StepX, StepY, frames\r\n");
                         blockLength += 5;
                     }

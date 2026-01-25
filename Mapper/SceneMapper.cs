@@ -85,12 +85,23 @@ namespace Tiled2dot8.Mapper
             Dictionary<string, Model.tileset> tilesSetData = new();
 
             int order = 0;       // order of load 
-            foreach (Model.TileSet tileSet in tileSetsRaw)
+
+            tileSetsRaw.ForEach(t => t.Source = Path.GetFullPath(Path.Combine(inputPath, t.Source)));
+            tileSetsRaw = tileSetsRaw.OrderBy(t => t.Source).ToList();
+
+            List < Model.TileSet > tileSets = tileSetsRaw.Where(s=>s.Source.Contains("tilesheets",StringComparison.CurrentCultureIgnoreCase)).ToList();
+            List<Model.TileSet> spriteSets = tileSetsRaw.Where(s => s.Source.Contains("sprites", StringComparison.CurrentCultureIgnoreCase)).ToList();
+
+            foreach (Model.TileSet tileSet in tileSets)
             {
                 tileSet.Order = order;      // judt to keep in mind the physical order of tilesheet that is align with gid's
-                string file = Path.Combine(inputPath, tileSet.Source);
+                string file = Path.GetFullPath(Path.Combine(inputPath, tileSet.Source));
+                Console.Write($"Loading tile sheet {file}.");
                 Model.tileset tileSetData = ReadTileSet(file);
-
+                if (tileSetData.properties == null)
+                {
+                    Console.Error.WriteLine($"Tile sheet {file} has no properties defined, check if was defined at cell level.");
+                }
                 tileSet.Lastgid = tileSetData.tilecount + tileSet.Firstgid - 1;
                 if (!resolved.ContainsKey(tileSetData.image.source))
                 {
@@ -99,12 +110,37 @@ namespace Tiled2dot8.Mapper
                 }
                 resolved[tileSetData.image.source].Add(tileSet);
                 order++;
+                Console.WriteLine($"  done.");
             }
+
+            foreach (Model.TileSet tileSet in spriteSets)
+            {
+                tileSet.Order = order;      // judt to keep in mind the physical order of tilesheet that is align with gid's
+                string file = Path.GetFullPath(Path.Combine(inputPath, tileSet.Source));
+                Console.Write($"Loading sprite sheet {file}.");
+                Model.tileset tileSetData = ReadTileSet(file);
+                if (tileSetData.properties == null)
+                {
+                    Console.Error.WriteLine($"Sprite sheet {file} has no properties defined, check if was defined at cell level.");
+                }
+                tileSet.Lastgid = tileSetData.tilecount + tileSet.Firstgid - 1;
+                if (!resolved.ContainsKey(tileSetData.image.source))
+                {
+                    resolved.Add(tileSetData.image.source, new List<Model.TileSet>());
+                    tilesSetData.Add(tileSetData.image.source, tileSetData);
+                }
+                resolved[tileSetData.image.source].Add(tileSet);
+                order++;
+                Console.WriteLine($"  done.");
+            }
+
+
             List<Entity.Tileset> tilesets = new();
 
 
             foreach (KeyValuePair<string, List<Model.TileSet>> sets in resolved)
             {
+                Console.Write($"Parse tile/sprite sheet {sets.Key}.");
                 foreach (Model.TileSet setRaw in sets.Value)
                 {
                     Entity.Tileset tileset = new();
@@ -122,6 +158,7 @@ namespace Tiled2dot8.Mapper
                     tileset.TileSheetID = tileSetData.properties.GetPropertyInt("TileSheetId");
                     tileset.PaletteIndex = tileSetData.properties.GetPropertyInt("PaletteIndex");
                     //}
+                    Console.WriteLine($"  done.");
                 }
             }
             return tilesets;

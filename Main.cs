@@ -43,7 +43,7 @@ namespace Tiled2dot8
             
 
 
-            string[] worlds = Directory.GetFiles(Path.GetDirectoryName(o.World), "*.world");
+            string[] worlds = Directory.GetFiles(Path.GetFullPath(o.World), "*.world");
             foreach (string worldFile in worlds)
             {
                 string worldRaw = File.ReadAllText(worldFile);
@@ -57,9 +57,6 @@ namespace Tiled2dot8
                 string worldName = Path.GetFileName(worldFile);
                 File.WriteAllText(Path.Combine(o.MapPath, Path.GetFileNameWithoutExtension(worldName)+"_worldMap.asm"), worldProc.ToString());
             }
-
-
-
             if (o.Project.Length > 0)
             {
                 if (File.Exists(o.Project))

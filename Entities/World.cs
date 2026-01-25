@@ -237,7 +237,11 @@ namespace Tiled2dot8.Entities
             {
                 if (map.X1 == x2)
                 {
-                    if ((y1 <= map.Y1 && y2 >= map.Y2) || (y1 >= map.Y1 && y2 <= map.Y2) || (map.Y1 >= y1 && map.Y1 <= y2) || (map.Y2 >= y1 && map.Y2 <= y2))
+                    if ((y1 < map.Y1 && y2 > map.Y2) ||  // 
+                        (y1 > map.Y1 && y2 < map.Y2) || 
+                        (map.Y1 > y1 && map.Y1 < y2) || 
+                        (map.Y2 > y1 && map.Y2 < y2) ||
+                            (map.Y1 == y1 && map.Y2==y2))
                     {
                         // join map on right
                         neigh.Right.Id = map.Id;
@@ -246,7 +250,11 @@ namespace Tiled2dot8.Entities
                 }
                 else if (map.X2 == x1)
                 {
-                    if ((y1 <= map.Y1 && y2 >= map.Y2) || (y1 >= map.Y1 && y2 <= map.Y2) || (map.Y1 >= y1 && map.Y1 <= y2) || (map.Y2 >= y1 && map.Y2 <= y2))
+                    if ((y1 < map.Y1 && y2 > map.Y2) || 
+                        (y1 > map.Y1 && y2 < map.Y2) || 
+                        (map.Y1 > y1 && map.Y1 < y2) || 
+                        (map.Y2 > y1 && map.Y2 < y2) ||
+                           (map.Y1 == y1 && map.Y2 == y2))
                     {
                         // join map on left
                         neigh.Left.Id = map.Id;
@@ -255,7 +263,11 @@ namespace Tiled2dot8.Entities
                 }
                 else if (map.Y1 == y2)
                 {
-                    if ((x1 <= map.X1 && x2 >= map.X2) || (x1 >= map.X1 && x2 <= map.X2) || ( map.X1 >= x1 && map.X1 <= x2) || ( map.X2>= x1 && map.X2 <= x2))
+                    if ((x1 < map.X1 && x2 > map.X2) || 
+                        (x1 > map.X1 && x2 < map.X2) || 
+                        (map.X1 > x1 && map.X1 < x2) || 
+                        (map.X2 > x1 && map.X2 < x2) ||
+                        (map.X1 == x1 && map.X2 == x2))
                     {
                         // join map on bottom
                         neigh.Bottom.Id = map.Id;
@@ -264,7 +276,11 @@ namespace Tiled2dot8.Entities
                 }
                 else if (map.Y2 == y1)
                 {
-                    if ((x1 <= map.X1 && x2 >= map.X2) || (x1 >= map.X1 && x2 <= map.X2) || (map.X1 >= x1 && map.X1 <= x2) || (map.X2 >= x1 && map.X2 <= x2))
+                    if ((x1 < map.X1 && x2 > map.X2) || 
+                        (x1 > map.X1 && x2 < map.X2) || 
+                        (map.X1 > x1 && map.X1 < x2) || 
+                        (map.X2 > x1 && map.X2 < x2) ||
+                        (map.X1 == x1 && map.X2 == x2))
                     {
                         // join map on top
                         neigh.Top.Id = map.Id;

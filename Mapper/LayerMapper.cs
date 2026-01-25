@@ -63,20 +63,6 @@ namespace Tiled2dot8.Mapper
             return layer;
         }
 
-        //private static List<Entity.Property> ParseProperties(List<Model.Property> propertiesRaw)
-        //{
-        //    List<Entity.Property> properties = new List<Entity.Property>();
-        //    foreach (Model.Property propertyRaw in propertiesRaw)
-        //    {
-        //        Entity.Property property = new Entity.Property();
-        //        property.Name = propertyRaw.Name;
-        //        property.Type = propertyRaw.Type;
-        //        property.Value = propertyRaw.Value;
-        //        properties.Add(property);
-        //    }
-        //    return properties;
-        //}
-
         private static List<Entity.Object> ParseObjects(List<Model.Object> objectsRaw)
         {
             List<Entity.Object> objects = new();
@@ -134,6 +120,20 @@ namespace Tiled2dot8.Mapper
                         obj.Polygon.Add(new Entity.PolygonPoint() { X = point.x, Y = point.y });
                     }
                 }
+
+                if (objectRaw.PolyLine != null)
+                {
+                    obj.Polygon = new();
+                    if (objectRaw.Properties != null)
+                    {
+                        obj.Polygon.Properties = PropertyMapper.Map(objectRaw.Properties);
+                    }
+                    foreach (Model.PolygonPoint point in objectRaw.PolyLine)
+                    {
+                        obj.Polygon.Add(new Entity.PolygonPoint() { X = point.x, Y = point.y });
+                    }
+                }
+
                 objects.Add(obj);
             }
             return objects;
