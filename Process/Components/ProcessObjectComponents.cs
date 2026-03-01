@@ -413,6 +413,9 @@ namespace Tiled2dot8.Process.EEI
                     //
                     TechHeader.Add("object", 1);
                     StringBuilder gameObjectHeader = new StringBuilder();
+
+                    gameObjectHeader.Append('.').Append(_layer.Name).Append('_').Append(entityGameObject.Name).Append('_').Append(entityGameObject.Id).AppendLine(":");
+
                     gameObjectHeader.Append("\t\t; GameObject: ").AppendLine(entityGameObject.Name);
                     gameObjectHeader.Append("\t\tdb $").Append(gameObject.Components.Int2Hex("X2")).AppendLine("\t\t; GameObject Components Flags");
                     gameObjectHeader.Append("\t\tdb ").Append(gameObject.Tag).AppendLine("\t\t; GameObject tag");
