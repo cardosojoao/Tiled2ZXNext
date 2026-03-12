@@ -104,14 +104,13 @@ namespace Tiled2dot8.Process.EEI
             header.Append("\t\tdb $").Append(layer.Layers.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");
             lengthData++;
 
-
-
             foreach (Entities.Layer entityGameObject in layer.Layers)
             {
 
                 if (entityGameObject.Visible)
                 {
                     Console.WriteLine($"GameObject {entityGameObject.Name} {entityGameObject.Id}");
+
                     GameObject gameObject = new();
                     gameObject.Tag = entityGameObject.Properties.GetProperty("tag", "tag_None");
                     StringBuilder componentsData = new StringBuilder();

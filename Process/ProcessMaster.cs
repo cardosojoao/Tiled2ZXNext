@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using Tiled2dot8.Entities;
 using Tiled2dot8.Extensions;
-//using Tiled2ZXNext.Models;
 using Tiled2dot8.ProcessLayers;
 
 namespace Tiled2dot8.Process.EEI
@@ -55,9 +54,7 @@ namespace Tiled2dot8.Process.EEI
         protected void CheckValidator()
         {
             blockType = _layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
-
             StringBuilder validator = Validator.ProcessLayerValidator(_layer.Properties);
-
             if (validator.Length > 0)
             {
                 int prevBlockType = blockType;
@@ -75,7 +72,36 @@ namespace Tiled2dot8.Process.EEI
                     int prevBlockType = blockType;
                     blockType += 64;
                     headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator item.");
-                    //headerType.Append(validatorItem);
+                }
+                else
+                {
+                    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine("\t\t; data block type");
+                }
+            }
+        }
+        protected void CheckValidator(Layer layer)
+        {
+            
+
+            StringBuilder validator = Validator.ProcessLayerValidator(layer.Properties);
+
+            if (validator.Length > 0)
+            {
+                int prevBlockType = blockType;
+                blockType += 128;
+                headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with validator.");
+                headerType.Append(validator);
+            }
+            else
+            {
+                // validator at item level
+                StringBuilder validatorItem = Validator.ProcessItemValidator(layer.Properties);
+                validatorItemActive = validatorItem.Length > 0;
+                if (validatorItemActive)
+                {
+                    int prevBlockType = blockType;
+                    blockType += 64;
+                    headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine($"\t\t; data block type {prevBlockType} with Validator item.");
                 }
                 else
                 {

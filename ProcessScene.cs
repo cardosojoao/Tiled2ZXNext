@@ -64,7 +64,7 @@ namespace Tiled2dot8
             List<Entities.Layer> groups = layers.FindAll(l => l.Type == "group" && l.Visible);
             foreach (Entities.Layer group in groups)
             {
-                if (group.Layers.Count > 0)
+                if (group.Layers.Count > 0 && group.Visible)
                 {
                     if (IsGenericGroup(group.Name))     // used for recursive call
                     {
@@ -85,10 +85,6 @@ namespace Tiled2dot8
                                     // default tiled layer
                                     case "tilelayer":
                                         blocks.Add(new ProcessLayer2(layer, scene, properties));
-                                        break;
-                                    // static sprite layer
-                                    case "objectgroup":
-                                        blocks.Add(new ProcessSprite(layer, scene, properties));
                                         break;
                                     default:
                                         break;
@@ -112,7 +108,7 @@ namespace Tiled2dot8
                     {
                         blocks.Add(new ProcessPaths(group, scene, properties));
                     }
-                    else if (group.Name.Equals("EEI", System.StringComparison.InvariantCultureIgnoreCase))
+                    else if (group.Name.Equals("eei", System.StringComparison.InvariantCultureIgnoreCase))
                     {
                         blocks.Add(new ProcessEei(group, scene, properties));
                     }

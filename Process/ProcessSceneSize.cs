@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Tiled2dot8.Entities;
+using Tiled2dot8.enums;
 
 namespace Tiled2dot8
 {
@@ -18,7 +19,7 @@ namespace Tiled2dot8
         public StringBuilder Execute()
         {
             Console.WriteLine("Scene size");
-            int blockType = 13;
+            int blockType = (int)BlockType.SceneSize;
             StringBuilder sceneSize = new();
             Entities.Layer layer = _scene.Layers.Find(l => l.Name.Equals("layer2", StringComparison.InvariantCultureIgnoreCase));
             int width = layer.Layers[0].Width;
