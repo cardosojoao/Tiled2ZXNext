@@ -11,7 +11,7 @@ namespace Tiled2dot8
 {
     public partial class Controller
     {
-        public void PostProcessing(Options o, string worldName)
+        public void PostProcessing(SceneOptions o, string worldName)
         {
             int execResult = -1;
             string outputPath = Path.Combine(o.RoomPath, worldName);

@@ -117,7 +117,7 @@ namespace Tiled2dot8
             return blocks;
         }
 
-        public void OutputLayer(Options o, string worldName, StringBuilder mapData)
+        public void OutputLayer(SceneOptions o, string worldName, StringBuilder mapData)
         {
             string FolderOutput = Path.Combine(o.RoomPath, worldName);
             if (!Directory.Exists(FolderOutput))
