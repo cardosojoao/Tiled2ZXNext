@@ -109,11 +109,11 @@ namespace Tiled2dot8
                         steps.Add((speedStep, x, y));
                     }
                     StringBuilder blockData = new(1024);
-                    blockData.Append("\t\tdb $").Append(steps.Count.Int2Hex("X2"));
-                    blockData.Append("\t\t; Number of steps\r\n");
-                    blockLength++;
                     blockData.Append("\t\tdb $").Append( SetFlags(steps).Int2Hex("X2"));
                     blockData.Append("\t\t; flags  bit0 - 1=Loop, 0=Once\r\n");
+                    blockLength++;
+                    blockData.Append("\t\tdb $").Append(steps.Count.Int2Hex("X2"));
+                    blockData.Append("\t\t; Number of steps\r\n");
                     blockLength++;
 
                     foreach (var step in steps)

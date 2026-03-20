@@ -104,14 +104,13 @@ namespace Tiled2dot8.Process.EEI
             header.Append("\t\tdb $").Append(layer.Layers.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");
             lengthData++;
 
-
-
             foreach (Entities.Layer entityGameObject in layer.Layers)
             {
 
                 if (entityGameObject.Visible)
                 {
                     Console.WriteLine($"GameObject {entityGameObject.Name} {entityGameObject.Id}");
+
                     GameObject gameObject = new();
                     gameObject.Tag = entityGameObject.Properties.GetProperty("tag", "tag_None");
                     StringBuilder componentsData = new StringBuilder();
@@ -120,7 +119,7 @@ namespace Tiled2dot8.Process.EEI
                         // parameter component - set a literal value of flag value to be consumed by other components
                         //
                         Entities.Object obj = entityGameObject.Objects.Find(c => c.Type.Equals(ComponentsType.Parameter, StringComparison.InvariantCultureIgnoreCase) && c.Visible);
-                        if (obj != null && obj.Visible)
+                        if (obj != null)
                         {
                             Console.WriteLine($"\t Component parameter {obj.Id}");
                             gameObject.Components |= ((int)ComponentFlags.Parameter);
@@ -139,7 +138,7 @@ namespace Tiled2dot8.Process.EEI
                         //  Sprite Modular Component - setup a sprite with modular configuration
                         //
                         Entities.Object obj = entityGameObject.Objects.Find(c => c.Type.Equals(ComponentsType.Sprite, StringComparison.InvariantCultureIgnoreCase) && c.Visible);
-                        if (obj != null && obj.Visible)
+                        if (obj != null)
                         {
                             Console.WriteLine($"\t Component sprite software {obj.Id}");
                             TechHeader.Add("sprite", 1);
@@ -162,7 +161,7 @@ namespace Tiled2dot8.Process.EEI
                         //  Sprite hardware component
                         //
                         Entities.Object obj = entityGameObject.Objects.Find(c => c.Type.Equals(ComponentsType.SpriteHW, StringComparison.InvariantCultureIgnoreCase) && c.Visible);
-                        if (obj != null && obj.Visible)
+                        if (obj != null)
                         {
                             Console.WriteLine($"\t Component sprite hardware {obj.Id}");
                             TechHeader.Add("spritehw", 1);
@@ -236,6 +235,7 @@ namespace Tiled2dot8.Process.EEI
 
                     {
                         //
+                        // 
                         // Animation Component - setup a sprite with animation
                         //
                         Entities.Object obj = entityGameObject.Objects.Find(c => c.Type.Equals(ComponentsType.Animation, StringComparison.InvariantCultureIgnoreCase) && c.Visible);
@@ -247,12 +247,54 @@ namespace Tiled2dot8.Process.EEI
                             Console.WriteLine($"\t Component animation {obj.Id}");
                             TechHeader.Add("animation", 1);
                             gameObject.Components |= ((int)ComponentFlags.Animation);
-
-
-
-                            
                             componentsData.AppendLine($"\t\t;\tAnimation Component - {obj.Id}");
+                            string animationName = obj.Properties.GetProperty("AnimationName");
+                            int animationStyle = obj.Properties.GetPropertyInt("Style", 0);
+                            int startDelay = obj.Properties.GetPropertyInt("StartDelay", 0);
+                            // int Direction = obj.Properties.GetPropertyInt("V/H", 0);
+                            // int animationIndex = Project.Instance.Tables["Animation"].Items.FindIndex(r => r.Equals(animationName + "_CODE", StringComparison.CurrentCultureIgnoreCase));
 
+                            int flags = animationStyle;         // bit 0  0 = Loop, 1 = Once
+                            //lags |= (Direction << 1);          // bit 1  0 = Vertical, 1 = Horizontal
+
+                            if (startDelay > 0)
+                            {
+                                flags |= 0x80; // set start delay flag
+                            }
+                            componentsData.Append("\t\tdb $").Append(flags.Int2Hex("X2")).Append("\t\t; ").AppendLine("bit0 = flags Animation style 0 = Loop. 1 = Once , bit1 = Vertical = 0, Horizontal = 1, bit7 = Start Delay in frames");
+                            lengthData++;
+                            if (startDelay > 0)
+                            {
+                                componentsData.Append("\t\tdb $").Append(startDelay.Int2Hex("X2")).AppendLine("\t\t; start delay in frames ");
+                                lengthData++;
+                            }
+                            componentsData.Append("\t\tdb ").AppendLine(animationName);
+                            lengthData++;
+
+
+                            if (!gameObject.Set)
+                            {
+                                gameObject.Setup(obj.X, obj.Y);
+                            }
+                        }
+                    }
+
+
+                    {
+                        //
+                        // *** on Hold ***
+                        // Animation Component - setup a sprite with animation
+                        //
+                        Entities.Object obj = entityGameObject.Objects.Find(c => c.Type.Equals(ComponentsType.Animation, StringComparison.InvariantCultureIgnoreCase) && c.Visible);
+                        if (obj != null && 1 == 0)
+                        {
+                            /*
+                             * The goal is to get the animation data and load into the heap and get the id 
+                             */
+                            Console.WriteLine($"\t Component animation {obj.Id}");
+                            TechHeader.Add("animation", 1);
+                            gameObject.Components |= ((int)ComponentFlags.Animation);
+                            componentsData.AppendLine($"\t\t;\tAnimation Component - {obj.Id}");
                             //string animationName = obj.Properties.GetProperty("AnimationName");
                             int animationStyle = obj.Properties.GetPropertyInt("Style", 0);
                             int startDelay = obj.Properties.GetPropertyInt("StartDelay", 0);
@@ -284,6 +326,7 @@ namespace Tiled2dot8.Process.EEI
                             }
 
                             componentsData.Append("\t\tdb $").Append(linesY.Length.Byte2Hex("X2")).AppendLine("\t;\t\t Number of steps");
+                            lengthData++;
                             for (int lineIndex = 0; lineIndex < linesX.Length; lineIndex++)
                             {
                                 lineX = linesX[lineIndex];
@@ -297,7 +340,7 @@ namespace Tiled2dot8.Process.EEI
 
                             // int animationIndex = Project.Instance.Tables["Animation"].Items.FindIndex(r => r.Equals(animationName + "_CODE", StringComparison.CurrentCultureIgnoreCase));
 
-                            string flagsDescription = "bit0 = flags Animation style 0 = Loop. 1 = Once , bit1 = Vertical = 0, Horizontal = 1, bit7 = Start Delay in frames";
+                            ;
                             int flags = animationStyle;         // bit 0  0 = Loop, 1 = Once
                             flags |= (Direction << 1);          // bit 1  0 = Vertical, 1 = Horizontal
 
@@ -305,12 +348,12 @@ namespace Tiled2dot8.Process.EEI
                             {
                                 flags |= 0x80; // set start delay flag
                             }
-                            componentsData.Append("\t\tdb $").Append(flags.Int2Hex("X2")).Append("\t\t; ").AppendLine(flagsDescription);
-                            lengthData += 1;
+                            componentsData.Append("\t\tdb $").Append(flags.Int2Hex("X2")).Append("\t\t; ").AppendLine("bit0 = flags Animation style 0 = Loop. 1 = Once , bit1 = Vertical = 0, Horizontal = 1, bit7 = Start Delay in frames");
+                            lengthData ++;
                             if (startDelay > 0)
                             {
                                 componentsData.Append("\t\tdb $").Append(startDelay.Int2Hex("X2")).AppendLine("\t\t; start delay in frames ");
-                                lengthData += 1;
+                                lengthData++;
                             }
                             //componentsData.Append("\t\tdb ").AppendLine(animationName);
                             
@@ -327,7 +370,7 @@ namespace Tiled2dot8.Process.EEI
                         // Force Component - setup a force
                         //
                         Entities.Object obj = entityGameObject.Objects.Find(c => c.Type.Equals(ComponentsType.Force, StringComparison.InvariantCultureIgnoreCase));
-                        if (obj != null && obj.Visible)
+                        if (obj != null)
                         {
                             Console.WriteLine($"\t Component force {obj.Id}");
                             TechHeader.Add("force", 1);
@@ -347,7 +390,7 @@ namespace Tiled2dot8.Process.EEI
                         // Path Component - setup a path for moving objects
                         //
                         Entities.Object obj = entityGameObject.Objects.Find(c => c.Type.Equals(ComponentsType.Path, StringComparison.InvariantCultureIgnoreCase));
-                        if (obj != null && obj.Visible)
+                        if (obj != null)
                         {
                             Console.WriteLine($"\t Component path {obj.Id}");
                             if ((gameObject.Components & ((int)ComponentFlags.SpriteHW)) == 0)
@@ -369,6 +412,9 @@ namespace Tiled2dot8.Process.EEI
                     //
                     TechHeader.Add("object", 1);
                     StringBuilder gameObjectHeader = new StringBuilder();
+
+                    gameObjectHeader.Append('.').Append(_layer.Name).Append('_').Append(entityGameObject.Name).Append('_').Append(entityGameObject.Id).AppendLine(":");
+
                     gameObjectHeader.Append("\t\t; GameObject: ").AppendLine(entityGameObject.Name);
                     gameObjectHeader.Append("\t\tdb $").Append(gameObject.Components.Int2Hex("X2")).AppendLine("\t\t; GameObject Components Flags");
                     gameObjectHeader.Append("\t\tdb ").Append(gameObject.Tag).AppendLine("\t\t; GameObject tag");

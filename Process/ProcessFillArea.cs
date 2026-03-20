@@ -5,6 +5,7 @@ using Tiled2dot8.Entities;
 using Tiled2dot8.Extensions;
 using Tiled2dot8.Palette;
 using Tiled2dot8.ProcessLayers;
+using Tiled2dot8.enums;
 
 namespace Tiled2dot8
 {
@@ -40,7 +41,7 @@ namespace Tiled2dot8
                     layer.Properties.Merge(_properties);        // add parent extended properties
 
                     _blockType = layer.Properties.GetPropertyInt("Type");
-                    if (_blockType == 15)
+                    if (_blockType == (int)BlockType.FillBlock)
                     {
                         Console.WriteLine("Layer " + layer.Name);
                         Dictionary<int, List<Rectangle>> areas = new LayerScanFill(layer).Scan();
@@ -117,27 +118,6 @@ namespace Tiled2dot8
             }
             return data;
         }
-
-        private StringBuilder AreaCode(Rectangle rect)
-        {
-            StringBuilder areaCode = new();
-            areaCode.Append("\t\tdb $");
-            areaCode.Append(rect.X.ToString("X2"));
-            areaCode.Append(",$");
-            areaCode.Append(rect.Y.ToString("X2"));
-            areaCode.Append(",$");
-            areaCode.Append(rect.Width.ToString("X2"));
-            areaCode.Append(",$");
-            areaCode.Append(rect.Height.ToString("X2"));
-            areaCode.Append("\t\t; x, y, width, height\r\n");
-            _size += 4;
-            return areaCode;
-        }
-
-
-
-
-
 
 
         private bool IsLayerEmpty(List<uint> data)

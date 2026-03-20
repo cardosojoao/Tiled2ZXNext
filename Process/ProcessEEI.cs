@@ -34,28 +34,7 @@ namespace Tiled2dot8
                     int type = layer.Properties.GetPropertyInt("Type");
                     switch (type)
                     {
-                        case 5:
-                            {
-                                all.Append(new ProcessPlatform(layer, _scene, _properties).Execute());
-                            }
-                            break;
-                        case 6:
-                            {
-                                all.Append(new ProcessWatter(layer, _scene, _properties).Execute());
-                                break;
-                            }
-                        case 7:
-                            {
-                                all.Append(new ProcessScrap(layer, _scene, _properties).Execute());
-                                break;
-                            }
-                        //case 8:
-                        //case 9:
-                        //    {
-                        //        all.Append(new ProcessSprite(layer, _scene, _properties).Execute());
-                        //        break;
-                        //    }
-                        case 17:        //  12
+                        case 17:
                             {
                                 all.Append(new ProcessObjectComponents(layer, _scene, _properties).Execute());
                                 break;

@@ -4,6 +4,7 @@ using System.Text;
 using Tiled2dot8.Entities;
 using Tiled2dot8.Palette;
 using Tiled2dot8.Extensions;
+using Tiled2dot8.enums;
 
 namespace Tiled2dot8
 {
@@ -31,7 +32,7 @@ namespace Tiled2dot8
             {
                 Console.WriteLine("Layer not defined, using color #000000");
                 backColour = new RGBA("#000000ff");
-                _blockType = 14;
+                _blockType = (int)BlockType.BackgroundColour;
             }
             else
             {

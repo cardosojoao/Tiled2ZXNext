@@ -1,22 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Tiled2dot8.Extensions;
-using Tiled2dot8.Entities;
-using System.IO;
-using Model = Tiled2dot8.Models;
+﻿using System.Collections.Generic;
 using Entity = Tiled2dot8.Entities;
-using System.Xml.Serialization;
-using Tiled2dot8.Models;
-using System.Reflection.Metadata;
+using Model = Tiled2dot8.Models;
 
 
 namespace Tiled2dot8.Mapper
 {
     public class WorldMapper
     {
-        public static Entities.World Map(Model.World world,Options options)
+        public static Entities.World Map(Model.World world)
         {
             Entity.World worldOutput = new();
 

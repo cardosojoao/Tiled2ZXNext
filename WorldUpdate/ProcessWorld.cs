@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Numerics;
+﻿using System;
 using System.Text;
 using Tiled2dot8.Entities;
 using Tiled2dot8.Extensions;
@@ -42,12 +37,7 @@ namespace Tiled2dot8
                 all.Append("\t\tdw $").Append(map.NeighBours.Top.Xoffset.Int2Hex("X4")).Append(", $").Append(map.NeighBours.Top.Yoffset.Int2Hex("X4")).AppendLine("\t; (Top) Xoffset, Yoffset");
                 all.Append("\t\tdb $").Append(map.NeighBours.Bottom.Id.ToString("X2")).AppendLine("\t; (Bottom) id");
                 all.Append("\t\tdw $").Append(map.NeighBours.Bottom.Xoffset.Int2Hex("X4")).Append(", $").Append(map.NeighBours.Bottom.Yoffset.Int2Hex("X4")).AppendLine("\t; (Bottom) Xoffset, Yoffset ");
-
-                //all.Append("\t\tdb $").Append(map.NeighBours.Right.Id.ToString("X2")).AppendLine("\t; Right");
-                //all.Append("\t\tdb $").Append(map.NeighBours.Top.Id.ToString("X2")).AppendLine("\t; Top");
-                //all.Append("\t\tdb $").Append(map.NeighBours.Bottom.Id.ToString("X2")).AppendLine("\t; Bottom\n");
             }
-
             return all;
         }
     }

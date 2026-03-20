@@ -1,12 +1,9 @@
-﻿using Microsoft.Extensions.Primitives;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using Tiled2dot8.Entities;
 using Tiled2dot8.Extensions;
-using Tiled2dot8.Models.XML;
 using Tiled2dot8.ProcessLayers;
 
 namespace Tiled2dot8

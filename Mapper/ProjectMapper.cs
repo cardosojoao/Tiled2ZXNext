@@ -16,7 +16,7 @@ namespace Tiled2dot8.Mapper
 {
     public class ProjectMapper
     {
-        public static void Map(Model.Project projectRaw, Entities.Project project, Options options)
+        public static void Map(Model.Project projectRaw, Entities.Project project, SceneOptions options)
         {
             project.Properties = PropertyMapper.Map(projectRaw.Properties);
             string inputPath = Path.GetDirectoryName(options.Input);
