@@ -43,6 +43,10 @@ namespace Tiled2dot8
             }
 
             int colourIndex = Controller.Palette.Colours.FindIndex(c => c.R == backColour.R && c.G == backColour.G && c.B == backColour.B && c.A == backColour.A);
+            if(colourIndex == -1)
+            {
+                throw new Exception("Background color missing in Palette " + layer.Colour);
+            }
             _size++;
             backgroundCode.Append("\t\tdb $").Append(_blockType.ToString("X2")).Append("\t\t; data block type Background Colour\r\n");
             backgroundCode.Append("\t\tdw $").Append(_size.ToString("X4")).Append("\t\t; Block size\r\n");

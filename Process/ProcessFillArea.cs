@@ -83,6 +83,10 @@ namespace Tiled2dot8
                 _size = 0;
 
                 int colourIndex = Controller.Palette.Colours.FindIndex(c => c.R == backColour.R && c.G == backColour.G && c.B == backColour.B && c.A == backColour.A);
+                if (colourIndex == -1)
+                {
+                    throw new Exception("Fill color missing in Palette " + layer.Colour);
+                }
                 _size++;
                 StringBuilder body = WriteAreas(data.Value);
 

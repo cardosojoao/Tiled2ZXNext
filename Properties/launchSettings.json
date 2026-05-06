@@ -6,11 +6,11 @@
     },
     "Map": {
       "commandName": "Project",
-      "commandLineArgs": "scene -i\"D:/devl/zx/proj/ZXGame/3.resources/Tiled/TheGym/TheGym_003.json\" -aD:\\devl\\zx\\proj\\ZXGame\\2.source -rD:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\worlds -p\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\mapa01.tiled-project\" -c\"D:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\Palette\\layer2_01.gpl\""
+      "commandLineArgs": "scene -i\"D:/devl/zx/proj/ZXGame/3.resources/Tiled/TheGym/TheGym_004.json\" -aD:\\devl\\zx\\proj\\ZXGame\\2.source -rD:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\worlds -p\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\mapa01.tiled-project\" -c\"D:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\Palette\\layer2_01.gpl\""
     },
     "world": {
       "commandName": "Project",
-      "commandLineArgs": "world -i\"D:/devl/zx/proj/ZXGame/3.resources/Tiled/TheGym/TheGym_003.json\" -o\"D:/devl/zx/proj/ZXGame/3.resources/Tiled/TheGym/TheGym_003.json\" "
+      "commandLineArgs": "world -i\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\chapter01.world\" -o\"data\\WorldMap\\Tiled\\chapter01.world\" "
     }
   }
 }

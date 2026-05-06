@@ -42,11 +42,15 @@ namespace Tiled2dot8
                         main.Run(WorldOptions);
                     })
 
-                    .WithNotParsed(errors => { });
+                    .WithNotParsed(errors =>
+                    {
+                        Environment.Exit(1);
+                    });
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine(ex.ToString());
+                Environment.Exit(1);
             }
         }
     }
