@@ -27,9 +27,7 @@ namespace Tiled2dot8
             StringBuilder processesCode = new(4096);
             StringBuilder sceneCode = new(2048);
 
-            string fileName = scene.Properties.GetProperty("FileName");
-
-
+            string fileName = scene.Properties.GetProperty("SceneName");
 
             TechHeader.Reset();
 
