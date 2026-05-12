@@ -99,6 +99,21 @@ namespace Tiled2dot8.Mapper
                         Entities.Scene.Instance.Templates.Add(obj.Template, template);
                     }
                     template = Entities.Scene.Instance.Templates[obj.Template];
+
+                    obj.Type = template.Type;
+
+                    if(obj.Width == 0 && template.Width != 0)
+                    {
+                        obj.Width = template.Width;
+                    }
+
+                    if (obj.Height == 0 && template.Height != 0)
+                    {
+                        obj.Height = template.Height;
+                    }
+
+
+
                     foreach (var property in template.Properties)
                     {
                         if (obj.Properties.Find(p => p.Name == property.Name) == null)

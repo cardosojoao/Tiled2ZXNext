@@ -6,14 +6,19 @@ namespace Tiled2dot8.Mapper
 {
     public static class TemplateMapper
     {
-        public static Entity.Template Map(Model.XML.Template TemplateRaw)
+        public static Entity.Template Map(Model.XML.Template templateRaw)
         {
             Entity.Template template= new Entity.Template();
-            foreach (Model.XML.Property propertyRaw in TemplateRaw.Object.Properties.Property)
+
+            template.Gid = templateRaw.Object.Gid;
+            template.Type = templateRaw.Object.Type;
+            template.Height = templateRaw.Object.Height;
+            template.Width = templateRaw.Object.Width;
+            foreach (Model.XML.Property propertyRaw in templateRaw.Object.Properties.Property)
             {
                 Entity.Property property = new Entity.Property();
                 property.Name = propertyRaw.Name;
-                property.Type = propertyRaw.Type.ToString();
+                property.Type = propertyRaw.Type ?? ""  ;
                 property.Value = propertyRaw.Value.ToString();
                 template.Properties.Add(property);
             }
