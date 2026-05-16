@@ -76,7 +76,7 @@ namespace Tiled2dot8
                     {
                         foreach (Entities.Layer layer in group.Layers)
                         {
-                            if (layer.Visible)
+                            if (layer.Visible && !layer.Name.EndsWith("_input",StringComparison.InvariantCultureIgnoreCase) && !layer.Empty())
                             {
                                 switch (layer.Type)
                                 {

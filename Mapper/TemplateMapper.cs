@@ -14,13 +14,16 @@ namespace Tiled2dot8.Mapper
             template.Type = templateRaw.Object.Type;
             template.Height = templateRaw.Object.Height;
             template.Width = templateRaw.Object.Width;
-            foreach (Model.XML.Property propertyRaw in templateRaw.Object.Properties.Property)
+            if (templateRaw.Object.Properties != null)
             {
-                Entity.Property property = new Entity.Property();
-                property.Name = propertyRaw.Name;
-                property.Type = propertyRaw.Type ?? ""  ;
-                property.Value = propertyRaw.Value.ToString();
-                template.Properties.Add(property);
+                foreach (Model.XML.Property propertyRaw in templateRaw.Object.Properties.Property)
+                {
+                    Entity.Property property = new Entity.Property();
+                    property.Name = propertyRaw.Name;
+                    property.Type = propertyRaw.Type ?? "";
+                    property.Value = propertyRaw.Value.ToString();
+                    template.Properties.Add(property);
+                }
             }
             return template;
         }

@@ -30,7 +30,7 @@ namespace Tiled2dot8
             //LayersArea.Clear();
             StringBuilder layer2Code = new();
             //foreach (Layer layer in _rootLayer.Layers)
-            if (!IsLayerEmpty(_layer.Data))
+            if (!_layer.Empty())
             {
                 _layer.Properties.Merge(_properties);        // add parent extended properties
                 _tileSets = new();
@@ -277,15 +277,15 @@ namespace Tiled2dot8
         }
 
 
-        private bool IsLayerEmpty(List<uint> data)
-        {
-            long result = 0;
+        //private bool IsLayerEmpty(List<uint> data)
+        //{
+        //    long result = 0;
 
-            for (int i = 0; i < data.Count; i++)
-            {
-                result += data[i];
-            }
-            return result == 0;
-        }
+        //    for (int i = 0; i < data.Count; i++)
+        //    {
+        //        result += data[i];
+        //    }
+        //    return result == 0;
+        //}
     }
 }

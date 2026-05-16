@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Tiled2dot8.Entities
 {
@@ -29,5 +30,10 @@ namespace Tiled2dot8.Entities
         public List<Object> Objects { get; set; }
 
         public List<Property> Properties { get; set; }
+
+        public bool Empty()
+        {
+            return Data.Count(c => c != 0) == 0;
+        }
     }
 }

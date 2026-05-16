@@ -138,8 +138,8 @@ namespace Tiled2dot8.Extensions
 
         public static void Merge(this List<Entities.Property> properties, List<Entities.Property> mergeProperties)
         {
-            if (properties == null) throw new ArgumentNullException(nameof(properties));
-            if(mergeProperties != null)
+
+            if (mergeProperties != null)
             {
                 properties.AddRange(mergeProperties);
             }
