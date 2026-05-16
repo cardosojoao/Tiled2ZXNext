@@ -14,7 +14,7 @@ namespace Tiled2dot8
             {
                 Console.WriteLine("Tiled 2 Dot8 " + Assembly.GetEntryAssembly().GetName().Version);
 
-                Parser.Default.ParseArguments<SceneOptions, PatternsOptions, WorldOptions>(args)
+                Parser.Default.ParseArguments<SceneOptions, PatternsOptions, WorldOptions, TileSheetOptions>(args)
                     .WithParsed<SceneOptions>(options =>
                     {
                         if (options.Verbose)
@@ -40,6 +40,12 @@ namespace Tiled2dot8
                         Console.WriteLine($"Verbose output enabled. Current Arguments: -v {WorldOptions.Verbose}");
                         WorldUpdate main = new();
                         main.Run(WorldOptions);
+                    })
+                    .WithParsed<TileSheetOptions>(TileSetOptions =>
+                    {
+                        Console.WriteLine($"Verbose output enabled. Current Arguments: -v {TileSetOptions.Verbose}");
+                        TileSheetUpdate main = new();
+                        main.Run(TileSetOptions);
                     })
 
                     .WithNotParsed(errors =>

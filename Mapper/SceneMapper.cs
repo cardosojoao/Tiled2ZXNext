@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using Tiled2dot8.Extensions;
-using Tiled2dot8.Entities;
-using System.IO;
-using Model = Tiled2dot8.Models;
-using Entity = Tiled2dot8.Entities;
+using System.Xml;
 using System.Xml.Serialization;
+using Tiled2dot8.Extensions;
 using Tiled2dot8.Models;
-using System.Reflection.Metadata;
-using Tiled2dot8.Metadata;
+using Entity = Tiled2dot8.Entities;
+using Model = Tiled2dot8.Models;
 
 
 
@@ -22,7 +20,7 @@ namespace Tiled2dot8.Mapper
         {
             string worldName = sceneRaw.Properties.GetProperty("WorldName");
             string scenedName = sceneRaw.Properties.GetProperty("SceneName");
-            scene.FileName = worldName+ "_" + scenedName;
+            scene.FileName = worldName + "_" + scenedName;
             scene.Layer2Palette = sceneRaw.Properties.GetProperty("PaletteLayer2");
             scene.Properties = PropertyMapper.Map(sceneRaw.Properties);
             string inputPath = Path.GetDirectoryName(options.Input);
@@ -49,7 +47,7 @@ namespace Tiled2dot8.Mapper
             tileSetsRaw.ForEach(t => t.Source = Path.GetFullPath(Path.Combine(inputPath, t.Source)));
             tileSetsRaw = tileSetsRaw.OrderBy(t => t.Source).ToList();
 
-            List < Model.TileSet > tileSets = tileSetsRaw.Where(s=>s.Source.Contains("tilesheets",StringComparison.CurrentCultureIgnoreCase)).ToList();
+            List<Model.TileSet> tileSets = tileSetsRaw.Where(s => s.Source.Contains("tilesheets", StringComparison.CurrentCultureIgnoreCase)).ToList();
 
             List<Model.TileSet> spriteSets = tileSetsRaw.Where(s => s.Source.Contains("sprites", StringComparison.CurrentCultureIgnoreCase)).ToList();
 
@@ -57,11 +55,11 @@ namespace Tiled2dot8.Mapper
             {
                 tileSet.Order = order;      // judt to keep in mind the physical order of tilesheet that is align with gid's
                 string file = Path.GetFullPath(Path.Combine(inputPath, tileSet.Source));
-                if( file.EndsWith(":\\automap-tiles.tsx",  StringComparison.InvariantCultureIgnoreCase))
+                if (file.EndsWith(":\\automap-tiles.tsx", StringComparison.InvariantCultureIgnoreCase))
                 {
                     continue;
                 }
-                
+
                 Console.Write($"Loading tile sheet {file}.");
                 Model.tileset tileSetData = ReadTileSet(file);
                 if (tileSetData.properties == null)
@@ -76,10 +74,10 @@ namespace Tiled2dot8.Mapper
                 {
                     throw new ArgumentNullException($"Tile sheet {file} missing property=\"Type\" defined, check if was defined at cell level.");
                 }
-                
+
                 int type = tileSetData.properties.GetPropertyInt("Type");
                 int tileSheetId = tileSetData.properties.GetPropertyInt("TileSheetId");
-                if( type == 1 || type == 2)
+                if (type == 1 || type == 2)
                 {
                     continue;
                 }
@@ -181,6 +179,27 @@ namespace Tiled2dot8.Mapper
             }
             return tileSet;
         }
+
+        public static void WriteTileSet(Model.tileset tileset, string outputPath)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? ".");
+
+            var serializer = new XmlSerializer(typeof(Model.tileset));
+
+            var settings = new XmlWriterSettings
+            {
+                Encoding = new UTF8Encoding(false),
+                Indent = true,
+                NewLineChars = "\n"
+            };
+
+            using var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
+            using var writer = XmlWriter.Create(stream, settings);
+            serializer.Serialize(writer, tileset);
+        }
+
+
+
 
         public static Model.XML.Template ReadTemplate(string pathFile)
         {

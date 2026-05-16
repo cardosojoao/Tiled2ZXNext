@@ -275,6 +275,9 @@
         private string nameField;
 
         private string valueField;
+        
+        private string typeField;
+        private string propertytypeField;
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttribute()]
@@ -290,6 +293,19 @@
             }
         }
 
+        [System.Xml.Serialization.XmlAttribute()]
+        public string type
+        {
+            get
+            {
+                return typeField;
+            }
+            set
+            {
+                typeField = value;
+            }
+        }
+
         /// <remarks/>
         [System.Xml.Serialization.XmlAttribute()]
         public string value
@@ -301,6 +317,19 @@
             set
             {
                 valueField = value;
+            }
+        }
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttribute()]
+        public string propertytype
+        {
+            get
+            {
+                return propertytypeField;
+            }
+            set
+            {
+                propertytypeField = value;
             }
         }
     }

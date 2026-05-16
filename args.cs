@@ -53,4 +53,15 @@ namespace Tiled2dot8
         public bool Verbose { get; set; }
 
     }
+
+    [Verb("tilesheet", HelpText = "TileSheet sorting assign id")]
+    public class TileSheetOptions
+    {
+        [Option('i', "input", Required = true, HelpText = "Input tileset root path")]
+        public string Input { get; set; }
+
+        [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages.")]
+        public bool Verbose { get; set; }
+    }
+
 }

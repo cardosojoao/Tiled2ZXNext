@@ -11,6 +11,10 @@
     "world": {
       "commandName": "Project",
       "commandLineArgs": "world -i\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\chapter01.world\" -o\"data\\WorldMap\\Tiled\\chapter01.world\" "
+    },
+    "tilesheet": {
+      "commandName": "Project",
+      "commandLineArgs": "tilesheet -i\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\tilesheets\""
     }
   }
 }
