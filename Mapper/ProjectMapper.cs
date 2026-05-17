@@ -22,10 +22,10 @@ namespace Tiled2dot8.Mapper
             string inputPath = Path.GetDirectoryName(options.Input);
             project.RootFolder = inputPath;
 
-            if (projectRaw.Properties.ExistProperty("Tables"))
-            {
-                project.Tables.Append<string, Table>(ResolveTables(projectRaw.Properties.GetProperty("Tables"), options.AppRoot));
-            }
+            //if (projectRaw.Properties.ExistProperty("Tables"))
+            //{
+            //    project.Tables.Append<string, Table>(ResolveTables(projectRaw.Properties.GetProperty("Tables"), options.AppRoot));
+            //}
 
             if (projectRaw.Properties.ExistProperty("Includes"))
             {
@@ -42,7 +42,6 @@ namespace Tiled2dot8.Mapper
         /// <param name="props"></param>
         private static Dictionary<string, Table> ResolveTables(string prop, string appRoot)
         {
-
             string[] tablesRaw = prop.Split('\n');           
             Dictionary<string, Table> tables = new();
             foreach (string table in tablesRaw)
@@ -52,24 +51,24 @@ namespace Tiled2dot8.Mapper
                 tables.Add(tableSettings.Name, tableSettings);
                 Console.WriteLine($"Table={tableSettings.Name} Path={tableSettings.FilePath}");
                 // read the file content    
-                List<string> tableData = new(File.ReadAllLines(tableSettings.FilePath.Replace("~", appRoot)));
-                // find table begin
-                int tableIndex = tableData.FindIndex(r => r.Contains("Table:" + tableSettings.Name, StringComparison.InvariantCultureIgnoreCase));
-                // if table exists
-                if (tableIndex > 0)
-                {   // loop through content until find and empty line
-                    for (int line = tableIndex + 1; line < tableData.Count; line++)
-                    {
-                        string item = tableData[line];
-                        if (item == string.Empty)
-                        {
-                            break;
-                        }
-                        // get just the name
-                        string[] itemData = item.Split(new char[] { ' ', '\t' });
-                        tableSettings.Items.Add(itemData[0]);
-                    }
-                }
+                //List<string> tableData = new(File.ReadAllLines(tableSettings.FilePath.Replace("~", appRoot)));
+                //// find table begin
+                //int tableIndex = tableData.FindIndex(r => r.Contains("Table:" + tableSettings.Name, StringComparison.InvariantCultureIgnoreCase));
+                //// if table exists
+                //if (tableIndex > 0)
+                //{   // loop through content until find and empty line
+                //    for (int line = tableIndex + 1; line < tableData.Count; line++)
+                //    {
+                //        string item = tableData[line];
+                //        if (item == string.Empty)
+                //        {
+                //            break;
+                //        }
+                //        // get just the name
+                //        string[] itemData = item.Split(new char[] { ' ', '\t' });
+                //        tableSettings.Items.Add(itemData[0]);
+                //    }
+                //}
             }
             return tables;
         }

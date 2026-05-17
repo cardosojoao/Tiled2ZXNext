@@ -101,10 +101,11 @@ namespace Tiled2dot8
                     string tablePath = table.FilePath.Replace("~", o.AppRoot);
                     string path = Path.GetRelativePath(o.RoomPath, tablePath);
                     header.Append('\t').Append("include\t\"").Append(tablePath.Replace('\\', '/')).AppendLine("\"");
+                    Console.WriteLine("include " + path);
                 }
 
                 layerData.Insert(0, header);
-                string sceneWorldName = scene.Properties.GetProperty("WorldName");
+               string sceneWorldName = scene.Properties.GetProperty("WorldName");
 
                 Console.WriteLine("output layer file " + outputFile);
                 // write layers to final location
