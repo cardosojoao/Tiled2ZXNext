@@ -74,10 +74,14 @@ namespace Tiled2dot8
             foreach (string tileSheetPath in tileSheetsPath)
             {
                 Model.tileset tileSetData = SceneMapper.ReadTileSet(tileSheetPath);
-                if (tileSetData.properties == null || GetTileSheetProperty(tileSetData, "TileSheetId") == int.MaxValue)
+                if (tileSetData.properties == null)
+                {
+                    tileSetData.properties = new Model.TilesetTileProperty[0];
+                }
+
+                if (GetTileSheetProperty(tileSetData, "TileSheetId") == int.MaxValue)
                 {
                     SetTileSheetProperty(tileSetData, "TileSheetId", "int", "1024");
-                    SetTileSheetProperty(tileSetData, "Type", "int", "0", "TileSetType");
                 }
                 if (GetTileSheetProperty(tileSetData, "Type") == int.MaxValue)
                 {

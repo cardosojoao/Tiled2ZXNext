@@ -6,7 +6,7 @@
     },
     "Map": {
       "commandName": "Project",
-      "commandLineArgs": "scene -i\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\chapter01\\island\\Chapter01_006.json\" -aD:\\devl\\zx\\proj\\ZXGame\\2.source -rD:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\worlds -p\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\mapa01.tiled-project\" -c\"D:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\Palette\\layer2_01.gpl\""
+      "commandLineArgs": "scene -i\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\chapter01\\island\\Chapter01_001.json\" -aD:\\devl\\zx\\proj\\ZXGame\\2.source -rD:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\worlds -p\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\mapa01.tiled-project\" -c\"D:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\Palette\\layer2_01.gpl\""
     },
     "world": {
       "commandName": "Project",

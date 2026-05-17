@@ -79,6 +79,7 @@ namespace Tiled2dot8.Mapper
                 int tileSheetId = tileSetData.properties.GetPropertyInt("TileSheetId");
                 if (type == 1 || type == 2)
                 {
+                    Console.WriteLine($" skipped type={type}");
                     continue;
                 }
                 tileSet.Lastgid = tileSetData.tilecount + tileSet.Firstgid - 1;
@@ -89,7 +90,7 @@ namespace Tiled2dot8.Mapper
                 }
                 resolved[tileSetData.image.source].Add(tileSet);
                 order++;
-                Console.WriteLine($"  done.");
+                Console.WriteLine($" done.");
 
             }
 
