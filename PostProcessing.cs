@@ -26,6 +26,11 @@ namespace Tiled2dot8
                 param = param.Replace("%1", inputFile).Replace("%2", outputfileAssembler);
                 execResult = ExecuteCommand(pathExe, param);
                 Console.WriteLine($"Result={execResult}");
+
+                if (execResult != 0)
+                {
+                    throw new InvalidOperationException(execResult.ToString());
+                }   
             }
 
             if (Controller.Config.Zip != null && execResult == 0)
@@ -43,6 +48,7 @@ namespace Tiled2dot8
             else
             {
                 Console.WriteLine("ERROR: Skip compress step");
+
             }
 
             BuildList(outputPath, "*.zx0", outputPath + "\\list.txt");
