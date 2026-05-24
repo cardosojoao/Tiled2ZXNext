@@ -19,8 +19,9 @@ namespace Tiled2dot8
         public static string G_PATH = "path";
         public static string G_EEI = "eei";
         public static string G_BACKGROUND = "background";
+        public static string G_STATIC = "static";
 
-        public static List<string> GROUPS = new List<string> { G_LAYER2, G_COLLISION, G_EEI, G_LOCATION, G_LOCATIONS, G_PATH, G_BACKGROUND };
+        public static List<string> GROUPS = new List<string> { G_LAYER2, G_COLLISION, G_EEI, G_LOCATION, G_LOCATIONS, G_PATH, G_BACKGROUND,G_STATIC };
 
         public StringBuilder ProcessScene(Entities.Scene scene)
         {
@@ -109,6 +110,10 @@ namespace Tiled2dot8
                     else if (group.Name.Equals("eei", System.StringComparison.InvariantCultureIgnoreCase))
                     {
                         blocks.Add(new ProcessEei(group, scene, properties));
+                    }
+                    else if (group.Name.Equals("static", System.StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        blocks.Add(new ProcessStatic(group, scene, properties));
                     }
                 }
             }

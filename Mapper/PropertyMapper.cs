@@ -17,7 +17,8 @@ namespace Tiled2dot8.Mapper
                     {
                         Name = propertyRaw.Name,
                         Type = propertyRaw.Type.ToString(),
-                        Value = propertyRaw.Value.ToString()
+                        Value = propertyRaw.Value.ToString(),
+                        Propertytype = propertyRaw.Propertytype
                     };
                     properties.Add(property);
                 }

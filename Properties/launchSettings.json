@@ -6,11 +6,11 @@
     },
     "Map": {
       "commandName": "Project",
-      "commandLineArgs": "scene -i\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\chapter01\\island\\Chapter01_009.json\" -aD:\\devl\\zx\\proj\\ZXGame\\2.source -rD:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\worlds -p\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\tidalquest.tiled-project\" -c\"D:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\Palette\\layer2_01.gpl\""
+      "commandLineArgs": "scene -i\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\chapter01\\island\\Chapter01_002.json\" -aD:\\devl\\zx\\proj\\ZXGame\\2.source -rD:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\worlds -p\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\tidalquest.tiled-project\" -c\"D:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\Palette\\layer2_01.gpl\""
     },
     "world": {
       "commandName": "Project",
-      "commandLineArgs": "world -i\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\chapter01.world\" -o\"data\\WorldMap\\Tiled\\chapter01.world\" "
+      "commandLineArgs": "world -i\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\Tiled\\chapter01.world\" -o\"D:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\WorldMap\\chapter01_worldMap.inc\" "
     },
     "tilesheet": {
       "commandName": "Project",

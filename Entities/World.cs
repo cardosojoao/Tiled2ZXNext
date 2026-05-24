@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Security;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks.Dataflow;
+using Tiled2dot8.Models;
 
 namespace Tiled2dot8.Entities
 {
@@ -158,26 +161,58 @@ namespace Tiled2dot8.Entities
                 }
             }
 
+            int offsetX = 0;
+            int offsetY = 0;
+            if (minX < 0)
+            {
+                offsetX = Math.Abs(minX);
+            }
+
+            if (minY < 0)
+            {
+                offsetY = Math.Abs(minY);
+            }
+
+            maxX += offsetX;
+            minX += offsetX;
+            maxY += offsetY;
+            minY += offsetY;
+
+
             mapWidth = (maxX - minX) + 1;
             mapHeight = (maxY - minY) + 1;
             maxX++;
             maxY++;
+
+
+
+
+
             // allocate rooms
             foreach (var map in Maps)
             {
-                //map.X1 = map.X;
-                //map.Y1 = map.Y;
-                if (minX < 0)
+                if (true)
                 {
-                    map.X += Math.Abs(minX);
+                    map.X += offsetX;
+                    map.X1 += map.X;
+                    map.Y += offsetY;
+                    map.Y1 += map.Y;
+                    map.Id = int.Parse(map.FileName.Substring(map.FileName.Length - 8, 3));
                 }
-                if (minY < 0)
+                else
                 {
-                    map.Y += Math.Abs(minY);
+                    if (minX < 0)
+                    {
+                        map.X += Math.Abs(minX);
+                    }
+                    if (minY < 0)
+                    {
+                        map.Y += Math.Abs(minY);
+                    }
+                    map.X1 = map.X;
+                    map.Y1 = map.Y;
+                    map.Id = int.Parse(map.FileName.Substring(map.FileName.Length - 8, 3));
                 }
-                map.X1 = map.X;
-                map.Y1 = map.Y;
-                map.Id = int.Parse(map.FileName.Substring(map.FileName.Length - 8, 3));
             }
 
             foreach (var map in Maps)
@@ -235,6 +270,11 @@ namespace Tiled2dot8.Entities
 
             foreach (Map map in world)
             {
+
+                if (map.Id == currentMap.Id)
+                {
+                    continue;
+                }
                 if (map.X1 == x2)
                 {
                     if ((y1 < map.Y1 && y2 > map.Y2) ||  // 
@@ -265,8 +305,8 @@ namespace Tiled2dot8.Entities
                 {
                     if ((x1 < map.X1 && x2 > map.X2) || 
                         (x1 > map.X1 && x2 < map.X2) || 
-                        (map.X1 > x1 && map.X1 < x2) || 
-                        (map.X2 > x1 && map.X2 < x2) ||
+                        (map.X1 >= x1 && map.X1 <= x2) || 
+                        (map.X2 >= x1 && map.X2 <= x2) ||
                         (map.X1 == x1 && map.X2 == x2))
                     {
                         // join map on bottom
@@ -278,8 +318,8 @@ namespace Tiled2dot8.Entities
                 {
                     if ((x1 < map.X1 && x2 > map.X2) || 
                         (x1 > map.X1 && x2 < map.X2) || 
-                        (map.X1 > x1 && map.X1 < x2) || 
-                        (map.X2 > x1 && map.X2 < x2) ||
+                        (map.X1 >= x1 && map.X1 <= x2) || 
+                        (map.X2 >= x1 && map.X2 <= x2) ||
                         (map.X1 == x1 && map.X2 == x2))
                     {
                         // join map on top
