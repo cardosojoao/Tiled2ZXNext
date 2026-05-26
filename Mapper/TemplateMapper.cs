@@ -21,7 +21,7 @@ namespace Tiled2dot8.Mapper
                     Entity.Property property = new Entity.Property();
                     property.Name = propertyRaw.Name;
                     property.Type = propertyRaw.Type ?? "";
-                    property.Value = propertyRaw.Value.ToString();
+                    //property.Value = propertyRaw.Value;
                     template.Properties.Add(property);
                 }
             }

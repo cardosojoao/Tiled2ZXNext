@@ -15,7 +15,8 @@ namespace Tiled2dot8.Models
         public string Name { get; set; }
 
         [JsonPropertyName("properties")]
-        public List<Property> Properties { get; set; }
+        public List<Property> Properties { get;
+            set; }
 
         [JsonPropertyName("rotation")]
         public int Rotation { get; set; }
@@ -36,7 +37,7 @@ namespace Tiled2dot8.Models
         public double Y { get; set; }
 
         [JsonPropertyName("gid")]
-        public int? Gid { get; set; }
+        public uint? Gid { get; set; }
 
         [JsonPropertyName("polygon")]
         public Polygon Polygon { get; set; }

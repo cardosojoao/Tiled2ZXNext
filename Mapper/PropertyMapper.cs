@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json;
 using Entity = Tiled2dot8.Entities;
 using Model = Tiled2dot8.Models;
 
@@ -17,7 +18,7 @@ namespace Tiled2dot8.Mapper
                     {
                         Name = propertyRaw.Name,
                         Type = propertyRaw.Type.ToString(),
-                        Value = propertyRaw.Value.ToString(),
+                        Value = propertyRaw.Value,
                         Propertytype = propertyRaw.Propertytype
                     };
                     properties.Add(property);
@@ -27,16 +28,18 @@ namespace Tiled2dot8.Mapper
         }
 
 
-        public static List<Entity.Property> Map(List<Model.XML.Property> propertiesRaw)
+        public static List<Entity.Property> Map(List<Models.TilesetTileProperty> propertiesRaw)
         {
             List<Entity.Property> properties = new();
-            foreach (Model.XML.Property propertyRaw in propertiesRaw)
+            foreach (Models.TilesetTileProperty propertyRaw in propertiesRaw)
             {
+
+
                 Entity.Property property = new()
                 {
-                    Name = propertyRaw.Name,
-                    Type = propertyRaw.Type.ToString(),
-                    Value = propertyRaw.Value.ToString()
+                    Name = propertyRaw.name,
+                    Type = "string", // propertyRaw.type.ToString()
+                    Value = JsonDocument.Parse($"\"{propertyRaw.value}\"").RootElement
                 };
                 properties.Add(property);
             }

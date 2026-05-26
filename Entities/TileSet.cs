@@ -1,4 +1,5 @@
-﻿namespace Tiled2dot8.Entities
+﻿using System.Collections.Generic;
+namespace Tiled2dot8.Entities
 {
 
     public class Tileset
@@ -25,6 +26,9 @@
         public int PaletteIndex { get; set; }
 
         public int Order { get; set; }
+
+        public List<TileSetTile> Tiles { get; set; }
+        public List<Property> Properties { get; set; }
 
     }
 }

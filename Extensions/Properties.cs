@@ -16,8 +16,21 @@ namespace Tiled2dot8.Extensions
         public static bool ExistProperty(this List<Entities.Property> properties, string name)
         {
             if (properties == null) throw new ArgumentNullException(nameof(properties));
-            Entities.Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-            return prop != null;
+
+            int proptNameIndex = name.IndexOf('.');
+            if (proptNameIndex != -1)
+            {
+                string subProp = name.Substring(proptNameIndex + 1);
+                string propName = name.Substring(0, proptNameIndex);
+
+                Entities.Property prop = properties.FirstOrDefault(p => p.Name.Equals(propName, StringComparison.InvariantCultureIgnoreCase));
+                return prop != null;
+            }
+            else
+            {
+                Entities.Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+                return prop != null;
+            }
         }
 
         public static string GetProperty(this List<Models.Property> properties, string name)
@@ -31,7 +44,7 @@ namespace Tiled2dot8.Extensions
                 Models.Property prop = properties.FirstOrDefault(p => p.Name.Equals(propName, StringComparison.InvariantCultureIgnoreCase));
                 if (prop.Propertytype == "class")
                 {
-                    Dictionary<string, object> dict = (Dictionary<string, object>)prop.Value;
+                    Dictionary<string, object> dict = (Dictionary<string, object>)prop.GetValue();
                     if (dict.ContainsKey(subProp))
                     {
                         return dict[subProp].ToString() ?? "";
@@ -42,7 +55,7 @@ namespace Tiled2dot8.Extensions
             else
             {
                 Models.Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-                return prop?.Value.ToString() ?? "";
+                return prop?.GetValue().ToString() ?? "";
             }
         }
 
@@ -57,7 +70,7 @@ namespace Tiled2dot8.Extensions
                 Entities.Property prop = properties.FirstOrDefault(p => p.Name.Equals(propName, StringComparison.InvariantCultureIgnoreCase));
                 if (prop.Propertytype == "class")
                 {
-                    Dictionary<string, object> dict = (Dictionary<string, object>)prop.Value;
+                    Dictionary<string, object> dict = (Dictionary<string, object>)prop.GetValue();
                     if (dict.ContainsKey(subProp))
                     {
                         return dict[subProp].ToString() ?? defaultValue;
@@ -68,7 +81,7 @@ namespace Tiled2dot8.Extensions
             else
             {
                 Entities.Property prop = properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-                return prop?.Value?.ToString() ?? defaultValue;
+                return prop?.GetValue().ToString() ?? defaultValue;
             }
         }
 
@@ -101,9 +114,9 @@ namespace Tiled2dot8.Extensions
                 string subProp = name.Substring(proptNameIndex + 1);
                 string propName = name.Substring(0, proptNameIndex);
                 Entities.Property prop = properties.FirstOrDefault(p => p.Name.Equals(propName, StringComparison.InvariantCultureIgnoreCase));
-                if (prop.Propertytype == "class")
+                if (prop.Type == "class")
                 {
-                    Dictionary<string, object> dict = (Dictionary<string, object>)prop.Value;
+                    Dictionary<string, object> dict = (Dictionary<string, object>)prop.GetValue();
                     if (dict.ContainsKey(subProp))
                     {
                         return int.Parse(dict[subProp].ToString());
@@ -114,7 +127,7 @@ namespace Tiled2dot8.Extensions
             else
             {
                 Entities.Property? prop = properties.Find(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-                return prop == null ? value : int.Parse(prop.Value.ToString());
+                return prop == null ? value : int.Parse(prop.GetValue().ToString());
             }
         }
 
@@ -136,7 +149,7 @@ namespace Tiled2dot8.Extensions
                 Entities.Property prop = properties.FirstOrDefault(p => p.Name.Equals(propName, StringComparison.InvariantCultureIgnoreCase));
                 if (prop.Propertytype == "class")
                 {
-                    Dictionary<string, object> dict = (Dictionary<string, object>)prop.Value;
+                    Dictionary<string, object> dict = (Dictionary<string, object>)prop.GetValue();
                     if (dict.ContainsKey(subProp))
                     {
 

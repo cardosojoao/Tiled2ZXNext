@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Tiled2dot8.Entities;
 
 namespace Tiled2dot8.Models
 {
@@ -33,6 +34,9 @@ namespace Tiled2dot8.Models
         public int PaletteIndex { get; set; }
 
         public int Order { get; set; }
+
+        public List<TilesetTile> Tiles { get; set; }
+        public List<TilesetTileProperty> Properties { get; set; }
 
     }
 }

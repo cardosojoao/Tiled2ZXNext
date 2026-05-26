@@ -1,4 +1,8 @@
-﻿namespace Tiled2dot8.Models
+﻿using System.Collections.Generic;
+using System.Xml.Serialization;
+using Tiled2dot8.Entities;
+
+namespace Tiled2dot8.Models
 {
 
     // NOTE: Generated code may require at least .NET Framework 4.5 or .NET Core/Standard 2.0.
@@ -29,6 +33,11 @@
 
         private TilesetTileProperty[] propertiesField;
 
+        //private List<Tile> tiles;
+
+        [XmlElement("tile")]
+        public List<TilesetTile> Tiles { get; set; }
+
 
         /// <remarks/>
         public TilesetImage image
@@ -46,17 +55,17 @@
 
 
         /// <remarks/>
-        public TilesetTile tile
-        {
-            get
-            {
-                return tileField;
-            }
-            set
-            {
-                tileField = value;
-            }
-        }
+        //public TilesetTile tile
+        //{
+        //    get
+        //    {
+        //        return tileField;
+        //    }
+        //    set
+        //    {
+        //        tileField = value;
+        //    }
+        //}
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttribute()]
@@ -333,4 +342,7 @@
             }
         }
     }
+
+
+
 }
