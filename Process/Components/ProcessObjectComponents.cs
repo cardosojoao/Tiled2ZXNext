@@ -83,7 +83,7 @@ namespace Tiled2dot8.Process.EEI
                     }
                 case 17:
                     {
-                        GameObjectCompnents(layer);
+                        GameObjectComponents(layer);
                         break;
                     }
                 default:
@@ -98,7 +98,7 @@ namespace Tiled2dot8.Process.EEI
             return header;
         }
 
-        private void GameObjectCompnents(Layer layer)
+        private void GameObjectComponents(Layer layer)
         {
             CheckValidator();
             header.Append("\t\tdb $").Append(layer.Layers.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");

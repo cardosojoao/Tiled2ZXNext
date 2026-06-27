@@ -14,6 +14,7 @@ namespace Tiled2dot8.Entities
         public double X { get; set; }
         public double Y { get; set; }
         public string Type { get; set; }
+        public uint? Gid { get; set; }
         public Polygon Polygon { get; set; }
         public List<Property> Properties { get; set; }
         public string Template { get; set; }

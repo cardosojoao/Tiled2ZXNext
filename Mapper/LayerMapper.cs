@@ -70,6 +70,7 @@ namespace Tiled2dot8.Mapper
             {
                 Entity.Object obj = new()
                 {
+                    Gid = objectRaw.Gid,
                     Name = objectRaw.Name,
                     Width = objectRaw.Width,
                     Height = objectRaw.Height,

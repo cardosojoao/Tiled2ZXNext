@@ -62,7 +62,7 @@ namespace Tiled2dot8
             {
                 if (obj.Visible && !CheckObject(obj))
                 {
-                    string objID = obj.Id + "-" + (obj.Name.Length > 0 ? obj.Name : "<na>");
+                    string objID = obj.Id + "-" + (obj.Name?.Length > 0 ? obj.Name : "<na>");
                     error.Clear();
                     error.Append("Object ");
                     error.Append(objID);

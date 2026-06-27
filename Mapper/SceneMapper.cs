@@ -77,17 +77,24 @@ namespace Tiled2dot8.Mapper
 
                 int type = tileSetData.properties.GetPropertyInt("Type");
                 int tileSheetId = tileSetData.properties.GetPropertyInt("TileSheetId");
-                if (type == 1 || type == 2)
+                if (type == 2) // skip ignore
                 {
                     Console.WriteLine($" skipped type={type}");
                     continue;
                 }
                 tileSet.Lastgid = tileSetData.tilecount + tileSet.Firstgid - 1;
+                tileSet.Tiles =  new List<TilesetTile>( tileSetData.Tiles);
+                tileSet.Properties = new List<TilesetTileProperty>(tileSetData.properties);
+
+
+
                 if (!resolved.ContainsKey(tileSetData.image.source))
                 {
                     resolved.Add(tileSetData.image.source, new List<Model.TileSet>());
                     tilesSetData.Add(tileSetData.image.source, tileSetData);
                 }
+
+
                 resolved[tileSetData.image.source].Add(tileSet);
                 order++;
                 Console.WriteLine($" done.");
@@ -157,6 +164,17 @@ namespace Tiled2dot8.Mapper
                     Model.tileset tileSetData = tilesSetData[sets.Key];
                     tileset.Parsedgid = setRaw.Firstgid - 1;
                     tileset.TileSheetID = tileSetData.properties.GetPropertyInt("TileSheetId");
+                    if (setRaw.Tiles != null)
+                    {
+                        tileset.Tiles = new List<Entity.TileSetTile>();
+                        
+                        foreach (TilesetTile tile in setRaw.Tiles)
+                        {
+                            tileset.Tiles.Add(new Entity.TileSetTile() { ID = tile.id, Properties = PropertyMapper.Map(tile.properties.ToList()) });
+                        }
+                    }
+                    tileset.Properties = PropertyMapper.Map(setRaw.Properties);
+
                     Console.WriteLine($"  done.");
                 }
             }
