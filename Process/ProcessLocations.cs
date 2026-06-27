@@ -83,11 +83,11 @@ namespace Tiled2dot8
             {
                 if (obj.Visible)
                 {
-                    double sceneSource = 0;
-                    if (obj.Properties != null &&  obj.Properties.ExistProperty("teleport"))
-                    {
-                        sceneSource = obj.Properties.GetPropertyInt("teleport");
-                    }
+                    double sceneSource = obj.Properties?.GetPropertyInt("teleport", 0) ?? 0;
+                    //if (obj.Properties != null &&  obj.Properties.ExistProperty("teleport"))
+                    //{
+                    //    sceneSource = obj.Properties.GetPropertyInt("teleport");
+                    //}
 
                     data.Append("\t\tdb $").Append(((int)sceneSource).ToString("X2")).AppendLine("\t;Scene Source");
                     data.Append("\t\tdw $").Append((obj.X + Controller.Config.Offset.x).Double2Hex("X4"));

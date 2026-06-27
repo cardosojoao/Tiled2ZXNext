@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json;
 using Entity = Tiled2dot8.Entities;
 using Model = Tiled2dot8.Models;
 
@@ -21,6 +22,7 @@ namespace Tiled2dot8.Mapper
                     Entity.Property property = new Entity.Property();
                     property.Name = propertyRaw.Name;
                     property.Type = propertyRaw.Type ?? "";
+                    property.Value = JsonDocument.Parse($"\"{propertyRaw.Value}\"").RootElement;
                     //property.Value = propertyRaw.Value;
                     template.Properties.Add(property);
                 }

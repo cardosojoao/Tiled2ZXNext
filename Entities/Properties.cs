@@ -19,7 +19,7 @@ namespace Tiled2dot8.Entities
         {
             return Type switch
             {
-                "int" => Value.GetInt32(),
+                "int" => int.Parse(Value.ToString()),
 
                 "string" => Value.GetString(),
 
