@@ -2,16 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using Tiled2dot8.Entities;
-using Tiled2dot8.Extensions;
-using Tiled2dot8.Mapper;
-using Tiled2dot8.Metadata;
 using Tiled2dot8.Palette;
-
+using TiledIO.Entities;
+using TiledIO.Extensions;
+using TiledIO.Mapper;
+using Entities = TiledIO.Entities;
+using Models = TiledIO.Models;
 
 namespace Tiled2dot8
 {
@@ -45,41 +44,21 @@ namespace Tiled2dot8
                 Config.Assembler = config.GetRequiredSection("assembler").Get<Command>();
                 Config.SpriteSoftwareSuffix = config.GetValue<string>("SpriteSoftwareSuffix");
 
-
-
-                //string[] worlds = Directory.GetFiles(Path.GetFullPath(o.World), "*.world");
-                //foreach (string worldFile in worlds)
-                //{
-                //    string worldRaw = File.ReadAllText(worldFile);
-                //    Models.World worldData = JsonSerializer.Deserialize<Models.World>(worldRaw);
-                //    Entities.World world = WorldMapper.Map(worldData);
-                //    world.Name = Path.GetFileNameWithoutExtension(worldFile);
-
-                //    world.GetMatrix();
-                //    ProcessWorld proc = new ProcessWorld(world);
-                //    var worldProc = proc.Execute();
-                //    string worldName = Path.GetFileName(worldFile);
-                //    File.WriteAllText(Path.Combine(o.MapPath, Path.GetFileNameWithoutExtension(worldName) + "_worldMap.asm"), worldProc.ToString());
-                //}
-
                 if (o.Project.Length > 0)
                 {
                     if (File.Exists(o.Project))
                     {
                         string projectRaw = File.ReadAllText(o.Project);
                         Models.Project projectData = JsonSerializer.Deserialize<Models.Project>(projectRaw);
-                        ProjectMapper.Map(projectData, Entities.Project.Instance, o);
+                        ProjectMapper.Map(projectData, Entities.Project.Instance, o.Input, o.AppRoot);
                     }
                 }
-                string data = File.ReadAllText(inputFile);
-                Models.Scene sceneRaw = JsonSerializer.Deserialize<Models.Scene>(data);
-                fileName = sceneRaw.Properties.GetProperty("SceneName");
+
+                Scene scene  = TiledIO.Tiled.LoadScene(inputFile);
+
+                fileName = scene.Properties.GetProperty("SceneName");
                 string extension = "asm";
                 outputFile = fileName + "." + extension;
-
-                Entities.Scene scene = SceneMapper.Map(sceneRaw, Entities.Scene.Instance, _options);      // migrated
-                scene.Layers = LayerMapper.Map(sceneRaw.Layers);
-
                 // palette require for background color and fill area
                 Palette = LoadGplPalette.Load(o.PalettePath);
 

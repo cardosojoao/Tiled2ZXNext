@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Tiled2dot8.Entities;
-using Tiled2dot8.Extensions;
+using Entities = TiledIO.Entities;
+using TiledIO.Extensions;
 
 namespace Tiled2dot8.Process.Components
 {

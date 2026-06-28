@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Tiled2dot8.Entities;
+using TiledIO.Entities;
 using Tiled2dot8.Palette;
-using Tiled2dot8.Extensions;
+using TiledIO.Extensions;
 using Tiled2dot8.enums;
 
 namespace Tiled2dot8

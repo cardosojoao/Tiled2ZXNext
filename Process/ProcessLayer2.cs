@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Tiled2dot8.Entities;
-using Tiled2dot8.Extensions;
+using TiledIO.Entities;
+using TiledIO.Extensions;
 using Tiled2dot8.ProcessLayers;
 
 namespace Tiled2dot8

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
-using Tiled2dot8.Extensions;
-using Tiled2dot8.Entities;
+using TiledIO.Extensions;
+using TiledIO.Entities;
 using System.Reflection;
 
 namespace Tiled2dot8

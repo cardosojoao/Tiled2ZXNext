@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Tiled2dot8.Entities;
-using Tiled2dot8.Extensions;
+using TiledIO.Entities;
+using TiledIO.Extensions;
 using Tiled2dot8.Palette;
 using Tiled2dot8.ProcessLayers;
 using Tiled2dot8.enums;
@@ -36,7 +36,7 @@ namespace Tiled2dot8
             Console.WriteLine("Group " + _rootLayer.Name);
             foreach (Layer layer in _rootLayer.Layers)
             {
-                if (layer.Visible && !IsLayerEmpty(layer.Data)) ;
+                if (layer.Visible && !IsLayerEmpty(layer.Data))
                 {
                     layer.Properties.Merge(_properties);        // add parent extended properties
 

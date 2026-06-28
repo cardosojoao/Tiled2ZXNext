@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Text;
-using Tiled2dot8.Entities;
-using Tiled2dot8.Extensions;
+using TiledIO.Entities;
+using Entities = TiledIO.Entities;
+using TiledIO.Extensions;
 using Tiled2dot8.Process.Components;
 
 

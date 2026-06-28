@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Tiled2dot8.Entities;
+using TiledIO.Entities;
 
 namespace Tiled2dot8
 {

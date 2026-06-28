@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using Tiled2dot8.Entities;
 
 
 namespace Tiled2dot8
