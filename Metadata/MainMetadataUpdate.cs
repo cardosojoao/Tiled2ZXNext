@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using Tiled2dot8.Entities;
-using Tiled2dot8.Mapper;
-using Tiled2dot8.Models;
+using TiledIO.Mapper;
+using TiledIO.Entities;
+using Entities = TiledIO.Entities;
+using Models = TiledIO.Models;
+using TiledIO.Models;
 
 namespace Tiled2dot8.Metadata
 {
     public class MetadataUpdate
     {
-
         public void Run(PatternsOptions args)
         {
             Console.WriteLine($"Metadata update.");

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
-using Tiled2dot8.Entities;
-using Tiled2dot8.Extensions;
+using TiledIO.Entities;
+using TiledIO.Extensions;
 
 
 namespace Tiled2dot8

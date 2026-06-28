@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using Tiled2dot8.Extensions;
+using TiledIO.Extensions;
+using Entities = TiledIO.Entities;
 
 namespace Tiled2dot8.ProcessLayers
 {

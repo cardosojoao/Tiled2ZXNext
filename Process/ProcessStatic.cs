@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Tiled2dot8.Entities;
-using Tiled2dot8.Extensions;
+using TiledIO.Entities;
+using TiledIO.Extensions;
 
 namespace Tiled2dot8
 {
@@ -14,7 +14,7 @@ namespace Tiled2dot8
     {
         private readonly Layer _rootLayer;
         private readonly Scene _scene;
-        private readonly List<Entities.Property> _properties;
+        private readonly List<Property> _properties;
         public ProcessStatic(Layer layer, Scene scene, List<Property> properties)
         {
             _rootLayer = layer;
@@ -27,7 +27,7 @@ namespace Tiled2dot8
             Console.WriteLine("Group " + _rootLayer.Name);
             StringBuilder staticSprites = new();
 
-            foreach (Entities.Layer staticSpriteGroup in _rootLayer.Layers)
+            foreach (Layer staticSpriteGroup in _rootLayer.Layers)
             {
                 if (staticSpriteGroup.Visible)
                 {
@@ -44,7 +44,7 @@ namespace Tiled2dot8
             return staticSprites;
         }
 
-        private StringBuilder WriteObjectsLayer(Entities.Layer staticSpriteGroup)
+        private StringBuilder WriteObjectsLayer(Layer staticSpriteGroup)
         {
             int lengthData = 0;
             Console.WriteLine($"\t Static Sprite Group {staticSpriteGroup.Id}");
@@ -81,7 +81,7 @@ namespace Tiled2dot8
                     TechHeader.Add("spritestatic", 1);
                     if (staticSprite.Properties == null)
                     {
-                        staticSprite.Properties = new List<Entities.Property>();
+                        staticSprite.Properties = new List<Property>();
                     }
 
                     uint gid = (uint)staticSprite.Gid;
@@ -95,7 +95,7 @@ namespace Tiled2dot8
                     gid &= 0xffff;
                     var gidData = _scene.GetParsedGid((int)gid);     // tile index is 0 based
                     int tileIndex = (int)gid - gidData.tileSheet.Firstgid;
-                    var props = gidData.tileSheet.Tiles.Count > 0 ? gidData.tileSheet.Tiles[tileIndex].Properties : new List<Entities.Property>();
+                    var props = gidData.tileSheet.Tiles.Count > 0 ? gidData.tileSheet.Tiles[tileIndex].Properties : new List<Property>();
                     PropertyExtensions.Merge(staticSprite.Properties, props);
                     PropertyExtensions.Merge(staticSprite.Properties, gidData.tileSheet.Properties);
 

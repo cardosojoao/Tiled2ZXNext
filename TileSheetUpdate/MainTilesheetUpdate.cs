@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Tiled2dot8.Entities;
-using Tiled2dot8.Mapper;
-using Tiled2dot8.Models;
-using Model = Tiled2dot8.Models;
+using Entities = TiledIO.Entities;
+using TiledIO.Mapper;
+using TiledIO.Models;
+using Model = TiledIO.Models;
 
 namespace Tiled2dot8
 {

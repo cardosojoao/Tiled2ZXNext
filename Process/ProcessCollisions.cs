@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Tiled2dot8.Entities;
-using Tiled2dot8.Extensions;
+using Entities = TiledIO.Entities;
+using TiledIO.Entities;
+using TiledIO.Extensions;
 using Tiled2dot8.ProcessLayers;
 
 namespace Tiled2dot8
@@ -12,8 +13,8 @@ namespace Tiled2dot8
     {
         private readonly Layer _rootLayer;
         private readonly Scene _scene;
-        private readonly List<Entities.Property> _properties;
-        public ProcessCollision(Layer layer, Scene scene, List<Entities.Property> properties)
+        private readonly List<Property> _properties;
+        public ProcessCollision(Layer layer, Scene scene, List<Property> properties)
         {
             _rootLayer = layer;
             _scene = scene;

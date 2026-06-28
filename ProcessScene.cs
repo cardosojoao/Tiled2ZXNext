@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Text;
-using Tiled2dot8.Entities;
-using Tiled2dot8.Extensions;
-using Tiled2dot8.Models;
+using Entities = TiledIO.Entities;
+using TiledIO.Extensions;
+using Models = TiledIO.Models;
 using Tiled2dot8.Process.EEI;
+
 namespace Tiled2dot8
 {
     public partial class Controller

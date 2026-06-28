@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using Tiled2dot8.Extensions;
-using Tiled2dot8.Entities;
+using TiledIO.Extensions;
+using TiledIO.Entities;
 using System;
 
 namespace Tiled2dot8
@@ -17,7 +17,7 @@ namespace Tiled2dot8
         /// </summary>
         /// <param name="layer">parent layer</param>
         /// <param name="scene">scene</param>
-        public ProcessTileMap(Layer layer, Scene scene, List<Entities.Property> properties)
+        public ProcessTileMap(Layer layer, Scene scene, List<Property> properties)
         {
             _rootLayer = layer;
             _tileData = scene;
