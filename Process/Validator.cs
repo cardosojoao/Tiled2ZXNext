@@ -12,8 +12,8 @@ namespace Tiled2dot8.ProcessLayers
             StringBuilder builder = new StringBuilder();
             if (properties != null && properties.ExistProperty("Validator.FlagId") && properties.ExistProperty("Validator.EnableValue"))
             {
-                builder.Append("\t\tdb $");
-                builder.Append(properties.GetPropertyInt("Validator.FlagId",-65535).ToString("X2"));
+                builder.Append("\t\tdb ");
+                builder.Append(properties.GetProperty("Validator.FlagId","Missing"));
                 builder.AppendLine($"\t\t; Flag ID");
                 builder.Append("\t\tdb $");
                 builder.Append(properties.GetPropertyInt("Validator.EnableValue",65535).ToString("X2"));
