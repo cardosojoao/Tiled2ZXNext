@@ -64,4 +64,20 @@ namespace Tiled2dot8
         public bool Verbose { get; set; }
     }
 
+    [Verb("sprite", HelpText = "sprite list tiled update")]
+    public class SpritetOptions
+    {
+        [Option('p', "project", Required = true, HelpText = "project file path", Default = "")]
+        public string Project { get; set; }
+
+        [Option('i', "input", Required = true, HelpText = "List of software sprites from dot8")]
+        public string Input { get; set; }
+
+        [Option('t', "type", Required = true, HelpText = "property type name")]
+        public string PropertyType { get; set; }
+
+        [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages.")]
+        public bool Verbose { get; set; }
+    }
+
 }

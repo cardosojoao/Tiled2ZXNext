@@ -15,6 +15,10 @@
     "tilesheet": {
       "commandName": "Project",
       "commandLineArgs": "tilesheet -i\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\tilesheets\""
+    },
+    "Sprite": {
+      "commandName": "Project",
+      "commandLineArgs": "sprite -p\"D:\\devl\\zx\\proj\\ZXGame\\3.resources\\tiled\\TidalQuest.tiled-project\" -i\"D:\\devl\\zx\\proj\\ZXGame\\2.source\\data\\sprites\\SW\\_sw_Index.inc\" -t\"SoftwareSprites\""
     }
   }
 }
