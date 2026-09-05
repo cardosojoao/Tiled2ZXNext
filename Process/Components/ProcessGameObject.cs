@@ -8,12 +8,12 @@ using TiledIO.Extensions;
 using Entities = TiledIO.Entities;
 
 
-namespace Tiled2dot8.Process.EEI
+namespace Tiled2dot8.Process
 {
     /// <summary>
     /// Process Environment Element Interaction scrap
     /// </summary>
-    public class ProcessObjectComponents : ProcessMaster
+    public class ProcessGameObject : ProcessMaster
     {
         public enum ComponentFlags
         {
@@ -59,7 +59,7 @@ namespace Tiled2dot8.Process.EEI
 
             }
         }
-        public ProcessObjectComponents(Layer layer, Scene scene, List<Property> properties) : base(layer, scene, properties)
+        public ProcessGameObject(Layer layer, Scene scene, List<Property> properties) : base(layer, scene, properties)
         {
         }
 
@@ -72,45 +72,16 @@ namespace Tiled2dot8.Process.EEI
         {
             blockType = layer.Properties.GetPropertyInt("Type");        // this type will be used by the engine to map the parser
             layer.Properties.Merge(_properties);
-            // size must be 2Bytes long (map is over 256 Bytes)
-            switch (blockType)
-            {
-                case 9:
-                    {
-                        throw new Exception("Machine is not supported, it should use [spritemodular]");
-                        Machine(layer);
-                        break;
-                    }
-                case 17:
-                    {
-                        GameObjectComponents(layer);
-                        break;
-                    }
-                default:
-                    break;
-            }
 
-
-            headerType.Append("\t\tdw $").Append(lengthData.ToString("X4")).Append("\t\t; Block size\r\n");
-            // insert header at begin
-            header.Insert(0, headerType);
-            header.Append(data);
-            return header;
-        }
-
-        private void GameObjectComponents(Layer layer)
-        {
             CheckValidator();
             header.Append("\t\tdb $").Append(layer.Layers.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");
             lengthData++;
 
             foreach (Entities.Layer entityGameObject in layer.Layers)
             {
-
                 if (entityGameObject.Visible)
                 {
                     Console.WriteLine($"GameObject {entityGameObject.Name} {entityGameObject.Id}");
-
                     GameObject gameObject = new();
                     gameObject.Tag = entityGameObject.Properties.GetProperty("tag", "tag_None");
                     StringBuilder componentsData = new StringBuilder();
@@ -323,7 +294,7 @@ namespace Tiled2dot8.Process.EEI
                             int animationStyle = obj.Properties.GetPropertyInt("Style", 0);
                             int startDelay = obj.Properties.GetPropertyInt("StartDelay", 0);
                             string stepsRaw = obj.Properties.GetProperty("Steps", "");
-                            int Direction = obj.Properties.GetPropertyInt("V/H",0);
+                            int Direction = obj.Properties.GetPropertyInt("V/H", 0);
 
                             int[][] steps = stepsRaw
                                                 .Split(';')
@@ -345,8 +316,8 @@ namespace Tiled2dot8.Process.EEI
                                 lineX = (int)(next.X - current.X);
                                 lineY = (int)(next.Y - current.Y);
                                 current = next;
-                                linesX[i-1] = lineX;
-                                linesY[i-1] = lineY;
+                                linesX[i - 1] = lineX;
+                                linesY[i - 1] = lineY;
                             }
 
                             componentsData.Append("\t\tdb $").Append(linesY.Length.Byte2Hex("X2")).AppendLine("\t;\t\t Number of steps");
@@ -373,14 +344,14 @@ namespace Tiled2dot8.Process.EEI
                                 flags |= 0x80; // set start delay flag
                             }
                             componentsData.Append("\t\tdb $").Append(flags.Int2Hex("X2")).Append("\t\t; ").AppendLine("bit0 = flags Animation style 0 = Loop. 1 = Once , bit1 = Vertical = 0, Horizontal = 1, bit7 = Start Delay in frames");
-                            lengthData ++;
+                            lengthData++;
                             if (startDelay > 0)
                             {
                                 componentsData.Append("\t\tdb $").Append(startDelay.Int2Hex("X2")).AppendLine("\t\t; start delay in frames ");
                                 lengthData++;
                             }
                             //componentsData.Append("\t\tdb ").AppendLine(animationName);
-                            
+
 
                             if (!gameObject.Set)
                             {
@@ -450,30 +421,18 @@ namespace Tiled2dot8.Process.EEI
                     data.Append(componentsData);
                 }
             }
+
+
+
+
+
+            headerType.Append("\t\tdw $").Append(lengthData.ToString("X4")).Append("\t\t; Block size\r\n");
+            // insert header at begin
+            header.Insert(0, headerType);
+            header.Append(data);
+            return header;
         }
 
-        private void Machine(Layer layer)
-        {
-            headerType.Append("\t\tdb $").Append(blockType.ToString("X2")).AppendLine("\t\t; data block type");
-            header.Append("\t\tdb $").Append(layer.Objects.Count(c => c.Visible).ToString("X2")).AppendLine("\t\t; Objects count.");
-            lengthData++;
-            foreach (Entities.Object obj in layer.Objects)
-            {
-                if (obj.Visible)
-                {
-                    int x = (int)obj.X + (int)Controller.Config.Offset.x;    // middle of first sprite, left start with 0 
-                    int y = (int)obj.Y + (int)Controller.Config.Offset.y;
-
-
-                    int spritePatternId = obj.Properties.GetPropertyInt("SpriteName");
-                    int flagId = obj.Properties.GetPropertyInt("FlagId");
-                    data.Append("\t\tdw $").Append(x.Int2Hex("X4")).Append(", $").Append(y.Int2Hex("X4")).AppendLine("\t\t; x, y.");
-                    data.Append("\t\tdb $").Append(spritePatternId.Int2Hex("X2")).AppendLine("\t\t; Sprite Name.");
-                    data.Append("\t\tdb $").Append(flagId.Int2Hex("X2")).AppendLine("\t\t; Flag Id.");
-                    lengthData += 6;
-                }
-            }
-        }
 
         private int GetPathId(int pathObjectId)
         {

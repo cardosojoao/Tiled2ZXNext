@@ -56,7 +56,7 @@ namespace Tiled2dot8
         static int ExecuteCommand(string exec, string parameters)
         {
             Console.WriteLine("execute  {0} {1}", exec, parameters);
-            ProcessStartInfo startinfo = new ProcessStartInfo(exec, parameters);
+            ProcessStartInfo startinfo = new(exec, parameters);
             startinfo.ErrorDialog = true;
             startinfo.CreateNoWindow = true;
             startinfo.UseShellExecute = false;
@@ -68,8 +68,8 @@ namespace Tiled2dot8
 
             System.Diagnostics.Process myProcess = System.Diagnostics.Process.Start(startinfo);
 
-            StringBuilder output = new StringBuilder();
-            StringBuilder error = new StringBuilder();
+            StringBuilder output = new();
+            StringBuilder error = new();
 
             // Event handlers for async output/error reading
             myProcess.OutputDataReceived += (sender, args) =>
@@ -105,7 +105,7 @@ namespace Tiled2dot8
         }
 
 
-        private void BuildList(string path, string filter, string outputFile)
+        private static void BuildList(string path, string filter, string outputFile)
         {
             var listData = Directory.EnumerateFiles(path, filter);
 

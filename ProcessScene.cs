@@ -3,27 +3,28 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Entities = TiledIO.Entities;
+using Tiled2dot8.Process;
 using TiledIO.Extensions;
+using TiledIO.Models.XML;
+using Entities = TiledIO.Entities;
 using Models = TiledIO.Models;
-using Tiled2dot8.Process.EEI;
 
 namespace Tiled2dot8
 {
     public partial class Controller
     {
-        public static string G_LAYER2 = "layer2";
-        public static string G_COLLISION = "collision";
-        public static string G_LOCATION = "location";
-        public static string G_LOCATIONS = "locations";
-        public static string G_PATH = "path";
-        public static string G_EEI = "eei";
-        public static string G_BACKGROUND = "background";
-        public static string G_STATIC = "static";
+        public static readonly string G_LAYER2 = "layer2";
+        public static readonly string G_COLLISION = "collision";
+        public static readonly string G_LOCATION = "location";
+        public static readonly string G_LOCATIONS = "location";
+        public static readonly string G_PATH = "path";
+        public static readonly string G_EEI = "gameobject";
+        public static readonly string G_BACKGROUND = "background";
+        public static readonly string G_STATIC = "static";
 
-        public static List<string> GROUPS = new List<string> { G_LAYER2, G_COLLISION, G_EEI, G_LOCATION, G_PATH, G_BACKGROUND,G_STATIC };
+        public static readonly List<string> GROUPS = new List<string> { G_LAYER2, G_COLLISION, G_EEI, G_LOCATION, G_PATH, G_BACKGROUND,G_STATIC };
 
-        public StringBuilder ProcessScene(Entities.Scene scene)
+        public static StringBuilder ProcessScene(Entities.Scene scene)
         {
             StringBuilder processesCode = new(4096);
             StringBuilder sceneCode = new(2048);
@@ -53,7 +54,7 @@ namespace Tiled2dot8
             return sceneCode;
         }
 
-        private List<IProcess> CreateProcesses(List<Entities.Layer> layers, Entities.Scene scene, List<Entities.Property> properties)
+        private static List<IProcess> CreateProcesses(List<Entities.Layer> layers, Entities.Scene scene, List<Entities.Property> properties)
         {
             List<IProcess> blocks = new();
             blocks.Add(new ProcessBackgroundColour(null, scene, properties));   // add default process for set background colour
@@ -107,9 +108,9 @@ namespace Tiled2dot8
                     {
                         blocks.Add(new ProcessPaths(group, scene, properties));
                     }
-                    else if (group.Name.Equals("eei", System.StringComparison.InvariantCultureIgnoreCase))
+                    else if (group.Name.Equals("gameobject", System.StringComparison.InvariantCultureIgnoreCase))
                     {
-                        blocks.Add(new ProcessEei(group, scene, properties));
+                        blocks.Add(new ProcessGameObject(group, scene, properties));
                     }
                     else if (group.Name.Equals("static", System.StringComparison.InvariantCultureIgnoreCase))
                     {

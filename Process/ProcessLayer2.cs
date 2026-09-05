@@ -5,7 +5,7 @@ using TiledIO.Entities;
 using TiledIO.Extensions;
 using Tiled2dot8.ProcessLayers;
 
-namespace Tiled2dot8
+namespace Tiled2dot8.Process
 {
     public class ProcessLayer2 : IProcess
     {
@@ -185,9 +185,9 @@ namespace Tiled2dot8
             if (cell.TileID > 0)
             {
                 uint tileId = cell.TileID;
-                const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;  // bit 3: mirror X    //  1000    8 /2    = 4
-                const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;    // bit 2: mirror Y    //  0100    4 /2    = 2
-                const uint FLIPPED_ROTATE90_FLAG = 0x20000000;      // bit 1: Rotate      //  0010    10/2    = 5
+                //const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;  // bit 3: mirror X    //  1000    8 /2    = 4
+                //const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;    // bit 2: mirror Y    //  0100    4 /2    = 2
+                //const uint FLIPPED_ROTATE90_FLAG = 0x20000000;      // bit 1: Rotate      //  0010    10/2    = 5
                 const uint MASK = 0xe0000000;
 
                 uint extend = tileId & (MASK);

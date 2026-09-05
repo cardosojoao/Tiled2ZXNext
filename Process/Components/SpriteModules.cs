@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Entities = TiledIO.Entities;
 using TiledIO.Extensions;
+using Entities = TiledIO.Entities;
 
 namespace Tiled2dot8.Process.Components
 {

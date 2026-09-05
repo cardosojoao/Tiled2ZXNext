@@ -93,31 +93,6 @@ namespace Tiled2dot8
             }
         }
 
-
-        private void DebugTest()
-        {
-            Layer layer = new();
-            layer.Width = 10;
-            layer.Height = 10;
-            layer.Data = new List<uint>(100){ 
-                0,0,0,0,0,0,0,0,0,0,
-                0,1,1,1,0,0,0,0,0,0,
-                0,1,1,1,0,0,0,0,0,0,
-                0,1,1,1,0,0,0,0,0,0,
-                0,1,1,0,0,0,0,0,0,0,
-                0,1,1,0,0,0,0,0,0,0,
-                0,1,1,0,0,0,0,0,0,0,
-                0,0,0,0,0,0,0,0,0,0,
-                0,1,1,1,0,0,0,0,0,0,
-                0,1,1,1,0,0,0,0,0,0
-            };
-
-            LayerScanFill scan = new(layer);
-            scan.Scan();
-             
-
-
-        }
     }
 
 

@@ -5,7 +5,7 @@ using TiledIO.Entities;
 using TiledIO.Extensions;
 using Tiled2dot8.ProcessLayers;
 
-namespace Tiled2dot8.Process.EEI
+namespace Tiled2dot8.Process
 {
     /// <summary>
     /// Process Environment Element Interaction scrap

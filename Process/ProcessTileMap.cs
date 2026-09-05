@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
-using TiledIO.Extensions;
 using TiledIO.Entities;
-using System;
+using TiledIO.Extensions;
 
-namespace Tiled2dot8
+namespace Tiled2dot8.Process
 {
     public class ProcessTileMap : IProcess
     {
@@ -67,9 +67,9 @@ namespace Tiled2dot8
                         uint tileId = (uint)layer.Data[index];
                         if (tileId > 0)
                         {
-                            const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;  // bit 3: mirror X    //  1000    8 /2    = 4
-                            const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;    // bit 2: mirror Y    //  0100    4 /2    = 2
-                            const uint FLIPPED_ROTATE90_FLAG = 0x20000000;      // bit 1: Rotate      //  0010    10/2    = 5
+                            //const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;  // bit 3: mirror X    //  1000    8 /2    = 4
+                            //const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;    // bit 2: mirror Y    //  0100    4 /2    = 2
+                            //const uint FLIPPED_ROTATE90_FLAG = 0x20000000;      // bit 1: Rotate      //  0010    10/2    = 5
                             // 1010 0 00 00 00
                             const uint MASK = 0xe0000000;
 

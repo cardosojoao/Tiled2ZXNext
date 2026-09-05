@@ -4,7 +4,7 @@ using System.IO;
 using TiledIO.Entities;
 using Entities = TiledIO.Entities;
 
-namespace Tiled2dot8
+namespace Tiled2dot8.WorldProcess
 {
     public class WorldUpdate
     {
@@ -25,7 +25,7 @@ namespace Tiled2dot8
             GetMatrix(world.Maps);
             ProcessWorld proc = new ProcessWorld(world);
             var worldProc = proc.Execute();
-            string worldName = Path.GetFileName(args.Input);
+            //string worldName = Path.GetFileName(args.Input);
             File.WriteAllText(args.Output, worldProc.ToString());
         }
 
@@ -87,28 +87,12 @@ namespace Tiled2dot8
             // allocate rooms
             foreach (var map in maps)
             {
-                if (true)
-                {
+
                     map.X += offsetX;
                     map.X1 += map.X;
                     map.Y += offsetY;
                     map.Y1 += map.Y;
                     map.Id = int.Parse(map.FileName.Substring(map.FileName.Length - 8, 3));
-                }
-                else
-                {
-                    if (minX < 0)
-                    {
-                        map.X += Math.Abs(minX);
-                    }
-                    if (minY < 0)
-                    {
-                        map.Y += Math.Abs(minY);
-                    }
-                    map.X1 = map.X;
-                    map.Y1 = map.Y;
-                    map.Id = int.Parse(map.FileName.Substring(map.FileName.Length - 8, 3));
-                }
             }
 
             foreach (var map in maps)
