@@ -113,7 +113,7 @@ namespace Tiled2dot8
                     }
                     else if (group.Name.Equals("static", System.StringComparison.InvariantCultureIgnoreCase))
                     {
-                        blocks.Add(new ProcessStatic(group, scene, properties));
+                        blocks.Add(new ProcessSpriteStatic(group, scene, properties));
                     }
                 }
             }

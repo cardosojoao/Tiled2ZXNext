@@ -2,11 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using TiledIO.Entities;
-using TiledIO.Mapper;
-using TiledIO.Models;
 using Model = TiledIO.Models;
-using Entity = TiledIO.Entities;
 
 namespace Tiled2dot8
 {
@@ -17,9 +13,6 @@ namespace Tiled2dot8
             List<string> spriteInfo = LoadSpritesInfo(args.Input);
             string projectRaw = File.ReadAllText(args.Project);
             Model.Project projectData = JsonSerializer.Deserialize<Model.Project>(projectRaw);
-            Entity.Project project= new Entity.Project();
-            ProjectMapper.Map(projectData, project, args.Input,"");
-
             Model.EnumPropertyType propData =  (Model.EnumPropertyType)projectData.PropertyTypes.Find(x => string.Equals(x.Name, args.PropertyType, StringComparison.OrdinalIgnoreCase));
             propData.Values = spriteInfo;
 
