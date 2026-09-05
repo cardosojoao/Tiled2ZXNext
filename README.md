@@ -1,12 +1,12 @@
 # Tiled2ZXNext
 
-Tiled2ZXNext converts Tiled JSON maps into Z80 assembly for a ZX Spectrum Next game. It can assemble scenes with sjasmplus, compress the resulting binaries with ZX0, generate world-neighbour tables, and update tileset and sprite metadata.
+Tiled2ZXNext converts Tiled JSON maps into Z80 assembly for a ZX Spectrum Next game. It assembles scenes with sjasmplus, compresses the resulting binaries with ZX0, generates world-neighbour tables, and updates tileset and sprite metadata.
 
-The project is in preview. Its scene format requires game-specific Tiled properties and assembly symbols; an arbitrary Tiled map will need preparation before conversion. The executable and solution retain the name `Tiled2dot8`.
+This project is in preview and targets game developers who can adapt their Tiled maps and assembly symbols to the expected scene format. The scene format requires game-specific Tiled properties and assembly symbols; an arbitrary Tiled map will need preparation before conversion. The executable and solution retain the name `Tiled2dot8`.
 
 ## Requirements and build
 
-- .NET 10 SDK.
+-.NET 10 SDK (or later).
 - Tiled JSON maps and their referenced tilesets and templates.
 - A GIMP palette (`.gpl`) for scene conversion.
 - sjasmplus and ZX0 for the configured scene post-processing pipeline.
@@ -28,7 +28,7 @@ dotnet run --no-launch-profile -- scene --help
 
 ## Scene configuration
 
-Edit [appconfig.json](appconfig.json) to point to your local tools before converting a scene. It is copied to the build output directory; rebuild after changing it if running the built executable directly.
+Edit [appconfig.json](appconfig.json) to point to your local tools before converting a scene. It is copied to the build output directory; rebuild after changing it if you run the built executable directly.
 
 ```json
 {
@@ -100,7 +100,7 @@ Map filenames must end in three digits followed by `.json`, for example `Chapter
 dotnet run --no-launch-profile -- patterns -i "C:\game\tilesheets,C:\game\sprites"
 ```
 
-`--input` is required and accepts comma-separated directories. Each directory is searched recursively for `.tsx` files. The command creates or updates a `.metadata` file alongside each referenced tileset image, recording tile dimensions, columns, rows, and image path. It expects image-based tilesets with a nonzero column count.
+`--input` is required and accepts comma-separated directories (no spaces around commas). Each directory is searched recursively for `.tsx` files. The command creates or updates a `.metadata` file alongside each referenced tileset image, recording tile dimensions, columns, rows, and image path. It expects image-based tilesets with a nonzero column count.
 
 ### Assign tilesheet IDs
 
@@ -138,7 +138,7 @@ The converter dispatches visible group layers by name, ignoring case:
 | `collision` | Collision objects. |
 | `location`  | Named location. |
 | `path` | Paths. |
-| `eei` | Game objects with components; supported child blocks use integer property `Type = 17`. |
+| `gameobject` | Game objects with components. |
 | `static` | Static tile sprites, including sprites in nested visible layers. |
 
 Keep a root `layer2` group with a tile layer as its first child: scene dimensions are read from that child. The palette must contain the background colour; when no `BackgroundColour` layer is defined, the converter uses black.
@@ -147,11 +147,11 @@ Layer and object properties are part of the game's data contract. Block `Type` v
 
 Static sprites use tile objects with a GID. A tile or tileset `Name` property supplies the `<NAME>_PATTERN_ID` symbol. Hidden objects and hidden child layers are excluded, and non-tile objects are skipped. Tile metadata is looked up by tile ID, allowing sparse metadata entries.
 
-For software `SpriteComponent` objects, use `SpriteName` directly or a tile GID with a `Name` property. Also supply `SpriteIndex` or `FlagName`. Optional `OffSetX` and `OffSetY` properties support offsets on either or both axes. Other supported component classes are `ParameterComponent`, `SpriteHWComponent`, `ColliderComponent`, `AnimationComponent`, `ForceComponent`, and `PathComponent`; their properties are defined in [ProcessObjectComponents.cs](Process/Components/ProcessObjectComponents.cs).
+For software `SpriteComponent` objects, use `SpriteName` directly or a tile GID with a `Name` property. Also supply `SpriteIndex` (numeric index) or `FlagName` (symbolic flag). Optional `OffSetX` and `OffSetY` properties support offsets on either or both axes. Other supported component classes are `ParameterComponent`, `SpriteHWComponent`, `ColliderComponent`, `AnimationComponent`, `ForceComponent`, and `PathComponent`; their properties are defined in [ProcessObjectComponents.cs](Process/Components/ProcessObjectComponents.cs).
 
 ## Validation
 
-Build and run the sprite regression checks from the repository root using PowerShell hosted on .NET 10:
+Build and run the sprite regression checks from the repository root using PowerShell (requires .NET 10):
 
 ```powershell
 dotnet build
@@ -162,8 +162,8 @@ The checks cover nested static sprites, visibility and record counts, sparse til
 
 ## Current limitations
 
-- The implementation and post-processing paths are oriented toward Windows.
-- `scene --verbose` currently prints diagnostic messages and skips conversion; omit it when exporting scenes.
-- The project depends on game-specific metadata and assembly includes, and does not validate every input constraint before processing.
-- The `tilemap` processor exists but its group name is absent from the recognized group list, so it is not currently dispatched as a tilemap block.
-- The checked-in configuration and launch profiles need local path changes before use.
+-. The implementation and post-processing paths are oriented toward Windows.
+-. `scene --verbose` currently prints diagnostic messages and skips conversion; omit it when exporting scenes.
+-. The project depends on game-specific metadata and assembly includes, and does not validate every input constraint before processing.
+-. The `tilemap` processor exists but its group name is absent from the recognized group list, so it is not currently dispatched as a tilemap block.
+-. The checked-in configuration and launch profiles contain development-machine paths and must be updated before use.
