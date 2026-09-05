@@ -69,7 +69,7 @@ namespace Tiled2dot8.Process.Components
             }
 
             // offset x, y
-            if (offSetX != 0 && offSetY != 0)
+            if (offSetX != 0 || offSetY != 0)
             {
                 lengdata += 2;
                 bitFlags |= 0x20;

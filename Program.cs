@@ -12,7 +12,12 @@ namespace Tiled2dot8
 
             try
             {
-                Console.WriteLine("Tiled 2 Dot8 " + Assembly.GetEntryAssembly().GetName().Version);
+
+                string version = Assembly.GetEntryAssembly()?
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                    .InformationalVersion;
+
+                Console.WriteLine($"Tiled 2 Dot8 {version}");
 
                 Parser.Default.ParseArguments<SceneOptions, PatternsOptions, WorldOptions, TileSheetOptions,SpritetOptions>(args)
                     .WithParsed<SceneOptions>(options =>

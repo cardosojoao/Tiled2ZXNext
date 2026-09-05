@@ -21,7 +21,7 @@ namespace Tiled2dot8
         public static string G_BACKGROUND = "background";
         public static string G_STATIC = "static";
 
-        public static List<string> GROUPS = new List<string> { G_LAYER2, G_COLLISION, G_EEI, G_LOCATION, G_LOCATIONS, G_PATH, G_BACKGROUND,G_STATIC };
+        public static List<string> GROUPS = new List<string> { G_LAYER2, G_COLLISION, G_EEI, G_LOCATION, G_PATH, G_BACKGROUND,G_STATIC };
 
         public StringBuilder ProcessScene(Entities.Scene scene)
         {
@@ -99,7 +99,7 @@ namespace Tiled2dot8
                     {
                         blocks.Add(new ProcessTileMap(group, scene, properties));
                     }
-                    else if (group.Name.Equals("locations", System.StringComparison.InvariantCultureIgnoreCase) || group.Name.Equals("location", System.StringComparison.InvariantCultureIgnoreCase))
+                    else if (group.Name.Equals("location", System.StringComparison.InvariantCultureIgnoreCase))
                     {
                         blocks.Add(new ProcessLocations(group, scene, properties));
                     }

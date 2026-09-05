@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -70,11 +70,12 @@ namespace Tiled2dot8
             }
 
 
-            header.Append("\t\tdb $").Append(staticSpriteGroup.Objects.Count(c => c.Visible && (c.Type == string.Empty)).ToString("X2")).Append("\t\t; Objects count\r\n");
+            var sprites = GetVisibleSprites(staticSpriteGroup).ToList();
+            header.Append("\t\tdb $").Append(sprites.Count.ToString("X2")).Append("\t\t; Objects count\r\n");
             lengthData += 1;
 
 
-            RecursiveScan(staticSpriteGroup);
+            WriteSprites();
 
             // size must be 2B long (map is over 256 Bytes)
             headerType.Append("\t\tdw $").Append(lengthData.ToString("X4")).Append("\t\t; Block size\r\n");
@@ -84,51 +85,74 @@ namespace Tiled2dot8
             return header;
 
 
-            void RecursiveScan( Layer staticSpriteGroup)
+            void WriteSprites()
             {
-                foreach (var staticSprite in staticSpriteGroup.Objects)
+                foreach (var staticSprite in sprites)
                 {
-                    if (staticSprite.Visible)
+                    TechHeader.Add("spritestatic", 1);
+                    if (staticSprite.Properties == null)
                     {
-                        if(staticSprite.Type == "objectgroup")
-                        {
-                            data.AppendLine($"\t\t;\tGroup Sprite Static - {staticSprite.Id} - {staticSprite.Name}");
-                            RecursiveScan(staticSpriteGroup);
-                        }
-
-                        TechHeader.Add("spritestatic", 1);
-                        if (staticSprite.Properties == null)
-                        {
-                            staticSprite.Properties = new List<Property>();
-                        }
-
-                        uint gid = (uint)staticSprite.Gid;
-                        const uint FLIPPED_HORIZONTALLY_FLAG = 0x80000000;  // bit 3: mirror X    //  1000    8 /2    = 4
-                        const uint FLIPPED_VERTICALLY_FLAG = 0x40000000;    // bit 2: mirror Y    //  0100    4 /2    = 2
-                        const uint MASK = 0xc0000000;
-                        uint extend = gid & (MASK);
-                        // 0b11000000_00000000_00000000_00000000;
-                        // 0b00000000_00000000_00000000_11000000;
-                        extend >>= 24;                     // bit 31 -> bit 7
-                        gid &= 0xffff;
-                        var gidData = _scene.GetParsedGid((int)gid);     // tile index is 0 based
-                        int tileIndex = (int)gid - gidData.tileSheet.Firstgid;
-                        var props = gidData.tileSheet.Tiles.Count > 0 ? gidData.tileSheet.Tiles[tileIndex].Properties : new List<Property>();
-                        PropertyExtensions.Merge(staticSprite.Properties, props);
-                        PropertyExtensions.Merge(staticSprite.Properties, gidData.tileSheet.Properties);
-
-                        data.AppendLine($"\t\t;\tSprite Static - {staticSprite.Id}");
-                        data.Append("\t\tdw $").Append(((int)staticSprite.X).Int2Hex("X4")).Append(", $").Append(((int)staticSprite.Y).Int2Hex("X4")).AppendLine("\t\t; X,Y");
-                        data.Append("\t\tdb ").Append(staticSprite.Properties.GetProperty("Name").ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
-
-                        tileIndex ^= (int)extend;     // apply extend to tile index, so we can use it in pattern table to flip the tile if needed
-                        data.Append("\t\tdb $").Append(tileIndex.ToString("X2")).AppendLine("\t\t; bit 7,6 = flip horizontal/vertical bit 5..0 Pattern Index");
-                        lengthData += 6;
+                        staticSprite.Properties = new List<Property>();
                     }
+
+                    uint gid = (uint)staticSprite.Gid;
+                    const uint MASK = 0xc0000000;
+                    uint extend = gid & (MASK);
+                    // 0b11000000_00000000_00000000_00000000;
+                    // 0b00000000_00000000_00000000_11000000;
+                    extend >>= 24;                     // bit 31 -> bit 7
+                    gid &= 0xffff;
+                    var gidData = _scene.GetParsedGid((int)gid);     // tile index is 0 based
+                    if (gidData.tileSheet == null)
+                    {
+                        throw new InvalidOperationException($"Static sprite {staticSprite.Id} references unknown tile GID {gid}.");
+                    }
+                    int tileIndex = (int)gid - gidData.tileSheet.Firstgid;
+                    var props = gidData.tileSheet.Tiles?.Find(tile => tile.ID == (uint)tileIndex)?.Properties ?? new List<Property>();
+                    PropertyExtensions.Merge(staticSprite.Properties, props);
+                    PropertyExtensions.Merge(staticSprite.Properties, gidData.tileSheet.Properties);
+
+                    data.AppendLine($"\t\t;\tSprite Static - {staticSprite.Id}");
+                    data.Append("\t\tdw $").Append(((int)staticSprite.X).Int2Hex("X4")).Append(", $").Append(((int)staticSprite.Y).Int2Hex("X4")).AppendLine("\t\t; X,Y");
+                    data.Append("\t\tdb ").Append(staticSprite.Properties.GetProperty("Name").ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
+
+                    tileIndex ^= (int)extend;     // apply extend to tile index, so we can use it in pattern table to flip the tile if needed
+                    data.Append("\t\tdb $").Append(tileIndex.ToString("X2")).AppendLine("\t\t; bit 7,6 = flip horizontal/vertical bit 5..0 Pattern Index");
+                    lengthData += 6;
                 }
 
 
 
+            }
+        }
+
+        private static IEnumerable<TiledIO.Entities.Object> GetVisibleSprites(Layer layer)
+        {
+            if (!layer.Visible)
+            {
+                yield break;
+            }
+
+            if (layer.Objects != null)
+            {
+                foreach (var obj in layer.Objects)
+                {
+                    if (obj.Visible && obj.Gid.HasValue && obj.Gid.Value != 0)
+                    {
+                        yield return obj;
+                    }
+                }
+            }
+
+            if (layer.Layers != null)
+            {
+                foreach (var child in layer.Layers)
+                {
+                    foreach (var sprite in GetVisibleSprites(child))
+                    {
+                        yield return sprite;
+                    }
+                }
             }
         }
     }

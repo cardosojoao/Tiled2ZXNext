@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using Tiled2dot8.Process.Components;
 using TiledIO.Entities;
@@ -145,23 +144,31 @@ namespace Tiled2dot8.Process.EEI
                             TechHeader.Add("sprite", 1);
                             gameObject.Components |= ((int)ComponentFlags.Sprite);
                             componentsData.AppendLine($"\t\t;\tSprite Modular Component - {obj.Id}");
-                            ///////////////////////////////////////////////
-                            uint gid = (uint)obj.Gid;
-                            gid &= 0xffff;
-                            var gidData = _scene.GetParsedGid((int)gid);     // tile index is 0 based
-                            int tileIndex = (int)gid - gidData.tileSheet.Firstgid;
-                            var props = gidData.tileSheet.Tiles.Count > 0 ? gidData.tileSheet.Tiles[tileIndex].Properties : new List<Property>();
-                            PropertyExtensions.Merge(obj.Properties, props);
-                            PropertyExtensions.Merge(obj.Properties, gidData.tileSheet.Properties);
+                            obj.Properties ??= new List<Property>();
+                            if (obj.Gid.HasValue && obj.Gid.Value != 0)
+                            {
+                                uint gid = obj.Gid.Value & 0xffff;
+                                var gidData = _scene.GetParsedGid((int)gid);
+                                if (gidData.tileSheet == null)
+                                {
+                                    throw new InvalidOperationException($"Sprite component {obj.Id} references unknown tile GID {gid}.");
+                                }
+                                int tileIndex = (int)gid - gidData.tileSheet.Firstgid;
+                                var props = gidData.tileSheet.Tiles?.Find(tile => tile.ID == (uint)tileIndex)?.Properties ?? new List<Property>();
+                                PropertyExtensions.Merge(obj.Properties, props);
+                                PropertyExtensions.Merge(obj.Properties, gidData.tileSheet.Properties);
+                            }
 
-
-
-                            ///////////////////////////////////////////////
-
-
-
-
-                            componentsData.Append("\t\tdb ").Append(obj.Properties.GetProperty("Name").ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
+                            string spriteName = obj.Properties.GetProperty("SpriteName");
+                            if (string.IsNullOrWhiteSpace(spriteName))
+                            {
+                                spriteName = obj.Properties.GetProperty("Name");
+                            }
+                            if (string.IsNullOrWhiteSpace(spriteName))
+                            {
+                                throw new InvalidOperationException($"Sprite component {obj.Id} requires SpriteName or a tile Name property.");
+                            }
+                            componentsData.Append("\t\tdb ").Append(spriteName.ToUpper()).Append("_PATTERN_ID").AppendLine("\t\t; PatternId");
                             // componentsData.Append("\t\tdb $").Append(obj.Properties.GetPropertyInt("Attributes",0).Int2Hex("X2")).AppendLine("\t\t; Sprite Attributes");
                             componentsData.Append(SpriteModules.WriteObjectsLayer(obj, ref lengthData));
 
